@@ -1,0 +1,30 @@
+---
+import "/src/styles/global.css";
+
+const { title } = Astro.props;
+---
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="generator" content={Astro.generator} />
+        <title>{title}</title>
+    </head>
+
+    <body>
+        <div class="w-1/2 h-full bg-pink-600 ml-auto mr-auto">
+            <div class="">
+                <h1
+                    class="bg-amber-600 font-extrabold flex justify-center items-center"
+                >
+                    I code using {title}
+                </h1>
+            </div>
+            <div>
+                <slot />
+            </div>
+        </div>
+    </body>
+</html>
