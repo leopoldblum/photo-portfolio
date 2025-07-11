@@ -30,3 +30,5 @@
 - scroll to top button
 - image carousels
 - cursor animation shenanigans?
+
+- sidewards scrolling?
