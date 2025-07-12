@@ -1,3 +1,4 @@
+import { Doc, ImageWrapper } from '@/types/apiTypes';
 import type { CollectionConfig } from 'payload';
 
 export const PhotoSet: CollectionConfig = {
@@ -37,11 +38,11 @@ export const PhotoSet: CollectionConfig = {
                     label: "Display this Picture on front page? (up to 2 in total)"
                 }
             ],
-            validate: (pics) => {
-                const thumbnails: any = pics?.filter((pic: any) => pic.isThumbnail === true);
-                if (thumbnails?.length > 2) {
-                    return ("You can only select up to 2 thumbnails")
-                }
+            validate: (pics: any) => {
+                console.log(pics)
+                const thumbnails: ImageWrapper[] = pics?.filter((pic: ImageWrapper) => pic.isThumbnail === true);
+                if (thumbnails.length > 2) return ("You can only select up to 2 thumbnails")
+                if (thumbnails.length === 0) return ("You have to pick atleast 1 thumbnail")
                 return true;
             }
         },
