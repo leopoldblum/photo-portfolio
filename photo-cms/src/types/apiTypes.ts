@@ -30,6 +30,7 @@ export interface Project {
 
 export interface ImageWrapper {
     image: Image;
+    isThumbnail: boolean;
     id: string;
 }
 

@@ -181,6 +181,7 @@ export interface PhotoSet {
   project: string | Project;
   images: {
     image: string | Media;
+    isThumbnail?: boolean | null;
     id?: string | null;
   }[];
   updatedAt: string;
@@ -312,6 +313,7 @@ export interface PhotoSetSelect<T extends boolean = true> {
     | T
     | {
         image?: T;
+        isThumbnail?: T;
         id?: T;
       };
   updatedAt?: T;
