@@ -10,13 +10,29 @@ const sets: ApiResponse = await res.json();
 ---
 
 <Layout title="ok got it">
-    <h1 class="font-extrabold text-5xl">
+    <!-- <h1 class="font-extrabold text-5xl">
         {sets.docs[0].project.title}
     </h1>
 
     {
-        sets.docs[0].images.map((imgWrapper) => (
-            <ImageDisplay srcImage={imgWrapper.image} />
+        sets.docs.map((sets) => (
+            <ImageDisplay srcImage={sets.} />
+        ))
+    } -->
+
+    {
+        sets.docs.map( (projectSet) => (
+            <h1 class="font-extrabold text-5xl bg-teal-400/50">
+                {projectSet.project.title}
+            </h1>
+
+            <div class="bg-fuchsia-400/20">
+                {
+                    projectSet.images.map( (image) => (
+                        <ImageDisplay srcImage={image.image} />
+                    ))
+                }
+            </div>
         ))
     }
 </Layout>
