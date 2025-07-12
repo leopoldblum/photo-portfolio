@@ -1,10 +1,22 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import type { ApiResponse } from "../../../photo-cms/src/types/apiTypes.ts";
 import "/src/styles/global.css";
 
 import ImageDisplay from "../components/ImageDisplay.astro";
+
+const res = await fetch("http://localhost:3001/api/photoSet/");
+const sets: ApiResponse = await res.json();
 ---
 
 <Layout title="ok got it">
-    <ImageDisplay />
+    <h1 class="font-extrabold text-5xl">
+        {sets.docs[0].project.title}
+    </h1>
+
+    {
+        sets.docs[0].images.map((imgWrapper) => (
+            <ImageDisplay srcImage={imgWrapper.image} />
+        ))
+    }
 </Layout>

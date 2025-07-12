@@ -1,18 +1,24 @@
 ---
 import { Image } from "astro:assets";
 import samplePic from "../../src/pictures/drain bg.webp";
+import type { Image as cmsImage } from "../../../photo-cms/src/types/apiTypes.ts";
+
+interface Props {
+    srcImage: cmsImage;
+}
+
+const { srcImage } = Astro.props;
 ---
 
-<div class="flex flex-col gap-10 py-10 bg-orange-300">
+<div class="flex flex-col gap-10 py-10">
     <div class="flex justify-center items-center">
-        <Image src={samplePic} alt={"drain your life"} width={500} />
-    </div>
-
-    <div class="flex justify-center items-center">
-        <Image
-            src={samplePic}
-            alt={"take a knife and drain your life"}
-            width={500}
-        />
+        <div class="w-[600px]">
+            <Image
+                src=`http://localhost:3001/${srcImage.url}`
+                alt={"take a knife and drain your life"}
+                height={srcImage.height}
+                width={srcImage.width}
+            />
+        </div>
     </div>
 </div>
