@@ -6,20 +6,25 @@ import "/src/styles/global.css";
 import ImageDisplay from "../components/ImageDisplay.astro";
 
 const res = await fetch("http://localhost:3001/api/photoSet/");
-const sets: ApiResponse = await res.json();
+const photoSetsJSON: ApiResponse = await res.json();
+
+const photoSetsArray = photoSetsJSON.docs;
 ---
 
 <Layout title="ok got it">
 
     {
-        sets.docs.map( (projectSet) => (
+        photoSetsArray.map( (photoSet) => (
+            
+            // Title
             <h1 class="font-extrabold text-5xl">
-                {projectSet.project.title}
+                {photoSet.project.title}
             </h1>
 
+            // Display Thumbnails here
             <div class="">
                 {
-                    projectSet.images.filter((image) => image.isThumbnail).map( (image) => (
+                    photoSet.images.filter((image) => image.isThumbnail).map( (image) => (
                         <ImageDisplay srcImage={image.image} />
                     ))
                 }
