@@ -15,17 +15,9 @@ const photoSetsArray = photoSetsJSON.docs;
     {
         photoSetsArray.map((photoSet) => (
             <>
-                {/* Title */}
-                <h1 class="font-extrabold text-5xl">
-                    {photoSet.project.title}
-                </h1>
                 {/* Display Thumbnails here */}
                 <div class="">
-                    {photoSet.images
-                        .filter((image) => image.isThumbnail)
-                        .map((image) => (
-                            <ImageDisplay srcImage={image.image} />
-                        ))}
+                    <ImageDisplay photoSetImages={photoSet.images} />
                 </div>
             </>
         ))
