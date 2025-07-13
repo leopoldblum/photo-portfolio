@@ -12,20 +12,32 @@ export const Projects: CollectionConfig = {
 
     fields: [
         {
-            name: "title",
-            type: "text",
-            required: true,
+            type: 'row',
+            fields: [
+                {
+                    name: "title",
+                    type: "text",
+                    required: true,
+                    admin: {
+                        width: "75%",
+                    }
+                },
+                {
+                    name: "date",
+                    type: "date",
+                    required: true,
+                    label: "When was this project done?",
+                    admin: {
+                        width: "25%",
+                    }
+                },
+            ],
         },
         {
             name: "description",
             type: "text",
             required: false,
         },
-        {
-            name: "date",
-            type: "date",
-            required: true,
-            label: "When was this project done?"
-        }
+
     ],
 }

@@ -1,30 +1,35 @@
-import { Doc, ImageWrapper } from '@/types/apiTypes';
+import { Doc, ImageWrapper, Project } from '@/types/apiTypes';
 import type { CollectionConfig } from 'payload';
 
 export const PhotoSet: CollectionConfig = {
     slug: 'photoSet',
 
     admin: {
-        useAsTitle: 'project',
+        useAsTitle: 'title',
     },
 
     access: {
         read: () => true,
     },
-
     fields: [
         {
             name: 'project',
             type: 'relationship',
             relationTo: 'projects',
             required: true,
-            label: 'Choose the Project: ',
+            label: 'Project: ',
+            admin: {
+                description: "Choose the associated project"
+            }
         },
         {
             name: 'images',
             type: 'array',
-            label: 'Upload the Picture(s): ',
+            label: 'Pictures',
             required: true,
+            admin: {
+                description: "Upload the Picture(s) and choose 1 – 2 thumbnails which get displayed on the main page."
+            },
             fields: [
                 {
                     name: 'image',
@@ -35,15 +40,43 @@ export const PhotoSet: CollectionConfig = {
                 {
                     name: "isThumbnail",
                     type: "checkbox",
-                    label: "Display this Picture on front page? (up to 2 in total)"
+                    label: "choose as thumbnail",
                 }
             ],
             validate: (pics: any) => {
-                const thumbnails: ImageWrapper[] = pics?.filter((pic: ImageWrapper) => pic.isThumbnail === true);
+                const thumbnails: ImageWrapper[] = pics?.filter((pic: ImageWrapper) => pic.isThumbnail);
                 if (thumbnails.length > 2) return ("You can only select up to 2 thumbnails")
                 if (thumbnails.length === 0) return ("You have to pick atleast 1 thumbnail")
                 return true;
             }
+        },
+        {
+            name: 'title',
+            type: 'text',
+            admin: {
+                hidden: true,
+            },
+
+            hooks: {
+                afterRead: [
+                    async ({ data, req }) => {
+                        if (data?.project) {
+                            try {
+                                const project = await req.payload.findByID({
+                                    collection: 'projects',
+                                    id: data.project
+                                });
+
+                                return `set – ${project.title}`;
+                            } catch (error) {
+                                console.error('Error fetching project:', error);
+                                return 'Unknown Project';
+                            }
+                        }
+                        return data?.title || 'Untitled';
+                    }
+                ],
+            },
         },
     ],
 };

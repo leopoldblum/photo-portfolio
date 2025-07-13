@@ -167,8 +167,8 @@ export interface Media {
 export interface Project {
   id: string;
   title: string;
-  description?: string | null;
   date: string;
+  description?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -178,12 +178,19 @@ export interface Project {
  */
 export interface PhotoSet {
   id: string;
+  /**
+   * Choose the associated project
+   */
   project: string | Project;
+  /**
+   * Upload the Picture(s) and choose 1 – 2 thumbnails which get displayed on the main page.
+   */
   images: {
     image: string | Media;
     isThumbnail?: boolean | null;
     id?: string | null;
   }[];
+  title?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -298,8 +305,8 @@ export interface MediaSelect<T extends boolean = true> {
  */
 export interface ProjectsSelect<T extends boolean = true> {
   title?: T;
-  description?: T;
   date?: T;
+  description?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -316,6 +323,7 @@ export interface PhotoSetSelect<T extends boolean = true> {
         isThumbnail?: T;
         id?: T;
       };
+  title?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -14,20 +14,6 @@ const thumbnails = photoSetImages.filter((image) => image.isThumbnail);
 // max 2 thumbnails
 const srcImage_1 = thumbnails[0].image;
 const srcImage_2 = thumbnails[1]?.image;
-
-const img2ratio =
-    (srcImage_1.height * (srcImage_2.width / srcImage_2.height)) /
-    srcImage_1.height;
-
-console.log("--------------------------");
-console.log(`img1 normal h x b: ${srcImage_1.height} x ${srcImage_1.width}`);
-console.log(`aspect ratio: ${srcImage_1.width / srcImage_1.height} `);
-console.log("   ");
-console.log(`img2 normal h x b: ${srcImage_2.height} x ${srcImage_2.width}`);
-console.log(`aspect ratio: ${srcImage_2.width / srcImage_2.height} `);
-console.log("   ");
-console.log(`setting to height: ${srcImage_1.height}`);
-console.log(`new ratio: ${img2ratio} `);
 ---
 
 <div class="flex flex-col py-1">
