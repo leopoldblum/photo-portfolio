@@ -15,11 +15,11 @@ const srcImage_1 = thumbnails[0].image;
 const srcImage_2 = thumbnails[1]?.image;
 ---
 
-<div class="flex flex-col py-1">
+<div class="flex flex-col py-0.5 lg:py-1">
     <div
-        class="flex justify-center items-center gap-2 w-[60vw] mx-auto bg-neutral-50"
+        class="flex justify-center items-center gap-1 lg:gap-2 w-full lg:w-[60vw] mx-auto"
     >
-        <div class="h-auto w-auto bg-amber-600">
+        <div class="hover:shadow-neutral-700 hover:shadow-lg transition-all duration-500 hover:cursor-pointer hover:scale-99">
             <Image
                 src=`http://localhost:3001/${srcImage_1.url}`
                 alt=`${srcImage_1.alt}`
@@ -28,7 +28,7 @@ const srcImage_2 = thumbnails[1]?.image;
             />
         </div>
 
-        {srcImage_2 && <div class="h-auto w-auto">
+        {srcImage_2 && <div class="hover:shadow-neutral-700 hover:shadow-lg transition-all duration-300 hover:cursor-pointer hover:scale-99">
             <Image
                 src=`http://localhost:3001/${srcImage_2.url}`
                 alt=`${srcImage_2.alt}`
