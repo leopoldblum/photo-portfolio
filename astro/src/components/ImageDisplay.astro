@@ -1,6 +1,5 @@
 ---
 import { Image } from "astro:assets";
-import samplePic from "../../src/pictures/drain bg.webp";
 import type { ImageWrapper } from "../../../photo-cms/src/types/apiTypes.ts";
 
 interface Props {
@@ -18,7 +17,7 @@ const srcImage_2 = thumbnails[1]?.image;
 
 <div class="flex flex-col py-1">
     <div
-        class="flex justify-center items-center gap-2 w-[70vw] mx-auto bg-neutral-50"
+        class="flex justify-center items-center gap-2 w-[60vw] mx-auto bg-neutral-50"
     >
         <div class="h-auto w-auto bg-amber-600">
             <Image
@@ -29,7 +28,7 @@ const srcImage_2 = thumbnails[1]?.image;
             />
         </div>
 
-        <div class="h-auto w-auto">
+        {srcImage_2 && <div class="h-auto w-auto">
             <Image
                 src=`http://localhost:3001/${srcImage_2.url}`
                 alt=`${srcImage_2.alt}`
@@ -38,5 +37,6 @@ const srcImage_2 = thumbnails[1]?.image;
                     srcImage_2.height}
             />
         </div>
+        }
     </div>
 </div>
