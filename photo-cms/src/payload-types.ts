@@ -378,7 +378,6 @@ export interface WebsiteLayout {
         id?: string | null;
       }[]
     | null;
-  layouts?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -393,7 +392,6 @@ export interface WebsiteLayoutSelect<T extends boolean = true> {
         photoset?: T;
         id?: T;
       };
-  layouts?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

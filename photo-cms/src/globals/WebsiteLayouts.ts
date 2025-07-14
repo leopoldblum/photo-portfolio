@@ -45,25 +45,5 @@ export const WebsiteLayout: GlobalConfig = {
             }
 
         },
-        {
-            name: "layouts",
-            type: "text",
-            admin: {
-                hidden: true,
-            },
-            hooks: {
-                afterRead: [
-                    () => {
-                        return "Website Layout"
-                    }
-                ]
-            }
-        }
     ],
-
-    hooks: {
-        beforeValidate: [
-
-        ]
-    }
 }

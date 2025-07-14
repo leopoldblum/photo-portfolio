@@ -1,39 +1,3 @@
-export interface ApiResponse {
-    docs: Doc[];
-    totalDocs: number;
-    limit: number;
-    totalPages: number;
-    page: number;
-    pagingCounter: number;
-    hasPrevPage: boolean;
-    hasNextPage: boolean;
-    prevPage: number | null;
-    nextPage: number | null;
-}
-
-export interface Doc {
-    createdAt: string;
-    updatedAt: string;
-    project: Project;
-    images: ImageWrapper[];
-    id: string;
-}
-
-export interface Project {
-    createdAt: string;
-    updatedAt: string;
-    title: string;
-    description: string;
-    date: string;
-    id: string;
-}
-
-export interface ImageWrapper {
-    image: Image;
-    isThumbnail: boolean;
-    id: string;
-}
-
 export interface Image {
     createdAt: string;
     updatedAt: string;
@@ -48,4 +12,40 @@ export interface Image {
     id: string;
     url: string;
     thumbnailURL: string | null;
+}
+
+export interface ImageWrapper {
+    image: Image;
+    isThumbnail: boolean;
+    id: string;
+}
+
+export interface Project {
+    createdAt: string;
+    updatedAt: string;
+    title: string;
+    date: string;
+    id: string;
+}
+
+export interface Photoset {
+    createdAt: string;
+    updatedAt: string;
+    project: Project;
+    images: ImageWrapper[];
+    title: string;
+    id: string;
+}
+
+export interface PhotosetsWrapper {
+    photoset: Photoset;
+    id: string;
+}
+
+export interface WebsiteLayout {
+    createdAt: string;
+    updatedAt: string;
+    globalType: string;
+    photosets: PhotosetsWrapper[];
+    id: string;
 }
