@@ -50,7 +50,7 @@ export const PhotoSet: CollectionConfig = {
             ],
             validate: (pics: any) => {
                 const thumbnails: ImageWrapper[] = pics?.filter((pic: ImageWrapper) => pic.isThumbnail);
-                if (thumbnails.length > 2) return ("You can only select up to 2 thumbnails")
+                if (thumbnails.length > 5) return ("Youre selecting way too many thumbnails lol")
                 if (thumbnails.length === 0) return ("You have to pick atleast 1 thumbnail")
                 return true;
             }

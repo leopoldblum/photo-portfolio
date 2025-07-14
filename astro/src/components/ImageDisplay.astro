@@ -10,33 +10,27 @@ const { photoSetImages } = Astro.props;
 
 const thumbnails = photoSetImages.filter((image) => image.isThumbnail);
 
-// max 2 thumbnails
-const srcImage_1 = thumbnails[0].image;
-const srcImage_2 = thumbnails[1]?.image;
+const basePicture = thumbnails[0].image;
 ---
 
 <div class="flex flex-col py-0.5 lg:py-1">
     <div
         class="flex justify-center items-center gap-1 lg:gap-2 w-full lg:w-[60vw] mx-auto"
     >
-        <div class="hover:shadow-neutral-700 hover:shadow-lg transition-all duration-500 hover:cursor-pointer">
-            <Image
-                src=`http://localhost:3001/${srcImage_1.url}`
-                alt=`${srcImage_1.alt}`
-                height={srcImage_1.height}
-                width={srcImage_1.width}
-            />
-        </div>
-
-        {srcImage_2 && <div class="hover:shadow-neutral-700 hover:shadow-lg transition-all duration-300 hover:cursor-pointer">
-            <Image
-                src=`http://localhost:3001/${srcImage_2.url}`
-                alt=`${srcImage_2.alt}`
-                height={srcImage_1.height}
-                width={(srcImage_1.height * srcImage_2.width) /
-                    srcImage_2.height}
-            />
-        </div>
+        {
+            thumbnails.map((thumbnailImg) => (
+                <div class="hover:shadow-neutral-700 hover:shadow-lg transition-all duration-500 hover:cursor-pointer">
+                    <Image
+                        src={`http://localhost:3001/${thumbnailImg.image.url}`}
+                        alt={thumbnailImg.image.alt}
+                        height={basePicture.height}
+                        width={
+                            (basePicture.height * thumbnailImg.image.width) /
+                            thumbnailImg.image.height
+                        }
+                    />
+                </div>
+            ))
         }
     </div>
 </div>
