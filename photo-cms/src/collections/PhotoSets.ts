@@ -1,4 +1,4 @@
-import { Doc, ImageWrapper, Project } from '@/types/apiTypes';
+import { ImageWrapper } from '@/types/apiTypes';
 import type { CollectionConfig } from 'payload';
 
 export const PhotoSet: CollectionConfig = {
@@ -12,6 +12,7 @@ export const PhotoSet: CollectionConfig = {
         read: () => true,
     },
     fields: [
+
         {
             name: 'project',
             type: 'relationship',
@@ -19,7 +20,7 @@ export const PhotoSet: CollectionConfig = {
             required: true,
             label: 'Project: ',
             admin: {
-                description: "Choose the associated project"
+                description: "Choose the associated project",
             }
         },
         {
@@ -36,11 +37,15 @@ export const PhotoSet: CollectionConfig = {
                     type: 'upload',
                     relationTo: 'media',
                     required: true,
+                    displayPreview: true,
+
                 },
                 {
                     name: "isThumbnail",
                     type: "checkbox",
                     label: "choose as thumbnail",
+                    required: true,
+                    defaultValue: false,
                 }
             ],
             validate: (pics: any) => {

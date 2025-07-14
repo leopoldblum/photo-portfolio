@@ -88,8 +88,12 @@ export interface Config {
   db: {
     defaultIDType: string;
   };
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    websiteLayout: WebsiteLayout;
+  };
+  globalsSelect: {
+    websiteLayout: WebsiteLayoutSelect<false> | WebsiteLayoutSelect<true>;
+  };
   locale: null;
   user: User & {
     collection: 'users';
@@ -187,7 +191,7 @@ export interface PhotoSet {
    */
   images: {
     image: string | Media;
-    isThumbnail?: boolean | null;
+    isThumbnail: boolean;
     id?: string | null;
   }[];
   title?: string | null;
@@ -358,6 +362,41 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "websiteLayout".
+ */
+export interface WebsiteLayout {
+  id: string;
+  /**
+   * Pick your sets and organize them in display order, starting from the top.
+   */
+  photosets?:
+    | {
+        photoset: string | PhotoSet;
+        id?: string | null;
+      }[]
+    | null;
+  layouts?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "websiteLayout_select".
+ */
+export interface WebsiteLayoutSelect<T extends boolean = true> {
+  photosets?:
+    | T
+    | {
+        photoset?: T;
+        id?: T;
+      };
+  layouts?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
