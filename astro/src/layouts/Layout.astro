@@ -17,8 +17,10 @@ const { title } = Astro.props;
         <title>{title}</title>
     </head>
 
-    <body class="w-[95%] mx-auto bg-neutral-900 text-neutral-400">
+    <body class="w-[95vw] mx-auto bg-neutral-900 text-neutral-400">
         <TopBar />
-        <slot />
+        <div class="w-full lg:w-[80vw] mx-auto">
+            <slot />
+        </div>
     </body>
 </html>

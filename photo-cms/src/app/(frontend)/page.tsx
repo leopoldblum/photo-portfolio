@@ -22,9 +22,9 @@ export default async function HomePage() {
           <source srcSet="https://raw.githubusercontent.com/payloadcms/payload/main/packages/ui/src/assets/payload-favicon.svg" />
           <Image
             alt="Payload Logo"
-            height={65}
+            height={100}
             src="https://raw.githubusercontent.com/payloadcms/payload/main/packages/ui/src/assets/payload-favicon.svg"
-            width={65}
+            width={100}
           />
         </picture>
         {!user && <h1>Welcome to your new project.</h1>}

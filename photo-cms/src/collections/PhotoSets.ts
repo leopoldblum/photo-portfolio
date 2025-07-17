@@ -29,7 +29,7 @@ export const PhotoSet: CollectionConfig = {
             label: 'Pictures',
             required: true,
             admin: {
-                description: "Upload the Picture(s) and choose 1 – 2 thumbnails which get displayed on the main page."
+                description: "Upload the Picture(s) and choose 1 – 5 thumbnails which get displayed on the main page.",
             },
             fields: [
                 {
@@ -38,14 +38,13 @@ export const PhotoSet: CollectionConfig = {
                     relationTo: 'media',
                     required: true,
                     displayPreview: true,
+                    label: "Pick your image:"
 
                 },
                 {
                     name: "isThumbnail",
                     type: "checkbox",
                     label: "choose as thumbnail",
-                    required: true,
-                    defaultValue: false,
                 }
             ],
             validate: (pics: any) => {

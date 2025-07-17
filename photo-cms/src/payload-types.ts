@@ -187,11 +187,11 @@ export interface PhotoSet {
    */
   project: string | Project;
   /**
-   * Upload the Picture(s) and choose 1 – 2 thumbnails which get displayed on the main page.
+   * Upload the Picture(s) and choose 1 – 5 thumbnails which get displayed on the main page.
    */
   images: {
     image: string | Media;
-    isThumbnail: boolean;
+    isThumbnail?: boolean | null;
     id?: string | null;
   }[];
   title?: string | null;

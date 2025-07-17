@@ -14,11 +14,9 @@ const basePicture = thumbnails[0].image;
 ---
 
 <div class="flex flex-col py-0.5 lg:py-1">
-    <div
-        class="flex justify-center items-center gap-1 lg:gap-2 w-full lg:w-[60vw] mx-auto"
-    >
+    <div class="flex justify-center items-center gap-1 lg:gap-2">
         {
-            thumbnails.map((thumbnailImg) => (
+            thumbnails.map((thumbnailImg, index) => (
                 <div class="hover:shadow-neutral-700 hover:shadow-lg transition-all duration-500 hover:cursor-pointer">
                     <Image
                         src={`http://localhost:3001/${thumbnailImg.image.url}`}
@@ -28,6 +26,7 @@ const basePicture = thumbnails[0].image;
                             (basePicture.height * thumbnailImg.image.width) /
                             thumbnailImg.image.height
                         }
+                        loading={index < 2 ? "eager" : "lazy"}
                     />
                 </div>
             ))

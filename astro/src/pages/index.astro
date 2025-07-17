@@ -4,6 +4,8 @@ import type { WebsiteLayout } from "../../../photo-cms/src/types/apiTypes";
 import "/src/styles/global.css";
 
 import ImageDisplay from "../components/ImageDisplay.astro";
+import ImageCarouselVanilla from "../components/ImageCarouselVanilla.astro";
+import ImageCarouselReact from "../components/ImageCarouselReact";
 
 const res = await fetch("http://localhost:3001/api/globals/websiteLayout");
 const websitelayout: WebsiteLayout = await res.json();
@@ -16,11 +18,20 @@ const allPhotoSetWrappers = websitelayout.photosets;
         allPhotoSetWrappers.map((photoSetWrapper) => (
             <>
                 {/* Display Thumbnails here */}
-                <div class="select-none">
+                {/* <div class="select-none">
                     <ImageDisplay
                         photoSetImages={photoSetWrapper.photoset.images}
                     />
-                </div>
+                </div> */}
+                {/* 
+                <ImageCarouselVanilla
+                    photoSetImages={photoSetWrapper.photoset.images}
+                /> */}
+
+                <ImageCarouselReact
+                    client:visible
+                    photoSetWrappers={photoSetWrapper.photoset.images}
+                />
             </>
         ))
     }
