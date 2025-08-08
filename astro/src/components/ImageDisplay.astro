@@ -1,14 +1,14 @@
 ---
 import { Image } from "astro:assets";
-import type { ImageWrapper } from "../../../photo-cms/src/types/apiTypes.ts";
+import type { Photoset } from "../../../photo-cms/src/types/apiTypes.ts";
 
 interface Props {
-    photoSetImages: ImageWrapper[];
+    photoSet: Photoset;
 }
 
-const { photoSetImages } = Astro.props;
+const { photoSet } = Astro.props;
 
-const thumbnails = photoSetImages.filter((image) => image.isThumbnail);
+const thumbnails = photoSet.images.filter((image) => image.isThumbnail);
 
 const basePicture = thumbnails[0].image;
 ---
@@ -17,7 +17,7 @@ const basePicture = thumbnails[0].image;
     <div class="flex justify-center items-center gap-1 lg:gap-2">
         {
             thumbnails.map((thumbnailImg, index) => (
-                <div class="hover:shadow-neutral-700 hover:shadow-lg transition-all duration-500 hover:cursor-pointer">
+                <div class=" transition-all duration-300 ring-neutral-600 hover:ring-2">
                     <Image
                         src={`http://localhost:3001/${thumbnailImg.image.url}`}
                         alt={thumbnailImg.image.alt}
@@ -27,6 +27,7 @@ const basePicture = thumbnails[0].image;
                             thumbnailImg.image.height
                         }
                         loading={index < 2 ? "eager" : "lazy"}
+                        draggable={false}
                     />
                 </div>
             ))

@@ -1,9 +1,11 @@
 import { useState } from "react";
-import type { ImageWrapper } from "../../../photo-cms/src/types/apiTypes";
-import { AnimatePresence, motion, spring } from "motion/react"
+import type { Photoset } from "../../../photo-cms/src/types/apiTypes";
+import { AnimatePresence, motion } from "motion/react"
+import { setCursorText } from "../components/CustomCursor";
 
 
-const ImageCarouselReact = ({ photoSetWrappers }: { photoSetWrappers: ImageWrapper[] }) => {
+
+const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
 
     const [imageIndex, setImageIndex] = useState(0)
     const [direction, setDirection] = useState(1)
@@ -12,34 +14,34 @@ const ImageCarouselReact = ({ photoSetWrappers }: { photoSetWrappers: ImageWrapp
         setDirection(-1)
 
         if (imageIndex > 0) setImageIndex(prev => prev - 1)
-        else setImageIndex(photoSetWrappers.length - 1)
+        else setImageIndex(photoSet.images.length - 1)
     }
 
     const scrollRight = () => {
         setDirection(1)
 
-        if (imageIndex < photoSetWrappers.length - 1) setImageIndex(prev => prev + 1)
+        if (imageIndex < photoSet.images.length - 1) setImageIndex(prev => prev + 1)
         else setImageIndex(0)
     }
 
     const sliderVariants = {
         incoming: (direction: number) => ({
-            x: direction > 0 ? "100%" : "-100%",
+            x: direction > 0 ? "200px" : "-200px",
             opacity: 0
         }),
         active: { x: 0, opacity: 1 },
-        exit: (direction: any) => ({
-            x: direction > 0 ? "-100%" : "100%",
-            opacity: 0.2
+        exit: (direction: number) => ({
+            x: direction > 0 ? "-200px" : "200px",
+            opacity: 0
         })
     }
 
 
     return (
-        <>
-            <div className="flex items-center justify-center mt-20 h-[80vh] w-full relative ">
+        <div className="">
+            <div className="flex items-center justify-center mt-20  w-full relative overflow-x-clip">
 
-                <div className="flex justify-center items-center cursor-pointer p-5 font-extrabold text-4xl h-full absolute left-0 w-2/6"
+                <div className="flex justify-center items-center p-5 font-extrabold text-4xl h-full absolute w-1/6 left-0 select-none z-10"
                     onClick={scrollLeft}
                 >
                     {`<`}
@@ -47,9 +49,10 @@ const ImageCarouselReact = ({ photoSetWrappers }: { photoSetWrappers: ImageWrapp
 
                 <AnimatePresence mode="wait" initial={false} custom={direction}>
                     <motion.img
-                        key={photoSetWrappers[imageIndex].image.url}
-                        src={`http://localhost:3001/${photoSetWrappers[imageIndex].image.url}`}
-                        className="object-contain h-[80vh] w-full"
+                        loading="eager"
+                        key={photoSet.images[imageIndex].image.url}
+                        src={`http://localhost:3001/${photoSet.images[imageIndex].image.url}`}
+                        className="object-contain h-[80vh] w-full z-0"
                         custom={direction}
                         variants={sliderVariants}
                         initial="incoming"
@@ -61,11 +64,14 @@ const ImageCarouselReact = ({ photoSetWrappers }: { photoSetWrappers: ImageWrapp
                         onDragEnd={(e, info) => {
                             if (info.offset.x < 100) scrollRight();
                             else if (info.offset.x > -100) scrollLeft();
-                        }}
+                        }
+                        }
+                        onMouseEnter={() => setCursorText(photoSet.project.title)}
+                        onMouseLeave={() => setCursorText("O")}
                     />
                 </AnimatePresence>
 
-                <div className="flex justify-center items-center cursor-pointer p-5 font-extrabold text-4xl h-full absolute right-0 w-2/6"
+                <div className="flex justify-center items-center p-5 font-extrabold text-4xl h-full absolute w-1/6 right-0 select-none z-10"
                     onClick={scrollRight}
                 >
                     {`>`}
@@ -73,21 +79,15 @@ const ImageCarouselReact = ({ photoSetWrappers }: { photoSetWrappers: ImageWrapp
 
             </div>
 
-            <div className="p-10 font-extrabold flex justify-center items-center  mt-10 mb-20">
+            <div className="p-5 font-extrabold flex justify-center items-center mt-5"
+            >
                 <AnimatePresence mode="wait" custom={direction}>
-                    <motion.div
-                        key={imageIndex}
-                        transition={{ duration: 0.3, type: "tween" }}
-                    >
-                        {`${imageIndex + 1} / ${photoSetWrappers.length}`}
-                    </motion.div>
+                    <div>
+                        {`${imageIndex + 1} / ${photoSet.images.length}`}
+                    </div>
                 </AnimatePresence>
-                <div>
-                    <p>
-                    </p>
-                </div>
             </div>
-        </>
+        </div>
 
     )
 }
