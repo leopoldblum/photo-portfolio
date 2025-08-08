@@ -18,14 +18,9 @@ const allPhotoSetWrappers = websitelayout.photosets;
         allPhotoSetWrappers.map((photoSetWrapper) => (
             <>
                 {/* Display Thumbnails here */}
-                <div class="select-none w-full flex justify-center items-center">
+                {/* <div class="select-none w-full flex justify-center items-center">
                     <ImageDisplay photoSet={photoSetWrapper.photoset} />
-                </div>
-
-                {/* 
-                <ImageCarouselVanilla
-                    photoSetImages={photoSetWrapper.photoset.images}
-                /> */}
+                </div> */}
 
                 <ImageCarouselReact
                     client:visible

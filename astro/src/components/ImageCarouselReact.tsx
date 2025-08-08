@@ -41,11 +41,11 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
         <div className="">
             <div className="flex items-center justify-center mt-20  w-full relative overflow-x-clip">
 
-                <div className="flex justify-center items-center p-5 font-extrabold text-4xl h-full absolute w-1/6 left-0 select-none z-10"
+                <button className="flex justify-center cursor-none items-center p-5 font-extrabold text-4xl h-full absolute w-1/6 left-0 select-none z-10"
                     onClick={scrollLeft}
                 >
                     {`<`}
-                </div>
+                </button>
 
                 <AnimatePresence mode="wait" initial={false} custom={direction}>
                     <motion.img
@@ -71,11 +71,11 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
                     />
                 </AnimatePresence>
 
-                <div className="flex justify-center items-center p-5 font-extrabold text-4xl h-full absolute w-1/6 right-0 select-none z-10"
+                <button className="flex justify-center cursor-none items-center p-5 font-extrabold text-4xl h-full absolute w-1/6 right-0 select-none z-10"
                     onClick={scrollRight}
                 >
                     {`>`}
-                </div>
+                </button>
 
             </div>
 

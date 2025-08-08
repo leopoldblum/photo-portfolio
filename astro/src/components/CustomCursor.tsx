@@ -28,7 +28,7 @@ export const CustomCursor = () => {
     return (
         <>
             <motion.div
-                className="fixed z-50 rounded-2xl text-neutral-300 bg-neutral-900/60 p-5 text-2xl select-none pointer-events-none"
+                className="fixed z-50 rounded-lg text-neutral-300 bg-neutral-900/60 p-3 text-xl select-none pointer-events-none"
                 style={{
                     top: `${mousePosition.y}px`,
                     left: `${mousePosition.x}px`,
@@ -38,14 +38,14 @@ export const CustomCursor = () => {
                 key={cursorText}
 
 
-                initial={{ opacity: 0.1 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0.1 }}
+                initial={{ rotateX: 90, translateX: "-50%", translateY: "-50%" }}
+                animate={{ rotateX: 0, translateX: "-50%", translateY: "-50%" }}
+                exit={{ rotateX: 90, translateX: "-50%", translateY: "-50%" }}
                 transition={{ duration: 0.2, ease: "easeIn" }}
 
 
             >
-                {cursorText}
+                {cursorText === "O" ? "o" : cursorText}
             </motion.div>
         </>
     );
