@@ -38,10 +38,10 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
 
 
     return (
-        <div className="">
+        <div className="p-5">
             <div className="flex items-center justify-center w-full relative overflow-x-clip">
 
-                <button className="absolute font-extrabold h-full w-1/3 left-0 z-10 cursor-none"
+                <button className="absolute h-full w-1/3 left-0 z-10 cursor-none invisible md:visible"
                     onClick={scrollLeft}
                     onMouseOver={() => CustomCursor.setCursorText("<")}
                     onMouseLeave={() => CustomCursor.setCursorText("")}
@@ -66,22 +66,20 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
                             else if (info.offset.x > -100) scrollLeft();
                         }
                         }
-                        // onMouseOver={() => CustomCursor.setCursorText(photoSet.project.title)}
-                        onMouseOver={() => CustomCursor.setCursorText("I")}
+                        onMouseOver={() => CustomCursor.setCursorText("+")}
                         onMouseLeave={() => CustomCursor.setCursorText("")}
                     />
                 </AnimatePresence>
 
-                <button className="absolute h-full w-1/3 right-0 z-10 cursor-none"
+                <button className="absolute h-full w-1/3 right-0 z-10 cursor-none invisible md:visible"
                     onClick={scrollRight}
                     onMouseOver={() => CustomCursor.setCursorText(">")}
                     onMouseLeave={() => CustomCursor.setCursorText("")}
                 />
 
-
             </div>
 
-            <div className="p-5 font-extrabold flex justify-center items-center mt-5"
+            <div className="pt-3 font-extrabold flex justify-center items-center"
             >
                 <AnimatePresence mode="wait" custom={direction}>
                     <div>

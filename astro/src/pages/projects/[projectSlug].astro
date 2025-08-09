@@ -24,10 +24,6 @@ const { photoset } = Astro.props;
 
 <Layout title={photoset.project.title}>
     <div class="">
-        <!-- <div>This is the slug: {photoset.project.slugTitle}!</div>
-        <div>This is the real title: {photoset.project.title}!</div>
-        <div>This has so many pictures: {photoset.images.length}!</div> -->
-
         <ImageCarouselReact client:load photoSet={photoset} />
     </div>
 </Layout>
