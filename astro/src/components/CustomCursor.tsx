@@ -27,31 +27,33 @@ export const CustomCursor = () => {
 
     return (
         <>
-            <motion.div
-                className="fixed z-50 rounded-lg text-neutral-300 bg-neutral-900/60 p-3 text-xl select-none pointer-events-none"
-                style={{
-                    top: `${mousePosition.y}px`,
-                    left: `${mousePosition.x}px`,
-                    transform: 'translate(-50%, -50%)',
-                }}
+            {cursorText !== "" &&
+                <motion.div
+                    className="fixed z-50 px-4 py-2 text-xl rounded-xl text-neutral-100 bg-neutral-900/80 select-none pointer-events-none"
+                    style={{
+                        top: `${mousePosition.y}px`,
+                        left: `${mousePosition.x}px`,
+                    }}
 
-                key={cursorText}
-
-
-                initial={{ rotateX: 90, translateX: "-50%", translateY: "-50%" }}
-                animate={{ rotateX: 0, translateX: "-50%", translateY: "-50%" }}
-                exit={{ rotateX: 90, translateX: "-50%", translateY: "-50%" }}
-                transition={{ duration: 0.2, ease: "easeIn" }}
+                    key={cursorText}
 
 
-            >
-                {cursorText === "O" ? "o" : cursorText}
-            </motion.div>
+                    initial={{ scaleY: 0.4, scaleX: 0.9, translateX: "-50%", translateY: "-50%" }}
+                    animate={{ scaleY: 1, scaleX: 1, translateX: "-50%", translateY: "-50%" }}
+                    exit={{ scaleY: 0.4, scaleX: 0.9, translateX: "-50%", translateY: "-50%" }}
+                    transition={{ duration: 0.2, ease: "easeIn" }}
+
+                >
+                    {cursorText === "" ? "" : cursorText}
+                </motion.div>
+            }
         </>
     );
 };
 
-export const setCursorText = (text: string) => {
+CustomCursor.setCursorText = (text: string) => {
     const event = new CustomEvent("cursor-text", { detail: text });
     document.dispatchEvent(event);
 };
+
+export default CustomCursor;

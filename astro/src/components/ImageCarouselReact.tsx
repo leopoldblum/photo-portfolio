@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Photoset } from "../../../photo-cms/src/types/apiTypes";
 import { AnimatePresence, motion } from "motion/react"
-import { setCursorText } from "../components/CustomCursor";
+import { CustomCursor } from "./CustomCursor";
 
 
 
@@ -66,8 +66,8 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
                             else if (info.offset.x > -100) scrollLeft();
                         }
                         }
-                        onMouseEnter={() => setCursorText(photoSet.project.title)}
-                        onMouseLeave={() => setCursorText("O")}
+                        onMouseOver={() => CustomCursor.setCursorText(photoSet.project.title)}
+                        onMouseLeave={() => CustomCursor.setCursorText("")}
                     />
                 </AnimatePresence>
 
