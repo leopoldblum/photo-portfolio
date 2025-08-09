@@ -39,20 +39,20 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
 
     return (
         <div className="">
-            <div className="flex items-center justify-center mt-20  w-full relative overflow-x-clip">
+            <div className="flex items-center justify-center w-full relative overflow-x-clip">
 
-                <button className="flex justify-center cursor-none items-center p-5 font-extrabold text-4xl h-full absolute w-1/6 left-0 select-none z-10"
+                <button className="absolute font-extrabold h-full w-1/3 left-0 z-10 cursor-none"
                     onClick={scrollLeft}
-                >
-                    {`<`}
-                </button>
+                    onMouseOver={() => CustomCursor.setCursorText("<")}
+                    onMouseLeave={() => CustomCursor.setCursorText("")}
+                />
 
                 <AnimatePresence mode="wait" initial={false} custom={direction}>
                     <motion.img
                         loading="eager"
                         key={photoSet.images[imageIndex].image.url}
                         src={`http://localhost:3001/${photoSet.images[imageIndex].image.url}`}
-                        className="object-contain h-[80vh] w-full z-0"
+                        className="object-contain h-[80vh] w-full z-0 cursor-none"
                         custom={direction}
                         variants={sliderVariants}
                         initial="incoming"
@@ -66,16 +66,18 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
                             else if (info.offset.x > -100) scrollLeft();
                         }
                         }
-                        onMouseOver={() => CustomCursor.setCursorText(photoSet.project.title)}
+                        // onMouseOver={() => CustomCursor.setCursorText(photoSet.project.title)}
+                        onMouseOver={() => CustomCursor.setCursorText("I")}
                         onMouseLeave={() => CustomCursor.setCursorText("")}
                     />
                 </AnimatePresence>
 
-                <button className="flex justify-center cursor-none items-center p-5 font-extrabold text-4xl h-full absolute w-1/6 right-0 select-none z-10"
+                <button className="absolute h-full w-1/3 right-0 z-10 cursor-none"
                     onClick={scrollRight}
-                >
-                    {`>`}
-                </button>
+                    onMouseOver={() => CustomCursor.setCursorText(">")}
+                    onMouseLeave={() => CustomCursor.setCursorText("")}
+                />
+
 
             </div>
 

@@ -26,6 +26,7 @@ export interface Project {
     title: string;
     date: string;
     id: string;
+    slugTitle: string;
 }
 
 export interface Photoset {

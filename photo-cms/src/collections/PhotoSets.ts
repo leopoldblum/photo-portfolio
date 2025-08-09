@@ -21,7 +21,8 @@ export const PhotoSet: CollectionConfig = {
             label: 'Project: ',
             admin: {
                 description: "Choose the associated project",
-            }
+            },
+            // validate here... for checking if a project already has a photoset
         },
         {
             name: 'images',
@@ -60,27 +61,29 @@ export const PhotoSet: CollectionConfig = {
             admin: {
                 hidden: true,
             },
-
-            hooks: {
-                afterRead: [
-                    async ({ data, req }) => {
-                        if (data?.project) {
-                            try {
-                                const project = await req.payload.findByID({
-                                    collection: 'projects',
-                                    id: data.project
-                                });
-
-                                return `set – ${project.title}`;
-                            } catch (error) {
-                                console.error('Error fetching project:', error);
-                                return 'Unknown Project';
-                            }
-                        }
-                        return data?.title || 'Untitled';
-                    }
-                ],
-            },
         },
     ],
-};
+    hooks: {
+        beforeChange: [
+            async ({ data, req }) => {
+                if (data?.project) {
+                    try {
+                        const project = await req.payload.findByID({
+                            collection: 'projects',
+                            id: data.project
+                        });
+
+                        return {
+                            ...data,
+                            title: `set – ${project.title}`,
+                        };
+
+                    } catch (error) {
+                        console.error('Error fetching project:', error);
+                        throw error;
+                    }
+                }
+            }
+        ],
+    }
+}

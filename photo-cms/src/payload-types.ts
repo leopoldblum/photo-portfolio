@@ -173,6 +173,7 @@ export interface Project {
   title: string;
   date: string;
   description?: string | null;
+  slugTitle: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -311,6 +312,7 @@ export interface ProjectsSelect<T extends boolean = true> {
   title?: T;
   date?: T;
   description?: T;
+  slugTitle?: T;
   updatedAt?: T;
   createdAt?: T;
 }
