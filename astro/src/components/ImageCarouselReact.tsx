@@ -38,12 +38,12 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
 
 
     return (
-        <div className="p-10 w-full h-full">
+        <div className="py-20 w-full h-full">
 
             {/* carousel */}
             <div className="flex items-center justify-center relative overflow-x-clip w-full h-full">
 
-                <button className="absolute h-full w-3/7 left-0 z-10 cursor-none invisible md:visible bg-green-400/50"
+                <button className="absolute h-full w-3/7 left-0 z-10 cursor-none invisible md:visible"
                     onClick={scrollLeft}
                     onMouseOver={() => CustomCursor.setCursorText("<")}
                     onMouseLeave={() => CustomCursor.setCursorText("")}
@@ -76,7 +76,7 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
                     />
                 </AnimatePresence>
 
-                <button className="absolute h-full w-3/7 right-0 z-10 cursor-none invisible md:visible bg-green-400/50"
+                <button className="absolute h-full w-3/7 right-0 z-10 cursor-none invisible md:visible"
                     onClick={scrollRight}
                     onMouseOver={() => CustomCursor.setCursorText(">")}
                     onMouseLeave={() => CustomCursor.setCursorText("")}
