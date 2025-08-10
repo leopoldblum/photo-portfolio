@@ -38,10 +38,12 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
 
 
     return (
-        <div className="p-5">
-            <div className="flex items-center justify-center w-full relative overflow-x-clip">
+        <div className="p-10 w-full h-full">
 
-                <button className="absolute h-full w-1/3 left-0 z-10 cursor-none invisible md:visible"
+            {/* carousel */}
+            <div className="flex items-center justify-center relative overflow-x-clip w-full h-full">
+
+                <button className="absolute h-full w-3/7 left-0 z-10 cursor-none invisible md:visible bg-green-400/50"
                     onClick={scrollLeft}
                     onMouseOver={() => CustomCursor.setCursorText("<")}
                     onMouseLeave={() => CustomCursor.setCursorText("")}
@@ -49,16 +51,18 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
 
                 <AnimatePresence mode="wait" initial={false} custom={direction}>
                     <motion.img
+                        className="object-contain w-full h-full z-0 cursor-none"
                         loading="eager"
                         key={photoSet.images[imageIndex].image.url}
                         src={`http://localhost:3001/${photoSet.images[imageIndex].image.url}`}
-                        className="object-contain h-[80vh] w-full z-0 cursor-none"
+
                         custom={direction}
                         variants={sliderVariants}
                         initial="incoming"
                         animate="active"
                         exit="exit"
                         transition={{ duration: 0.2, ease: "easeInOut" }}
+
                         drag="x"
                         dragConstraints={{ left: 0, right: 0 }}
                         onDragEnd={(e, info) => {
@@ -66,12 +70,13 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
                             else if (info.offset.x > -100) scrollLeft();
                         }
                         }
+
                         onMouseOver={() => CustomCursor.setCursorText("+")}
                         onMouseLeave={() => CustomCursor.setCursorText("")}
                     />
                 </AnimatePresence>
 
-                <button className="absolute h-full w-1/3 right-0 z-10 cursor-none invisible md:visible"
+                <button className="absolute h-full w-3/7 right-0 z-10 cursor-none invisible md:visible bg-green-400/50"
                     onClick={scrollRight}
                     onMouseOver={() => CustomCursor.setCursorText(">")}
                     onMouseLeave={() => CustomCursor.setCursorText("")}
@@ -79,14 +84,15 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
 
             </div>
 
-            <div className="pt-3 font-extrabold flex justify-center items-center"
-            >
+            {/* counter */}
+            <div className="pt-3 font-extrabold flex justify-center items-center">
                 <AnimatePresence mode="wait" custom={direction}>
                     <div>
                         {`${imageIndex + 1} / ${photoSet.images.length}`}
                     </div>
                 </AnimatePresence>
             </div>
+
         </div>
 
     )

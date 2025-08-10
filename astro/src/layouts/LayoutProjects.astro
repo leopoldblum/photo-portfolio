@@ -1,0 +1,32 @@
+---
+import "/src/styles/global.css";
+import TopBar from "../components/TopBar.astro";
+import { CustomCursor } from "../components/CustomCursor";
+
+interface Props {
+    title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="generator" content={Astro.generator} />
+        <title>{title}</title>
+    </head>
+
+    <body class="flex flex-col h-screen bg-neutral-900 text-neutral-400">
+        <CustomCursor client:load />
+
+        <TopBar />
+        <div
+            class="flex-1 flex justify-center items-center w-full lg:w-[65vw] mx-auto h-20"
+        >
+            <slot />
+        </div>
+    </body>
+</html>

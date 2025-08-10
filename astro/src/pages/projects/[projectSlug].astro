@@ -1,6 +1,6 @@
 ---
 import type { WebsiteLayout } from "../../../../photo-cms/src/types/apiTypes";
-import Layout from "../../layouts/Layout.astro";
+import LayoutProjects from "../../layouts/LayoutProjects.astro";
 import ImageCarouselReact from "../../components/ImageCarouselReact";
 
 export async function getStaticPaths() {
@@ -22,8 +22,9 @@ export async function getStaticPaths() {
 const { photoset } = Astro.props;
 ---
 
-<Layout title={photoset.project.title}>
-    <div class="">
+<LayoutProjects title={photoset.project.title}>
+    <div class="w-full h-full">
         <ImageCarouselReact client:load photoSet={photoset} />
+        <!-- test -->
     </div>
-</Layout>
+</LayoutProjects>

@@ -4,7 +4,7 @@ import { AnimatePresence, easeIn, motion } from "motion/react"
 
 export const CustomCursor = () => {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-    const [cursorText, setCursorText] = useState("O")
+    const [cursorText, setCursorText] = useState("")
 
     useEffect(() => {
         const updateMousePosition = (event: MouseEvent) => {

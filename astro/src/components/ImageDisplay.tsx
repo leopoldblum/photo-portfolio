@@ -19,17 +19,22 @@ const ImageDisplay = ({ photoSet }: { photoSet: Photoset }) => {
                             onMouseOver={() => CustomCursor.setCursorText(projectTitle)}
                             onMouseLeave={() => CustomCursor.setCursorText("")}
                         >
-                            <img
-                                src={`http://localhost:3001/${thumbnailImg.image.url}`}
-                                alt={thumbnailImg.image.alt}
-                                height={basePicture.height}
-                                width={
-                                    (basePicture.height * thumbnailImg.image.width) /
-                                    thumbnailImg.image.height
-                                }
-                                loading={index < 2 ? "eager" : "lazy"}
-                                draggable={false}
-                            />
+                            <a
+                                href={`http://localhost:4321/projects/${photoSet.project.slugTitle}`}
+                                className="cursor-none"
+                            >
+                                <img
+                                    src={`http://localhost:3001/${thumbnailImg.image.url}`}
+                                    alt={thumbnailImg.image.alt}
+                                    height={basePicture.height}
+                                    width={
+                                        (basePicture.height * thumbnailImg.image.width) /
+                                        thumbnailImg.image.height
+                                    }
+                                    loading={index < 2 ? "eager" : "lazy"}
+                                    draggable={false}
+                                />
+                            </a>
                         </div>
                     ))
                 }
