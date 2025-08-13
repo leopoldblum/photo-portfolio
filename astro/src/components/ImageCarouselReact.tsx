@@ -1,16 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Photoset } from "../../../photo-cms/src/types/apiTypes";
 import { AnimatePresence, motion } from "motion/react";
 import { CustomCursor } from "./CustomCursor";
 
-const ArrowButton = ({ position, onClick, label }: { position: "left" | "right", onClick: () => void, label: string }) => (
-    <button
-        className={`absolute ${position}-0 w-1/3 z-10 h-full cursor-none invisible md:visible`}
-        onClick={onClick}
-        onMouseOver={() => CustomCursor.setCursorText(label)}
-        onMouseLeave={() => CustomCursor.setCursorText("")}
-    />
-);
+const db_url = import.meta.env.PUBLIC_API_URL
 
 const sliderVariants = {
     incoming: (direction: number) => ({
@@ -28,6 +21,7 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
     const [imageIndex, setImageIndex] = useState(0);
     const [direction, setDirection] = useState(1);
 
+
     const scrollLeft = () => {
         setDirection(-1);
         setImageIndex(prev => prev > 0 ? prev - 1 : photoSet.images.length - 1);
@@ -39,10 +33,14 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
     };
 
     return (
-        <div className="flex flex-col justify-center items-center relative cursor-none w-full">
-            <ArrowButton position="left" onClick={scrollLeft} label="<" />
-            <ArrowButton position="right" onClick={scrollRight} label=">" />
+        <div className="flex flex-col justify-center items-center relative cursor-none w-full overflow-x-hidden">
 
+            <button
+                className={`absolute left-0 w-1/3 z-10 h-full cursor-none invisible md:visible`}
+                onClick={scrollLeft}
+                onMouseOver={() => CustomCursor.setCursorText("<")}
+                onMouseLeave={() => CustomCursor.setCursorText("")}
+            />
 
             <div className="flex items-center justify-center h-[70vh]">
 
@@ -52,7 +50,7 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
 
                         loading="eager"
                         key={photoSet.images[imageIndex].image.url}
-                        src={`http://localhost:3001/${photoSet.images[imageIndex].image.url}`}
+                        src={`${db_url}${photoSet.images[imageIndex].image.url}`}
 
                         custom={direction}
                         variants={sliderVariants}
@@ -71,6 +69,13 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
                     />
                 </AnimatePresence>
             </div>
+
+            <button
+                className={`absolute right-0 w-1/3 z-10 h-full cursor-none invisible md:visible `}
+                onClick={scrollRight}
+                onMouseOver={() => CustomCursor.setCursorText(">")}
+                onMouseLeave={() => CustomCursor.setCursorText("")}
+            />
 
             <div className="py-2">
                 {`${imageIndex + 1} / ${photoSet.images.length}`}

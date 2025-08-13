@@ -4,7 +4,9 @@ import LayoutProjects from "../../layouts/LayoutProjects.astro";
 import ImageCarouselReact from "../../components/ImageCarouselReact";
 
 export async function getStaticPaths() {
-    const res = await fetch("http://localhost:3001/api/globals/websiteLayout");
+    const db_url = import.meta.env.PUBLIC_API_URL;
+
+    const res = await fetch(`${db_url}api/globals/websiteLayout`);
     const websitelayout: WebsiteLayout = await res.json();
 
     const allPhotoSetWrappers = websitelayout.photosets;

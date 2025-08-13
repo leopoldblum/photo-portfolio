@@ -1,6 +1,8 @@
 import type { Photoset } from "../../../photo-cms/src/types/apiTypes.ts";
 import { CustomCursor } from "./CustomCursor.tsx";
 
+const db_url = import.meta.env.PUBLIC_API_URL
+
 const ImageDisplay = ({ photoSet }: { photoSet: Photoset }) => {
 
     const thumbnails = photoSet.images.filter((image) => image.isThumbnail);
@@ -24,7 +26,7 @@ const ImageDisplay = ({ photoSet }: { photoSet: Photoset }) => {
                                 className="cursor-none"
                             >
                                 <img
-                                    src={`http://localhost:3001/${thumbnailImg.image.url}`}
+                                    src={`${db_url}${thumbnailImg.image.url}`}
                                     alt={thumbnailImg.image.alt}
                                     height={basePicture.height}
                                     width={
