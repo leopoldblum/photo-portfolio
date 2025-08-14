@@ -40,7 +40,7 @@ export const CustomCursor = () => {
                     initial={{ scaleY: 0.2, scaleX: 0, translateX: "-50%", translateY: "-50%" }}
                     animate={{ scaleY: 1, scaleX: 1, translateX: "-50%", translateY: "-50%" }}
                     exit={{ scaleY: 0.2, scaleX: 0, translateX: "-50%", translateY: "-50%" }}
-                    transition={{ duration: 0.2, ease: "easeIn" }}
+                    transition={{ duration: 0.15, ease: "easeIn" }}
 
                 >
                     {cursorText === "" ? "" : cursorText}

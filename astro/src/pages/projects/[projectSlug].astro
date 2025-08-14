@@ -6,7 +6,7 @@ import ImageCarouselReact from "../../components/ImageCarouselReact";
 export async function getStaticPaths() {
     const db_url = import.meta.env.PUBLIC_API_URL;
 
-    const res = await fetch(`${db_url}api/globals/websiteLayout`);
+    const res = await fetch(`${db_url}/api/globals/websiteLayout`);
     const websitelayout: WebsiteLayout = await res.json();
 
     const allPhotoSetWrappers = websitelayout.photosets;

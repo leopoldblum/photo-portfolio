@@ -12,5 +12,42 @@ export const Media: CollectionConfig = {
       required: true,
     },
   ],
-  upload: true,
+  upload: {
+    imageSizes: [
+      {
+        name: "small", width: 800, height: undefined, formatOptions: {
+          format: "webp", options: {
+            quality: 85,
+          }
+        }
+      },
+      {
+        name: "res1080", width: 1920, height: undefined, formatOptions: {
+          format: "webp", options: {
+            quality: 85,
+          }
+        }
+      },
+      {
+        name: "res1440", width: 2560, height: undefined, formatOptions: {
+          format: "webp", options: {
+            quality: 85,
+          }
+        }
+      },
+      {
+        name: "res4k", width: 3840, height: undefined, formatOptions: {
+          format: "webp", options: {
+            quality: 85,
+          }
+        }
+      },
+    ],
+    formatOptions: {
+      format: "webp", options: {
+        quality: 85,
+      }
+    }
+  }
 }
+

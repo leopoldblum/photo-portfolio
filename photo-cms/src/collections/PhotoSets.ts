@@ -1,4 +1,5 @@
 import { ImageWrapper } from '@/types/apiTypes';
+import { UnderlineFeature } from '@payloadcms/richtext-lexical';
 import type { CollectionConfig } from 'payload';
 
 export const PhotoSet: CollectionConfig = {
@@ -39,8 +40,7 @@ export const PhotoSet: CollectionConfig = {
                     relationTo: 'media',
                     required: true,
                     displayPreview: true,
-                    label: "Pick your image:"
-
+                    label: "Pick your image:",
                 },
                 {
                     name: "isThumbnail",

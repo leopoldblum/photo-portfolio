@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import type { Photoset } from "../../../photo-cms/src/types/apiTypes";
+import type { AvailableSizes, ImageSize, ImageWrapper, Photoset } from "../../../photo-cms/src/types/apiTypes";
 import { AnimatePresence, motion } from "motion/react";
 import { CustomCursor } from "./CustomCursor";
 
-const db_url = import.meta.env.PUBLIC_API_URL
+const db_url = import.meta.env.PUBLIC_API_URL as String
 
 const sliderVariants = {
     incoming: (direction: number) => ({
@@ -32,8 +32,12 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
         setImageIndex(prev => prev < photoSet.images.length - 1 ? prev + 1 : 0);
     };
 
+    const getImageUrl = (dbUrl: String, image: ImageWrapper, sizeName: keyof AvailableSizes) => {
+        return dbUrl + (image.image.sizes?.[sizeName].url || image.image.url)
+    }
+
     return (
-        <div className="flex flex-col justify-center items-center relative cursor-none w-full overflow-x-hidden bg-orange-200"
+        <div className="flex flex-col justify-center items-center relative cursor-none w-full overflow-x-hidden"
             onMouseLeave={() => CustomCursor.setCursorText("")}
         >
 
@@ -56,6 +60,13 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
                         loading="eager"
                         key={photoSet.images[imageIndex].image.url}
                         src={`${db_url}${photoSet.images[imageIndex].image.url}`}
+                        srcSet={
+                            `${getImageUrl(db_url, photoSet.images[imageIndex], "small")} 800w, 
+                            ${getImageUrl(db_url, photoSet.images[imageIndex], "res1080")} 1920w, 
+                            ${getImageUrl(db_url, photoSet.images[imageIndex], "res1440")} 2560w, 
+                            ${getImageUrl(db_url, photoSet.images[imageIndex], "res4k")} 3840w
+                        `}
+                        sizes="100vw"
 
                         custom={direction}
                         variants={sliderVariants}
@@ -69,6 +80,7 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
                             if (offset.x < -100) scrollRight();
                             else if (offset.x > 100) scrollLeft();
                         }}
+
                     />
                 </AnimatePresence>
             </div>
