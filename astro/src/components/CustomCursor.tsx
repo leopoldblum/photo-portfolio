@@ -29,7 +29,7 @@ export const CustomCursor = () => {
         <>
             {cursorText !== "" &&
                 <motion.div
-                    className="fixed z-50 px-4 py-2 text-xl rounded-xl text-neutral-100 bg-neutral-900/80 select-none pointer-events-none"
+                    className="fixed z-50 px-4 py-2 text-xl rounded-xl text-neutral-100 bg-neutral-600/80 select-none pointer-events-none text-nowrap"
                     style={{
                         top: `${mousePosition.y}px`,
                         left: `${mousePosition.x}px`,
@@ -37,10 +37,9 @@ export const CustomCursor = () => {
 
                     key={cursorText}
 
-
-                    initial={{ scaleY: 0.4, scaleX: 0.9, translateX: "-50%", translateY: "-50%" }}
+                    initial={{ scaleY: 0.2, scaleX: 0, translateX: "-50%", translateY: "-50%" }}
                     animate={{ scaleY: 1, scaleX: 1, translateX: "-50%", translateY: "-50%" }}
-                    exit={{ scaleY: 0.4, scaleX: 0.9, translateX: "-50%", translateY: "-50%" }}
+                    exit={{ scaleY: 0.2, scaleX: 0, translateX: "-50%", translateY: "-50%" }}
                     transition={{ duration: 0.2, ease: "easeIn" }}
 
                 >

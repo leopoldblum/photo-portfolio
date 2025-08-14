@@ -33,7 +33,9 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
     };
 
     return (
-        <div className="flex flex-col justify-center items-center relative cursor-none w-full overflow-x-hidden">
+        <div className="flex flex-col justify-center items-center relative cursor-none w-full overflow-x-hidden bg-orange-200"
+            onMouseLeave={() => CustomCursor.setCursorText("")}
+        >
 
             <button
                 className={`absolute left-0 w-1/3 z-10 h-full cursor-none invisible md:visible`}
@@ -42,11 +44,14 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
                 onMouseLeave={() => CustomCursor.setCursorText("")}
             />
 
-            <div className="flex items-center justify-center h-[70vh]">
+            <div className="flex items-center justify-center h-[70vh] w-full"
+                onMouseOver={() => CustomCursor.setCursorText("+")}
+                onClick={() => console.log("open popup")}
+            >
 
                 <AnimatePresence mode="wait" initial={false} custom={direction}>
                     <motion.img
-                        className="object-contain flex-1 max-h-[70vh]"
+                        className="object-scale-down flex-1 max-h-[70vh]"
 
                         loading="eager"
                         key={photoSet.images[imageIndex].image.url}
@@ -64,8 +69,6 @@ const ImageCarouselReact = ({ photoSet }: { photoSet: Photoset }) => {
                             if (offset.x < -100) scrollRight();
                             else if (offset.x > 100) scrollLeft();
                         }}
-                        onMouseOver={() => CustomCursor.setCursorText("+")}
-                        onClick={() => console.log("open popup")}
                     />
                 </AnimatePresence>
             </div>
