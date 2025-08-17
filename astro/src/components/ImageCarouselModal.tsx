@@ -7,7 +7,9 @@ const ImageCarouselModal = ({ displayPhotoset, isOpen, toggleFunction }: { displ
 
     function handleKeyDown(e: KeyboardEvent) {
         console.log("pressed key")
-        if (e.key === "Escape") toggleFunction()
+        if (e.key === "Escape") {
+            toggleFunction()
+        }
     }
 
     useEffect(() => {
@@ -16,7 +18,8 @@ const ImageCarouselModal = ({ displayPhotoset, isOpen, toggleFunction }: { displ
             document.addEventListener('keydown', handleKeyDown);
             console.log("toggled modal open")
         }
-        else {
+
+        return () => {
             document.removeEventListener('keydown', handleKeyDown)
             document.body.classList.remove("overflow-hidden")
             console.log("toggled modal closed")
