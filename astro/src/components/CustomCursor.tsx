@@ -29,7 +29,7 @@ export const CustomCursor = () => {
         <>
             {cursorText !== "" &&
                 <motion.div
-                    className="fixed z-50 px-4 py-2 text-xl rounded-xl text-neutral-100 bg-neutral-600/80 select-none pointer-events-none text-nowrap"
+                    className="fixed z-100 px-4 py-2 text-xl rounded-xl text-neutral-100 bg-neutral-600/80 select-none pointer-events-none text-nowrap"
                     style={{
                         top: `${mousePosition.y}px`,
                         left: `${mousePosition.x}px`,

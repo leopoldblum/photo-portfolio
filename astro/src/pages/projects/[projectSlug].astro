@@ -26,6 +26,10 @@ const { photoset } = Astro.props;
 
 <LayoutProjects title={photoset.project.title}>
     <div class="w-full">
-        <ImageCarouselReact client:load photoSet={photoset} />
+        <ImageCarouselReact
+            client:load
+            photoSet={photoset}
+            isFullscreen={false}
+        />
     </div>
 </LayoutProjects>

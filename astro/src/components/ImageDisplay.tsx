@@ -24,10 +24,10 @@ const ImageDisplay = ({ photoSet }: { photoSet: Photoset }) => {
             onMouseLeave={() => CustomCursor.setCursorText("")}
         >
 
-            <div className="flex justify-center items-center gap-1 lg:gap-2 ">
+            <div className="flex justify-center items-center gap-1 lg:gap-2">
                 {
                     thumbnails.map((thumbnailImg) => (
-                        <motion.div className="transition-all duration-300 ring-neutral-400 hover:ring-0 hover:ring-offset-3 ring-offset-neutral-800/90"
+                        <motion.div className="transition-all duration-300 ring-neutral-400 hover:ring-0 hover:ring-offset-3 ring-offset-neutral-800/90 overflow-hidden"
                             key={thumbnailImg.id}
                             layout
                         >
@@ -44,6 +44,7 @@ const ImageDisplay = ({ photoSet }: { photoSet: Photoset }) => {
                                         ${getImageUrl(db_url, thumbnailImg, "res4k")} 3840w
                                     `}
                                     sizes="(max-width: 768px) 100vw, 30vw"
+                                    className="hover:scale-105 transition-all duration-300"
 
                                     alt={thumbnailImg.image.alt}
                                     height={basePicture.height}
