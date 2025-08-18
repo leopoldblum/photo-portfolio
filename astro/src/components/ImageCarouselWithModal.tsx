@@ -1,8 +1,8 @@
 import type { Photoset } from "../../../photo-cms/src/types/apiTypes";
 import { useState, useEffect } from "react";
 import ImageCarouselReact from "./ImageCarouselReact";
-
-
+import { CustomCursor } from "./CustomCursor";
+import { motion } from "motion/react";
 
 const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
 
@@ -42,8 +42,18 @@ const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
 
     const handleKeyDown = (e: KeyboardEvent) => {
         console.log("pressed key")
-        if (e.key === "Escape") {
-            toggleModal()
+
+        switch (e.key) {
+            case "Escape":
+                toggleModal(); break;
+
+            case "ArrowLeft":
+                scrollLeft(); break;
+
+            case "ArrowRight":
+                scrollRight(); break;
+
+            default:
         }
     }
 
@@ -64,12 +74,22 @@ const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
                 // modal container
                 <div className="h-screen w-screen fixed top-0 left-0 z-10 flex flex-col justify-center items-center bg-neutral-900/80">
 
-                    <button
-                        className="fixed top-0 right-0 mx-20 my-5 z-15 w-15 h-15 lg:w-20 lg:h-20 hover:cursor-pointer ring-1 rounded-sm"
+                    <motion.button
+                        className="fixed top-0 right-0  mx-7 my-7 lg:mx-20 lg:my-5 z-15 w-15 h-15 lg:w-15 lg:h-15 ring-1 rounded-sm cursor-none"
                         onClick={toggleModal}
+                        onMouseOver={() => CustomCursor.setCursorText("X")}
+
+                        whileHover={
+                            {
+                                scale: 0.95,
+                                color: "#cd5c5c",
+
+                                transition: { duration: 0.2 }
+                            }
+                        }
                     >
                         X
-                    </button>
+                    </motion.button>
 
                     {/* image display */}
                     <div className="h-full w-full flex justify-center items-center">
@@ -83,7 +103,7 @@ const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
                             toggleModal={toggleModal}
                         />
                     </div>
-                </div>
+                </div >
             }
         </>
     )
