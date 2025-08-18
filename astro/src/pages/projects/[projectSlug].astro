@@ -2,6 +2,7 @@
 import type { WebsiteLayout } from "../../../../photo-cms/src/types/apiTypes";
 import LayoutProjects from "../../layouts/LayoutProjects.astro";
 import ImageCarouselReact from "../../components/ImageCarouselReact";
+import ImageCarouselWithModal from "../../components/ImageCarouselWithModal";
 
 export async function getStaticPaths() {
     const db_url = import.meta.env.PUBLIC_API_URL;
@@ -26,10 +27,6 @@ const { photoset } = Astro.props;
 
 <LayoutProjects title={photoset.project.title}>
     <div class="w-full">
-        <ImageCarouselReact
-            client:load
-            photoSet={photoset}
-            isFullscreen={false}
-        />
+        <ImageCarouselWithModal client:load photoSet={photoset} />
     </div>
 </LayoutProjects>

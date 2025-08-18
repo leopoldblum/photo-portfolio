@@ -1,60 +1,39 @@
-import { createContext, useState } from "react";
 import type { AvailableSizes, ImageSize, ImageWrapper, Photoset } from "../../../photo-cms/src/types/apiTypes";
 import { AnimatePresence, motion } from "motion/react";
 import { CustomCursor } from "./CustomCursor";
-import ImageCarouselModal from "./ImageCarouselModal";
+import { imageCarouselSliderVariants } from "../util/motionSliderVariants";
 
 const db_url = import.meta.env.PUBLIC_API_URL as String
 
-const imageCarouselSliderVariants = {
-    incoming: (direction: number) => ({
-        x: direction > 0 ? 200 : -200,
-        opacity: 0
-    }),
-    active: { x: 0, opacity: 1 },
-    exit: (direction: number) => ({
-        x: direction > 0 ? -200 : 200,
-        opacity: 0
-    })
-};
+interface CarouselProps {
+    photoSet: Photoset,
+    isFullscreen: boolean,
+    imageIndex: number,
+    direction: number
+    scrollLeft: () => void,
+    scrollRight: () => void,
+    toggleModal: () => void,
+}
 
-const ImageCarouselReact = ({ photoSet, isFullscreen }: { photoSet: Photoset, isFullscreen: boolean }) => {
-    const [imageIndex, setImageIndex] = useState(0);
-    const [direction, setDirection] = useState(1);
-    const [showModal, setShowModal] = useState(false)
-
-    const toggleModal = () => {
-        if (!isFullscreen) setShowModal(prev => !prev);
-    }
-
-    const scrollLeft = () => {
-        setDirection(-1);
-        setImageIndex(prev => prev > 0 ? prev - 1 : photoSet.images.length - 1);
-    };
-
-    const scrollRight = () => {
-        setDirection(1);
-        setImageIndex(prev => prev < photoSet.images.length - 1 ? prev + 1 : 0);
-    };
+const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scrollLeft, scrollRight, toggleModal }: CarouselProps) => {
 
     const getImageUrl = (dbUrl: String, image: ImageWrapper, sizeName: keyof AvailableSizes) => {
-        // idk if this is useful, is the full resolution truly ever needed?
+        // idk if this is useful, is the full resolution truly ever needed? worst case its really really big and takes ages to load
         // if (isFullscreen) return dbUrl + image.image.url
         // else return dbUrl + (image.image.sizes?.[sizeName].url || image.image.url)
 
         return dbUrl + (image.image.sizes?.[sizeName].url || image.image.url)
     }
 
-
     return (
         <>
-            <div className={`flex flex-col justify-center items-center relative cursor-none w-full overflow-x-hidden`}
+            <div className={`flex flex-col justify-center items-center relative cursor-none w-full overflow-x-hidden ${isFullscreen ? "backdrop-blur-xs" : ""} `}
                 onMouseLeave={() => CustomCursor.setCursorText("")}
             >
 
                 <button
                     className={`absolute left-0 w-1/3 z-5 h-full cursor-none invisible md:visible`}
-                    onClick={scrollLeft}
+                    onClick={() => scrollLeft()}
                     onMouseOver={() => CustomCursor.setCursorText("<")}
                     onMouseLeave={() => CustomCursor.setCursorText("")}
                 />
@@ -62,7 +41,7 @@ const ImageCarouselReact = ({ photoSet, isFullscreen }: { photoSet: Photoset, is
                 <div className={`flex items-center justify-center ${isFullscreen ? "h-[95vh]" : "h-[70vh]"} w-full`}
                     onMouseOver={isFullscreen ? () => CustomCursor.setCursorText("O") : () => CustomCursor.setCursorText("+")}
                     onMouseLeave={() => CustomCursor.setCursorText("")}
-                    onClick={toggleModal}
+                    onClick={!isFullscreen ? () => toggleModal() : () => (0)}
                 >
 
                     <AnimatePresence mode="wait" initial={false} custom={direction}>
@@ -86,7 +65,7 @@ const ImageCarouselReact = ({ photoSet, isFullscreen }: { photoSet: Photoset, is
                             animate="active"
                             exit="exit"
                             transition={{ duration: 0.2, ease: "easeInOut" }}
-                            drag="x"
+                            drag={isFullscreen ? "x" : undefined}
                             dragConstraints={{ left: 0, right: 0 }}
                             onDragEnd={(e, { offset }) => {
                                 if (offset.x < -100) scrollRight();
@@ -99,7 +78,7 @@ const ImageCarouselReact = ({ photoSet, isFullscreen }: { photoSet: Photoset, is
 
                 <button
                     className={`absolute right-0 w-1/3 z-5 h-full cursor-none invisible md:visible `}
-                    onClick={scrollRight}
+                    onClick={() => scrollRight()}
                     onMouseOver={() => CustomCursor.setCursorText(">")}
                     onMouseLeave={() => CustomCursor.setCursorText("")}
                 />
@@ -110,7 +89,6 @@ const ImageCarouselReact = ({ photoSet, isFullscreen }: { photoSet: Photoset, is
 
 
             </div>
-            <ImageCarouselModal displayPhotoset={photoSet} isOpen={showModal} toggleFunction={toggleModal} />
         </>
     );
 };
