@@ -11,11 +11,10 @@ const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
     const [showModal, setShowModal] = useState(false)
 
     useEffect(() => {
-        if (showModal) {
-            document.body.classList.add("overflow-hidden")
-            document.addEventListener('keydown', handleKeyDown);
-            console.log("toggled modal open")
-        }
+        document.body.classList.add("overflow-hidden")
+        document.addEventListener('keydown', handleKeyDown);
+        console.log("toggled modal open")
+
 
         return () => {
             document.removeEventListener('keydown', handleKeyDown)
@@ -45,7 +44,8 @@ const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
 
         switch (e.key) {
             case "Escape":
-                toggleModal(); break;
+                if (showModal) toggleModal();
+                break;
 
             case "ArrowLeft":
                 scrollLeft(); break;

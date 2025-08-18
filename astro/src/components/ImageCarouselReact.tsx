@@ -1,4 +1,4 @@
-import type { AvailableSizes, ImageSize, ImageWrapper, Photoset } from "../../../photo-cms/src/types/apiTypes";
+import type { AvailableSizes, ImageWrapper, Photoset } from "../../../photo-cms/src/types/apiTypes";
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { CustomCursor } from "./CustomCursor";
