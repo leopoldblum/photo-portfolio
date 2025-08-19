@@ -48,7 +48,7 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
                             loading="eager"
                             key={photoSet.images[imageIndex].image.url}
                             src={`${db_url}${photoSet.images[imageIndex].image.url}`}
-                            srcSet={getImageSrcSet(db_url, photoSet.images[imageIndex]).join(', \n')}
+                            srcSet={getImageSrcSet(db_url, photoSet.images[imageIndex])}
                             sizes={isFullscreen ? "100vw" : "60vw"}
 
                             custom={direction}

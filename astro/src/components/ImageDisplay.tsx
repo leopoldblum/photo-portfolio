@@ -35,9 +35,9 @@ const ImageDisplay = ({ photoSet }: { photoSet: Photoset }) => {
                             >
                                 <img
                                     src={`${db_url}${thumbnailImg.image.url}`}
-                                    srcSet={getImageSrcSet(db_url, thumbnailImg).join(', \n')}
+                                    srcSet={getImageSrcSet(db_url, thumbnailImg)}
                                     sizes="(max-width: 768px) 100vw, 30vw"
-                                    className="hover:scale-105 transition-all duration-300"
+                                    className="hover:scale-105 transition-all duration-300 select-none"
 
                                     alt={thumbnailImg.image.alt}
                                     height={basePicture.height}
