@@ -1,6 +1,8 @@
-import type { Photoset, ImageWrapper, AvailableSizes } from "../../../photo-cms/src/types/apiTypes.ts";
+import { preload } from "react-dom";
+import type { Photoset, ImageWrapper, AvailableSizes, Image } from "../../../photo-cms/src/types/apiTypes.js";
 import { CustomCursor } from "./CustomCursor.tsx";
 import { AnimatePresence, easeIn, motion } from "motion/react"
+import { getImageSrcSet } from "../util/imageUtil.tsx";
 
 
 const db_url = import.meta.env.PUBLIC_API_URL as String
@@ -14,14 +16,10 @@ const ImageDisplay = ({ photoSet }: { photoSet: Photoset }) => {
 
     const basePicture = thumbnails[0].image;
 
-    const getImageUrl = (dbUrl: String, image: ImageWrapper, sizeName: keyof AvailableSizes) => {
-        return dbUrl + (image.image.sizes?.[sizeName].url || image.image.url)
-    }
-
     return (
         <div className="flex flex-col py-0.5 lg:py-1 cursor-none"
-            onMouseOver={() => CustomCursor.setCursorText(projectTitle)}
-            onMouseLeave={() => CustomCursor.setCursorText("")}
+            onMouseOver={() => CustomCursor.setCursorType({ type: "displayTitle", displayText: projectTitle })}
+            onMouseLeave={() => CustomCursor.setCursorType({ type: "default" })}
         >
 
             <div className="flex justify-center items-center gap-1 lg:gap-2">
@@ -37,12 +35,7 @@ const ImageDisplay = ({ photoSet }: { photoSet: Photoset }) => {
                             >
                                 <img
                                     src={`${db_url}${thumbnailImg.image.url}`}
-                                    srcSet={`
-                                        ${getImageUrl(db_url, thumbnailImg, "small")} 800w,
-                                        ${getImageUrl(db_url, thumbnailImg, "res1080")} 1920w, 
-                                        ${getImageUrl(db_url, thumbnailImg, "res1440")} 2560w, 
-                                        ${getImageUrl(db_url, thumbnailImg, "res4k")} 3840w
-                                    `}
+                                    srcSet={getImageSrcSet(db_url, thumbnailImg).join(', \n')}
                                     sizes="(max-width: 768px) 100vw, 30vw"
                                     className="hover:scale-105 transition-all duration-300"
 
@@ -52,7 +45,7 @@ const ImageDisplay = ({ photoSet }: { photoSet: Photoset }) => {
                                         (basePicture.height * thumbnailImg.image.width) /
                                         thumbnailImg.image.height
                                     }
-                                    loading="eager"
+                                    loading="lazy"
                                     draggable={false}
                                 />
                             </a>

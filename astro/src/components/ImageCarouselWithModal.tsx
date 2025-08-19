@@ -77,7 +77,7 @@ const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
                     <motion.button
                         className="fixed top-0 right-0  mx-7 my-7 lg:mx-20 lg:my-5 z-15 w-15 h-15 lg:w-15 lg:h-15 ring-1 rounded-sm cursor-none"
                         onClick={toggleModal}
-                        onMouseOver={() => CustomCursor.setCursorText("X")}
+                        onMouseOver={() => CustomCursor.setCursorType({ type: "close" })}
 
                         whileHover={
                             {
