@@ -30,12 +30,12 @@ export const CustomCursor = () => {
             setMousePosition({ x: event.clientX, y: event.clientY });
         };
 
-        document.addEventListener("mouseenter", updateMousePosition, true)
-        document.addEventListener("mousemove", updateMousePosition);
+        document.addEventListener("pointerenter", updateMousePosition, true)
+        document.addEventListener("pointermove", updateMousePosition);
         document.addEventListener("cursor-text", handleCursorTypeChange as EventListener);
 
         return () => {
-            document.removeEventListener("mousemove", updateMousePosition);
+            document.removeEventListener("pointermove", updateMousePosition);
             document.removeEventListener("cursor-text", handleCursorTypeChange as EventListener);
 
         };
@@ -95,7 +95,7 @@ export const CustomCursor = () => {
 
             case "displayTitle":
                 return (
-                    <div className="px-4 py-2 rounded-md  text-neutral-100 bg-neutral-600/50 ">
+                    <div className="px-4 py-2 rounded-md text-neutral-100 bg-neutral-600/80 ring-[2px] ring-neutral-100/30 mix-blend-difference">
                         {cursor.displayText}
                     </div>
                 )
