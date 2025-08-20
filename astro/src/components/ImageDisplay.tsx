@@ -18,8 +18,8 @@ const ImageDisplay = ({ photoSet }: { photoSet: Photoset }) => {
 
     return (
         <div className="flex flex-col py-0.5 lg:py-1 cursor-none"
-            onMouseOver={() => CustomCursor.setCursorType({ type: "displayTitle", displayText: projectTitle })}
-            onMouseLeave={() => CustomCursor.setCursorType({ type: "default" })}
+            onPointerOver={() => CustomCursor.setCursorType({ type: "displayTitle", displayText: projectTitle })}
+            onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
         >
 
             <div className="flex justify-center items-center gap-1 lg:gap-2">

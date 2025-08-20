@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react"
-import { ChevronLeft, ChevronRight, Circle, Maximize2Icon, PlusIcon, SparkleIcon, X, ZoomInIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, Circle, DotIcon, Maximize2Icon, Minimize2Icon, PlusIcon, SparkleIcon, Triangle, X, ZoomInIcon } from "lucide-react";
 
 type CursorTypeNames =
     | "hidden"
@@ -8,6 +8,7 @@ type CursorTypeNames =
     | "arrowLeft"
     | "arrowRight"
     | "zoomIn"
+    | "zoomOut"
     | "close"
     | "displayTitle"
 
@@ -47,44 +48,54 @@ export const CustomCursor = () => {
 
             case "default":
                 return (
-                    <div className="p-2">
-                        <Circle />
+                    <div className="text-xs rounded-3xl text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30 mix-blend-difference">
+                        <DotIcon strokeWidth={2.5} />
+                        {/* <Triangle strokeWidth={2.5} /> */}
                     </div>
                 )
 
             case "arrowLeft":
                 return (
-                    <div className="px-1 py-2">
-                        <ChevronLeft />
+                    <div className="px-1 py-2 rounded-md text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30 mix-blend-difference">
+                        <ChevronLeft strokeWidth={2.5} />
                     </div>
                 )
 
             case "arrowRight":
                 return (
-                    <div className="px-1 py-2">
-                        <ChevronRight />
+                    <div className="px-1 py-2 rounded-md text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30 mix-blend-difference">
+                        <ChevronRight strokeWidth={2.5} />
                     </div>
                 )
 
             case "zoomIn":
                 return (
-                    <div className="p-2">
+                    <div className="p-2 rounded-3xl text-neutral-100 bg-neutral-600/50 ring-[2px] ring-neutral-100/30 mix-blend-difference">
                         {/* <ZoomInIcon /> */}
                         {/* <PlusIcon /> */}
-                        <Maximize2Icon />
+                        <Maximize2Icon strokeWidth={2.5} />
+                    </div>
+                )
+
+            case "zoomOut":
+                return (
+                    <div className="p-2 rounded-3xl text-neutral-100 bg-neutral-600/50 ring-[2px] ring-neutral-100/30 mix-blend-difference">
+                        {/* <ZoomInIcon /> */}
+                        {/* <PlusIcon /> */}
+                        <Minimize2Icon strokeWidth={2.5} />
                     </div>
                 )
 
             case "close":
                 return (
-                    <div className="p-2 ">
-                        <X />
+                    <div className="p-2 rounded-md text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30 mix-blend-difference">
+                        <X strokeWidth={2.5} />
                     </div>
                 )
 
             case "displayTitle":
                 return (
-                    <div className="px-4 py-2">
+                    <div className="px-4 py-2 rounded-md  text-neutral-100 bg-neutral-600/50 ">
                         {cursor.displayText}
                     </div>
                 )
@@ -97,7 +108,7 @@ export const CustomCursor = () => {
     return (
         <>
             <motion.div
-                className="fixed z-100 text-xl select-none pointer-events-none text-nowrap cursor-none rounded-md text-neutral-100 bg-neutral-600/50 mix-blend-luminosity ring-[1.5px] ring-neutral-500 "
+                className="fixed z-100 text-xl select-none pointer-events-none text-nowrap cursor-none mix-blend-luminosity rounded-md backdrop-blur-[2px]"
                 style={{
                     top: `${mousePosition.y}px`,
                     left: `${mousePosition.x}px`,
@@ -110,7 +121,9 @@ export const CustomCursor = () => {
                 transition={{ duration: 0.15, ease: "easeIn" }}
 
             >
-                {renderCursor(cursor)}
+                {
+                    renderCursor(cursor)
+                }
             </motion.div>
         </>
     );

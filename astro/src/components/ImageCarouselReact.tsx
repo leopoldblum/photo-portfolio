@@ -25,20 +25,20 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
     return (
         <>
             <div className={`flex flex-col justify-center items-center relative cursor-none w-full overflow-x-hidden ${isFullscreen ? "backdrop-blur-xs" : ""} `}
-                onMouseLeave={() => CustomCursor.setCursorType({ type: "default" })}
+                onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
             >
 
                 <button
                     className={`absolute left-0 w-1/3 z-5 h-full cursor-none invisible md:visible`}
                     onClick={() => scrollLeft()}
-                    onMouseOver={() => CustomCursor.setCursorType({ type: "arrowLeft" })}
-                    onMouseLeave={() => CustomCursor.setCursorType({ type: "default" })}
+                    onPointerOver={() => CustomCursor.setCursorType({ type: "arrowLeft" })}
+                    onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
                 />
 
                 <div className={`flex items-center justify-center ${isFullscreen ? "h-[95vh]" : "h-[70vh]"} w-full`}
-                    onMouseOver={isFullscreen ? () => CustomCursor.setCursorType({ type: "default" }) : () => CustomCursor.setCursorType({ type: "zoomIn" })}
-                    onMouseLeave={() => CustomCursor.setCursorType({ type: "default" })}
-                    onClick={!isFullscreen && !isClickBlocked ? () => toggleModal() : () => (0)}
+                    onPointerOver={isFullscreen ? () => CustomCursor.setCursorType({ type: "zoomOut" }) : () => CustomCursor.setCursorType({ type: "zoomIn" })}
+                    onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
+                    onClick={!isClickBlocked ? () => toggleModal() : () => (0)}
                 >
 
                     <AnimatePresence mode="wait" initial={false} custom={direction}>
@@ -76,8 +76,8 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
                 <button
                     className={`absolute right-0 w-1/3 z-5 h-full cursor-none invisible md:visible `}
                     onClick={() => scrollRight()}
-                    onMouseOver={() => CustomCursor.setCursorType({ type: "arrowRight" })}
-                    onMouseLeave={() => CustomCursor.setCursorType({ type: "default" })}
+                    onPointerOver={() => CustomCursor.setCursorType({ type: "arrowRight" })}
+                    onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
                 />
 
                 <div className="py-2">

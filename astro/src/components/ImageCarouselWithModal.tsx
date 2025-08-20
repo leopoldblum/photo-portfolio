@@ -14,13 +14,15 @@ const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
     useEffect(() => {
         document.body.classList.add("overflow-hidden")
         document.addEventListener('keydown', handleKeyDown);
-        console.log("toggled modal open")
+
+        if (showModal) CustomCursor.setCursorType({ type: "default" })
+        if (!showModal) CustomCursor.setCursorType({ type: "default" })
+
 
 
         return () => {
             document.removeEventListener('keydown', handleKeyDown)
             document.body.classList.remove("overflow-hidden")
-            console.log("toggled modal closed")
         }
 
     }, [showModal])
@@ -78,7 +80,7 @@ const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
                     <motion.button
                         className="fixed top-0 right-0  mx-7 my-7 lg:mx-20 lg:my-5 z-15 w-15 h-15 lg:w-15 lg:h-15 ring-1 rounded-sm cursor-none flex justify-center items-center"
                         onClick={toggleModal}
-                        onMouseOver={() => CustomCursor.setCursorType({ type: "close" })}
+                        onPointerOver={() => CustomCursor.setCursorType({ type: "close" })}
 
                         whileHover={
                             {
