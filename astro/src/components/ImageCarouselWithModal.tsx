@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import ImageCarouselReact from "./ImageCarouselReact";
 import { CustomCursor } from "./CustomCursor";
 import { motion } from "motion/react";
+import { X } from "lucide-react";
 
 const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
 
@@ -75,7 +76,7 @@ const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
                 <div className="h-screen w-screen fixed top-0 left-0 z-10 flex flex-col justify-center items-center bg-neutral-900/80">
 
                     <motion.button
-                        className="fixed top-0 right-0  mx-7 my-7 lg:mx-20 lg:my-5 z-15 w-15 h-15 lg:w-15 lg:h-15 ring-1 rounded-sm cursor-none"
+                        className="fixed top-0 right-0  mx-7 my-7 lg:mx-20 lg:my-5 z-15 w-15 h-15 lg:w-15 lg:h-15 ring-1 rounded-sm cursor-none flex justify-center items-center"
                         onClick={toggleModal}
                         onMouseOver={() => CustomCursor.setCursorType({ type: "close" })}
 
@@ -88,7 +89,7 @@ const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
                             }
                         }
                     >
-                        X
+                        <X />
                     </motion.button>
 
                     {/* image display */}

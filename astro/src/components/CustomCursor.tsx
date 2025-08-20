@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "motion/react"
+import { motion } from "motion/react"
+import { ChevronLeft, ChevronRight, Circle, Maximize2Icon, PlusIcon, SparkleIcon, X, ZoomInIcon } from "lucide-react";
 
 type CursorTypeNames =
     | "hidden"
@@ -43,18 +44,50 @@ export const CustomCursor = () => {
         switch (cursor.type) {
             case "hidden":
                 return null;
+
             case "default":
-                return ("O")
+                return (
+                    <div className="p-2">
+                        <Circle />
+                    </div>
+                )
+
             case "arrowLeft":
-                return ("<")
+                return (
+                    <div className="px-1 py-2">
+                        <ChevronLeft />
+                    </div>
+                )
+
             case "arrowRight":
-                return (">")
+                return (
+                    <div className="px-1 py-2">
+                        <ChevronRight />
+                    </div>
+                )
+
             case "zoomIn":
-                return ("+")
+                return (
+                    <div className="p-2">
+                        {/* <ZoomInIcon /> */}
+                        {/* <PlusIcon /> */}
+                        <Maximize2Icon />
+                    </div>
+                )
+
             case "close":
-                return ("X")
+                return (
+                    <div className="p-2 ">
+                        <X />
+                    </div>
+                )
+
             case "displayTitle":
-                return (cursor.displayText)
+                return (
+                    <div className="px-4 py-2">
+                        {cursor.displayText}
+                    </div>
+                )
 
             default:
                 return null
@@ -64,7 +97,7 @@ export const CustomCursor = () => {
     return (
         <>
             <motion.div
-                className="fixed z-100 px-4 py-2 text-xl rounded-xl text-neutral-100 bg-neutral-600/80 select-none pointer-events-none text-nowrap"
+                className="fixed z-100 text-xl select-none pointer-events-none text-nowrap cursor-none rounded-md text-neutral-100 bg-neutral-600/50 mix-blend-luminosity ring-[1.5px] ring-neutral-500 "
                 style={{
                     top: `${mousePosition.y}px`,
                     left: `${mousePosition.x}px`,
