@@ -2,20 +2,15 @@ import { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react"
 import { ChevronLeft, ChevronRight, Circle, DotIcon, Maximize2Icon, Minimize2Icon, PlusIcon, SparkleIcon, Triangle, X, ZoomInIcon } from "lucide-react";
 
-type CursorTypeNames =
-    | "hidden"
-    | "default"
-    | "arrowLeft"
-    | "arrowRight"
-    | "zoomIn"
-    | "zoomOut"
-    | "close"
-    | "displayTitle"
-
-export interface CursorType {
-    type: CursorTypeNames,
-    displayText?: string,
-}
+type CursorType =
+    | { type: "hidden" }
+    | { type: "default" }
+    | { type: "arrowLeft" }
+    | { type: "arrowRight" }
+    | { type: "zoomIn" }
+    | { type: "zoomOut" }
+    | { type: "close" }
+    | { type: "displayTitle", displayText: string }
 
 export const CustomCursor = () => {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -111,11 +106,15 @@ export const CustomCursor = () => {
                     translateX: "-50%",
                     translateY: "-50%",
                 }}
-                key={`${cursor.type}_${cursor.displayText}`}
+                key={
+                    cursor.type === "displayTitle"
+                        ? `${cursor.type}-${cursor.displayText}`
+                        : cursor.type
+                }
 
-                initial={{ scaleY: 0.5, scaleX: 0.2, y: -20 }}
+                initial={{ scaleY: 0.5, scaleX: 0.2, y: -15 }}
                 animate={{ scaleY: 1, scaleX: 1, y: 0 }}
-                exit={{ scaleY: 0.5, scaleX: 0.2, y: 20 }}
+                exit={{ scaleY: 0.5, scaleX: 0.2, y: 15 }}
                 transition={{ duration: 0.2, ease: "easeInOut" }}
 
             >
