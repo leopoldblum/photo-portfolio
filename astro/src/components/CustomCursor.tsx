@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { motion } from "motion/react"
+import { AnimatePresence, motion } from "motion/react"
 import { ChevronLeft, ChevronRight, Circle, DotIcon, Maximize2Icon, Minimize2Icon, PlusIcon, SparkleIcon, Triangle, X, ZoomInIcon } from "lucide-react";
 
 type CursorTypeNames =
@@ -50,52 +50,48 @@ export const CustomCursor = () => {
                 return (
                     <div className="text-xs rounded-3xl text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30 mix-blend-difference">
                         <DotIcon strokeWidth={2.5} />
-                        {/* <Triangle strokeWidth={2.5} /> */}
                     </div>
                 )
 
             case "arrowLeft":
                 return (
-                    <div className="px-1 py-2 rounded-md text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30 mix-blend-difference">
+                    <div className="px-1 py-2 rounded-md text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30">
                         <ChevronLeft strokeWidth={2.5} />
                     </div>
                 )
 
             case "arrowRight":
                 return (
-                    <div className="px-1 py-2 rounded-md text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30 mix-blend-difference">
+                    <div className="px-1 py-2 rounded-md text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30">
                         <ChevronRight strokeWidth={2.5} />
                     </div>
                 )
 
             case "zoomIn":
                 return (
-                    <div className="p-2 rounded-3xl text-neutral-100 bg-neutral-600/50 ring-[2px] ring-neutral-100/30 mix-blend-difference">
-                        {/* <ZoomInIcon /> */}
-                        {/* <PlusIcon /> */}
+                    <div className="p-2 rounded-3xl text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30">
                         <Maximize2Icon strokeWidth={2.5} />
                     </div>
                 )
 
             case "zoomOut":
                 return (
-                    <div className="p-2 rounded-3xl text-neutral-100 bg-neutral-600/50 ring-[2px] ring-neutral-100/30 mix-blend-difference">
-                        {/* <ZoomInIcon /> */}
-                        {/* <PlusIcon /> */}
+                    <div className="p-2 rounded-3xl text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30">
                         <Minimize2Icon strokeWidth={2.5} />
                     </div>
                 )
 
             case "close":
                 return (
-                    <div className="p-2 rounded-md text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30 mix-blend-difference">
+                    <div className="p-2 rounded-3xl text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30">
                         <X strokeWidth={2.5} />
                     </div>
                 )
 
             case "displayTitle":
                 return (
-                    <div className="px-4 py-2 rounded-md text-neutral-100 bg-neutral-600/80 ring-[2px] ring-neutral-100/30 mix-blend-difference">
+
+                    <div className="px-5 py-2 rounded-md text-sm tracking-widest text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30 drop-shadow-[0_1px_3px_rgba(0,0,0,0.2)]">
                         {cursor.displayText}
                     </div>
                 )
@@ -108,17 +104,19 @@ export const CustomCursor = () => {
     return (
         <>
             <motion.div
-                className="fixed z-100 text-xl select-none pointer-events-none text-nowrap cursor-none mix-blend-luminosity rounded-md backdrop-blur-[2px]"
+                className="fixed z-100 text-xl select-none pointer-events-none text-nowrap cursor-none rounded-md backdrop-blur-[2px] mix-blend-hard-light"
                 style={{
                     top: `${mousePosition.y}px`,
                     left: `${mousePosition.x}px`,
+                    translateX: "-50%",
+                    translateY: "-50%",
                 }}
                 key={`${cursor.type}_${cursor.displayText}`}
 
-                initial={{ scaleY: 0.5, scaleX: 0.2, translateX: "-50%", translateY: "-50%" }}
-                animate={{ scaleY: 1, scaleX: 1, translateX: "-50%", translateY: "-50%" }}
-                exit={{ scaleY: 0.5, scaleX: 0.2, translateX: "-50%", translateY: "-50%" }}
-                transition={{ duration: 0.15, ease: "easeIn" }}
+                initial={{ scaleY: 0.5, scaleX: 0.2, y: -20 }}
+                animate={{ scaleY: 1, scaleX: 1, y: 0 }}
+                exit={{ scaleY: 0.5, scaleX: 0.2, y: 20 }}
+                transition={{ duration: 0.2, ease: "easeInOut" }}
 
             >
                 {
