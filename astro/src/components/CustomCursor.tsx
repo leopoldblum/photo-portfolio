@@ -86,7 +86,7 @@ export const CustomCursor = () => {
             case "displayTitle":
                 return (
 
-                    <div className="px-5 py-2 rounded-md text-sm tracking-widest text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30 drop-shadow-[0_1px_3px_rgba(0,0,0,0.2)]">
+                    <div className="px-5 py-2 rounded-md text-sm tracking-widest text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30 drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
                         {cursor.displayText}
                     </div>
                 )
@@ -99,7 +99,7 @@ export const CustomCursor = () => {
     return (
         <>
             <motion.div
-                className="fixed z-100 text-xl select-none pointer-events-none text-nowrap cursor-none rounded-md backdrop-blur-[2px] mix-blend-hard-light"
+                className="fixed z-100 text-xl select-none pointer-events-none text-nowrap cursor-none rounded-md backdrop-blur-[2px] mix-blend-luminosity"
                 style={{
                     top: `${mousePosition.y}px`,
                     left: `${mousePosition.x}px`,

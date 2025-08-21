@@ -1,10 +1,11 @@
 import type { AvailableSizes, ImageWrapper, Photoset } from "../../../photo-cms/src/types/apiTypes";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { CustomCursor } from "./CustomCursor";
 import { imageCarouselSliderVariants } from "../util/motionSliderVariants";
-import { getImageSrcSet, getAllURLs } from "../util/imageUtil";
+import { getImageSrcSet, getAllURLs, getImageURLForGivenWidth } from "../util/imageUtil";
 import { preload } from "react-dom";
+import { prefetch } from "astro/virtual-modules/prefetch.js";
 
 const db_url = import.meta.env.PUBLIC_API_URL as String
 
@@ -21,6 +22,38 @@ interface CarouselProps {
 const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scrollLeft, scrollRight, toggleModal }: CarouselProps) => {
 
     const [isClickBlocked, setIsClickBlocked] = useState(false)
+
+    const previousIndex = (imageIndex - 1 + photoSet.images.length) % photoSet.images.length
+    const nextIndex = (imageIndex + 1) % photoSet.images.length
+
+    const imageWidthScaling = isFullscreen ? 1 : 0.6
+
+    // const url_prev = getImageURLForGivenWidth(db_url, photoSet.images[previousIndex], document.documentElement.clientWidth, imageWidthScaling)
+    // const url_curr = getImageURLForGivenWidth(db_url, photoSet.images[imageIndex], document.documentElement.clientWidth, imageWidthScaling)
+    // const url_next = getImageURLForGivenWidth(db_url, photoSet.images[nextIndex], document.documentElement.clientWidth, imageWidthScaling)
+
+    // prefetch(url_prev)
+    // preload(url_curr, { as: "image" })
+    // prefetch(url_next)
+
+    // console.log("preloading: ")
+    // console.log(url_prev)
+    // console.log(url_curr)
+    // console.log(url_next)
+    // console.log("")
+
+    const prevImgWrapper = photoSet.images[previousIndex]
+    const currImgWrapper = photoSet.images[imageIndex]
+    const nextImgWrapper = photoSet.images[nextIndex]
+
+    const img = new Image()
+    img.src = db_url + prevImgWrapper.image.url
+    img.srcset = getImageSrcSet(db_url, prevImgWrapper)
+
+    const img2 = new Image()
+    img2.src = db_url + nextImgWrapper.image.url
+    img2.srcset = getImageSrcSet(db_url, nextImgWrapper)
+
 
     return (
         <>
@@ -46,10 +79,10 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
                             className="object-scale-down flex-1 h-full w-full"
 
                             loading="eager"
-                            key={photoSet.images[imageIndex].image.url}
-                            src={`${db_url}${photoSet.images[imageIndex].image.url}`}
+                            key={currImgWrapper.image.url}
+                            src={db_url + currImgWrapper.image.url}
                             srcSet={getImageSrcSet(db_url, photoSet.images[imageIndex])}
-                            sizes={isFullscreen ? "100vw" : "60vw"}
+                            sizes={imageWidthScaling.toString()}
 
                             custom={direction}
                             variants={imageCarouselSliderVariants}
