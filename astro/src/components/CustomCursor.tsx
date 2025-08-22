@@ -36,6 +36,8 @@ export const CustomCursor = () => {
         };
     }, []);
 
+
+
     const renderCursor = (cursor: CursorType) => {
         switch (cursor.type) {
             case "hidden":
@@ -43,42 +45,42 @@ export const CustomCursor = () => {
 
             case "default":
                 return (
-                    <div className="text-xs rounded-3xl text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30">
+                    <div className="cursor-base-style text-xs rounded-3xl">
                         <DotIcon strokeWidth={2.5} />
                     </div>
                 )
 
             case "arrowLeft":
                 return (
-                    <div className="px-1 py-2 rounded-md text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30">
+                    <div className="cursor-base-style px-1 py-2 rounded-md">
                         <ChevronLeft strokeWidth={2.5} />
                     </div>
                 )
 
             case "arrowRight":
                 return (
-                    <div className="px-1 py-2 rounded-md text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30">
+                    <div className="cursor-base-style px-1 py-2 rounded-md">
                         <ChevronRight strokeWidth={2.5} />
                     </div>
                 )
 
             case "zoomIn":
                 return (
-                    <div className="p-2 rounded-3xl text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30">
+                    <div className="cursor-base-style p-2 rounded-3xl">
                         <Maximize2Icon strokeWidth={2.5} />
                     </div>
                 )
 
             case "zoomOut":
                 return (
-                    <div className="p-2 rounded-3xl text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30">
+                    <div className="cursor-base-style p-2 rounded-3xl">
                         <Minimize2Icon strokeWidth={2.5} />
                     </div>
                 )
 
             case "close":
                 return (
-                    <div className="p-2 rounded-3xl text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30">
+                    <div className="cursor-base-style p-2 rounded-3xl">
                         <X strokeWidth={2.5} />
                     </div>
                 )
@@ -86,7 +88,7 @@ export const CustomCursor = () => {
             case "displayTitle":
                 return (
 
-                    <div className="px-5 py-2 rounded-md text-sm tracking-widest text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30 drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
+                    <div className="cursor-base-style px-5 py-2 rounded-md text-sm tracking-widest drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
                         {cursor.displayText}
                     </div>
                 )
@@ -99,7 +101,7 @@ export const CustomCursor = () => {
     return (
         <>
             <motion.div
-                className={`fixed z-100 text-xl select-none pointer-events-none text-nowrap cursor-none ${cursor.type === "displayTitle" ? "rounded-sm" : "rounded-3xl"} mix-blend-luminosity backdrop-blur-[2px]`}
+                className={`fixed z-100 text-xl select-none pointer-events-none text-nowrap cursor-none ${cursor.type === "displayTitle" ? "rounded-md" : "rounded-3xl"} mix-blend-luminosity backdrop-blur-[2px]`}
                 style={{
                     top: `${mousePosition.y}px`,
                     left: `${mousePosition.x}px`,
