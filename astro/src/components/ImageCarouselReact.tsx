@@ -26,7 +26,7 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
     const previousIndex = (imageIndex - 1 + photoSet.images.length) % photoSet.images.length
     const nextIndex = (imageIndex + 1) % photoSet.images.length
 
-    const imageWidthScaling = isFullscreen ? 1 : 0.6
+    const imageWidthScaling = isFullscreen ? "100vw" : "60vw"
 
     // const url_prev = getImageURLForGivenWidth(db_url, photoSet.images[previousIndex], document.documentElement.clientWidth, imageWidthScaling)
     // const url_curr = getImageURLForGivenWidth(db_url, photoSet.images[imageIndex], document.documentElement.clientWidth, imageWidthScaling)
@@ -41,6 +41,10 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
     // console.log(url_curr)
     // console.log(url_next)
     // console.log("")
+
+    /**
+     * @todo setup proper caching tags in response headers in cloudflare when hosting, for proper preloading
+     */
 
     const prevImgWrapper = photoSet.images[previousIndex]
     const currImgWrapper = photoSet.images[imageIndex]
@@ -116,7 +120,6 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
                 <div className="py-2">
                     {`${imageIndex + 1} / ${photoSet.images.length}`}
                 </div>
-
 
             </div>
         </>

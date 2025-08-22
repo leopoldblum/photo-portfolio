@@ -43,7 +43,7 @@ export const CustomCursor = () => {
 
             case "default":
                 return (
-                    <div className="text-xs rounded-3xl text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30 mix-blend-difference">
+                    <div className="text-xs rounded-3xl text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30">
                         <DotIcon strokeWidth={2.5} />
                     </div>
                 )
@@ -99,7 +99,7 @@ export const CustomCursor = () => {
     return (
         <>
             <motion.div
-                className="fixed z-100 text-xl select-none pointer-events-none text-nowrap cursor-none rounded-md backdrop-blur-[2px] mix-blend-luminosity"
+                className={`fixed z-100 text-xl select-none pointer-events-none text-nowrap cursor-none ${cursor.type === "displayTitle" ? "rounded-sm" : "rounded-3xl"} mix-blend-luminosity backdrop-blur-[2px]`}
                 style={{
                     top: `${mousePosition.y}px`,
                     left: `${mousePosition.x}px`,
@@ -116,7 +116,6 @@ export const CustomCursor = () => {
                 animate={{ scaleY: 1, scaleX: 1, y: 0 }}
                 exit={{ scaleY: 0.5, scaleX: 0.2, y: 15 }}
                 transition={{ duration: 0.2, ease: "easeInOut" }}
-
             >
                 {
                     renderCursor(cursor)
