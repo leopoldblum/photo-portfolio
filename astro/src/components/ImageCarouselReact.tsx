@@ -53,11 +53,12 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
     const img = new Image()
     img.src = db_url + prevImgWrapper.image.url
     img.srcset = getImageSrcSet(db_url, prevImgWrapper)
+    img.sizes = imageWidthScaling
 
     const img2 = new Image()
     img2.src = db_url + nextImgWrapper.image.url
     img2.srcset = getImageSrcSet(db_url, nextImgWrapper)
-
+    img2.sizes = imageWidthScaling
 
     return (
         <>

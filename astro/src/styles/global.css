@@ -1,14 +1,5 @@
 @import "tailwindcss";
 
-@utility drag-none {
-    -webkit-user-drag: none;
-    -khtml-user-drag: none;
-    -moz-user-drag: none;
-    -o-user-drag: none;
-    user-select: none;
-}
-
-
 @utility cursor-base-style {
     @apply text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30;
 }
