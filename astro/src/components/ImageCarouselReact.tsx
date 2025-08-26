@@ -109,6 +109,11 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
 
                         // onAnimationStart={() => setIsDraggable(false)}
                         // onAnimationComplete={() => setIsDraggable(true)}
+
+                        // onAnimationStart={() => {
+                        //     setIsDraggable(false)
+                        //     setTimeout(() => setIsDraggable(true), 0.85 * 0.25)
+                        // }}
                         >
 
                             {/* blurry image */}
