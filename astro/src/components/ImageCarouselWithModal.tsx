@@ -63,22 +63,24 @@ const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
 
     return (
         <>
-            <ImageCarouselReact
-                photoSet={photoSet}
-                isFullscreen={false}
-                imageIndex={imageIndex}
-                direction={direction}
-                scrollLeft={scrollLeft}
-                scrollRight={scrollRight}
-                toggleModal={toggleModal}
-            />
+            {!showModal &&
+                <ImageCarouselReact
+                    photoSet={photoSet}
+                    isFullscreen={false}
+                    imageIndex={imageIndex}
+                    direction={direction}
+                    scrollLeft={scrollLeft}
+                    scrollRight={scrollRight}
+                    toggleModal={toggleModal}
+                />
+            }
 
             {showModal &&
                 // modal container
                 <div className="h-screen w-screen fixed top-0 left-0 z-10 flex flex-col justify-center items-center bg-neutral-900/80">
 
                     <motion.button
-                        className="fixed top-0 right-0  mx-7 my-7 lg:mx-20 lg:my-5 z-15 w-15 h-15 lg:w-15 lg:h-15 ring-1 rounded-sm cursor-none flex justify-center items-center"
+                        className="fixed top-0 right-0  mx-7 my-7 lg:mx-20 lg:my-5 z-15 w-10 h-10 lg:w-15 lg:h-15 ring-1 rounded-sm cursor-none flex justify-center items-center"
                         onClick={toggleModal}
                         onPointerOver={() => CustomCursor.setCursorType({ type: "close" })}
 
