@@ -21,36 +21,32 @@ interface CarouselProps {
 const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scrollLeft, scrollRight, toggleModal }: CarouselProps) => {
 
     const [isClickBlocked, setIsClickBlocked] = useState(false)
-    const [isImageLoaded, setIsImageLoaded] = useState(false)
+    const [isImageLoaded, setIsImageLoaded] = useState<Map<ImageWrapper, Boolean>>(new Map(photoSet.images.map(img => [img, false])))
     const [showBlurImage, setShowBlurImage] = useState(false)
+    const [isFirstLoad, setIsFirstLoad] = useState(true)
     // const [isDraggable, setIsDraggable] = useState(true)
-
-    const previousIndex = (imageIndex - 1 + photoSet.images.length) % photoSet.images.length
-    const nextIndex = (imageIndex + 1) % photoSet.images.length
 
     // const imageWidthScaling = isFullscreen ? 1 : 0.6
     const imageWidthScaling = isFullscreen ? "100vw" : "60vw"
 
     useEffect(() => {
         // small delay for loading blurry images so that it doesnt flicker on fast connections
-        // setShowBlurImage(true)
+        setShowBlurImage(false)
 
         const blurLoadingDelay = setTimeout(() => {
             setShowBlurImage(true);
-        }, 150)
+            console.log("show blur image")
+        }, 250)
         return () => clearTimeout(blurLoadingDelay)
 
-
     }, [imageIndex])
-
-    useEffect(() => {
-        console.log("display blurred: ", showBlurImage)
-
-    }, [showBlurImage])
 
     /**
      * @todo setup proper caching tags in response headers in cloudflare when hosting, for proper preloading
      */
+
+    const previousIndex = (imageIndex - 1 + photoSet.images.length) % photoSet.images.length
+    const nextIndex = (imageIndex + 1) % photoSet.images.length
 
     const prevImgWrapper = photoSet.images[previousIndex]
     const currImgWrapper = photoSet.images[imageIndex]
@@ -140,9 +136,10 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
                                         alt={currImgWrapper.image.alt}
                                         loading="eager"
 
-                                        initial={{ opacity: 1 }}
-                                        animate={{ opacity: isImageLoaded ? 0 : (showBlurImage ? 1 : 0) }}
-                                        transition={{ duration: isImageLoaded ? 1.5 : 0, ease: "easeIn" }}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: isImageLoaded.get(currImgWrapper) ? 0 : (showBlurImage ? 1 : 0) }}
+                                        // animate={{ opacity: 0 }}
+                                        transition={{ duration: isImageLoaded.get(currImgWrapper) ? 1.5 : 0, ease: "easeIn" }}
                                     />
                                 </motion.div>
                             </motion.div>
@@ -157,11 +154,17 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
                                 alt={currImgWrapper.image.alt}
                                 loading="lazy"
 
-                                initial={{ opacity: showBlurImage ? 0 : 1 }}
-                                animate={{ opacity: isImageLoaded ? 1 : 0 }}
-                                transition={{ duration: 0.3, ease: "linear" }}
+                                initial={{ opacity: isImageLoaded.get(currImgWrapper) ? 1 : 0 }}
+                                animate={{ opacity: isImageLoaded.get(currImgWrapper) ? 1 : 0 }}
+                                transition={{ opacity: { duration: isImageLoaded ? 0.1 : 0.3, ease: "linear" } }}
 
-                                onLoad={() => { setIsImageLoaded(true), setShowBlurImage(false) }}
+                                onLoad={() => {
+                                    setIsImageLoaded(prev => {
+                                        const newMap = new Map(prev);
+                                        newMap.set(currImgWrapper, true);
+                                        return newMap;
+                                    })
+                                }}
                             />
 
                         </motion.div>
