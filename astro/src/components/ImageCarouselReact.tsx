@@ -36,7 +36,7 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
         const blurLoadingDelay = setTimeout(() => {
             setShowBlurImage(true);
             console.log("show blur image")
-        }, 250)
+        }, 200)
         return () => clearTimeout(blurLoadingDelay)
 
     }, [imageIndex])
@@ -139,7 +139,7 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: isImageLoaded.get(currImgWrapper) ? 0 : (showBlurImage ? 1 : 0) }}
                                         // animate={{ opacity: 0 }}
-                                        transition={{ duration: isImageLoaded.get(currImgWrapper) ? 1.5 : 0, ease: "easeIn" }}
+                                        transition={{ duration: isImageLoaded.get(currImgWrapper) ? 1.5 : 0.15, ease: "easeIn" }}
                                     />
                                 </motion.div>
                             </motion.div>
@@ -156,7 +156,7 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
 
                                 initial={{ opacity: isImageLoaded.get(currImgWrapper) ? 1 : 0 }}
                                 animate={{ opacity: isImageLoaded.get(currImgWrapper) ? 1 : 0 }}
-                                transition={{ opacity: { duration: isImageLoaded ? 0.1 : 0.3, ease: "linear" } }}
+                                transition={{ opacity: { duration: 0.15, ease: "easeIn" } }}
 
                                 onLoad={() => {
                                     setIsImageLoaded(prev => {
