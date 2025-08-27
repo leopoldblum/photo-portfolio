@@ -2,6 +2,7 @@ import { image, main } from "motion/react-client";
 import type { ImageWrapper, AvailableSizes, Image } from "../../../photo-cms/src/types/apiTypes";
 
 const sizeBreakpoints: Record<keyof AvailableSizes, number> = {
+    tinyPreview: 100,
     small: 800,
     res1080: 1920,
     res1440: 2560,

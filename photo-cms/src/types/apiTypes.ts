@@ -16,6 +16,7 @@ export interface Image {
 }
 
 export interface AvailableSizes {
+    tinyPreview: ImageSize
     small: ImageSize;
     res1080: ImageSize;
     res1440: ImageSize;

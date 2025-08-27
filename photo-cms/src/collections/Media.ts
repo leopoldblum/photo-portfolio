@@ -15,6 +15,13 @@ export const Media: CollectionConfig = {
   upload: {
     imageSizes: [
       {
+        name: "tinyPreview", width: 50, height: undefined, formatOptions: {
+          format: "webp", options: {
+            quality: 85
+          }
+        }
+      },
+      {
         name: "small", width: 800, height: undefined, formatOptions: {
           format: "webp", options: {
             quality: 85,

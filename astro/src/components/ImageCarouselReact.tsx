@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { CustomCursor } from "./CustomCursor";
 import { imageCarouselSliderVariants } from "../util/motionSliderVariants";
 import { getImageSrcSet, getAllURLs, getImageURLForGivenWidth } from "../util/imageUtil";
+import { preload } from "react-dom";
 
 const db_url = import.meta.env.PUBLIC_API_URL as String
 
@@ -32,14 +33,20 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
 
     useEffect(() => {
         // small delay for loading blurry images so that it doesnt flicker on fast connections
+        // setShowBlurImage(true)
 
         const blurLoadingDelay = setTimeout(() => {
             setShowBlurImage(true);
-            console.log("display blurred image")
         }, 150)
         return () => clearTimeout(blurLoadingDelay)
 
+
     }, [imageIndex])
+
+    useEffect(() => {
+        console.log("display blurred: ", showBlurImage)
+
+    }, [showBlurImage])
 
     /**
      * @todo setup proper caching tags in response headers in cloudflare when hosting, for proper preloading
@@ -60,6 +67,11 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
     img2.src = db_url + nextImgWrapper.image.url
     img2.srcset = getImageSrcSet(db_url, nextImgWrapper)
     img2.sizes = imageWidthScaling
+
+    // preloading tiny images for better interaction in carousel on slow connections
+    preload(db_url + prevImgWrapper.image.sizes.tinyPreview.url, { as: "image" })
+    preload(db_url + currImgWrapper.image.sizes.tinyPreview.url, { as: "image" })
+    preload(db_url + nextImgWrapper.image.sizes.tinyPreview.url, { as: "image" })
 
     return (
         <>
@@ -117,16 +129,23 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
                         >
 
                             {/* blurry image */}
-                            <motion.img
-                                className="absolute object-contain w-full h-full blur-[2px] pointer-events-none"
+                            <motion.div
+                                className="absolute inset-0 flex justify-center items-center pointer-events-none "
+                            >
+                                <motion.div className="overflow-hidden inline-block h-full">
+                                    <motion.img
+                                        className="object-contain w-full h-full blur-[15px] pointer-events-none"
 
-                                src={db_url + currImgWrapper.image.sizes.small.url}
-                                alt={currImgWrapper.image.alt}
-                                loading="eager"
+                                        src={db_url + currImgWrapper.image.sizes.tinyPreview.url}
+                                        alt={currImgWrapper.image.alt}
+                                        loading="eager"
 
-                                animate={{ opacity: isImageLoaded ? 0 : (showBlurImage ? 1 : 0) }}
-                                transition={{ duration: 0.6, ease: "easeIn" }}
-                            />
+                                        initial={{ opacity: 1 }}
+                                        animate={{ opacity: isImageLoaded ? 0 : (showBlurImage ? 1 : 0) }}
+                                        transition={{ duration: isImageLoaded ? 1.5 : 0, ease: "easeIn" }}
+                                    />
+                                </motion.div>
+                            </motion.div>
 
                             {/* real image */}
                             <motion.img
@@ -136,12 +155,13 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
                                 srcSet={getImageSrcSet(db_url, photoSet.images[imageIndex])}
                                 sizes={imageWidthScaling}
                                 alt={currImgWrapper.image.alt}
-                                loading="eager"
+                                loading="lazy"
 
+                                initial={{ opacity: showBlurImage ? 0 : 1 }}
                                 animate={{ opacity: isImageLoaded ? 1 : 0 }}
-                                transition={{ duration: 0.3, ease: "easeOut" }}
+                                transition={{ duration: 0.3, ease: "linear" }}
 
-                                onLoad={() => setIsImageLoaded(true)}
+                                onLoad={() => { setIsImageLoaded(true), setShowBlurImage(false) }}
                             />
 
                         </motion.div>
