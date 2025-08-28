@@ -48,6 +48,9 @@ const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
     const throttledScrollLeft = useThrottledCallback(scrollLeft, 500, { leading: true, trailing: false })
     const throttledScrollRight = useThrottledCallback(scrollRight, 500, { leading: true, trailing: false })
 
+    // controversial IMO, open to change
+    const throttledToggleModal = useThrottledCallback(toggleModal, 200, { leading: true, trailing: false })
+
 
     const handleKeyDown = (e: KeyboardEvent) => {
         console.log("pressed key")
@@ -80,7 +83,7 @@ const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
                     direction={direction}
                     scrollLeft={scrollLeft}
                     scrollRight={scrollRight}
-                    toggleModal={toggleModal}
+                    toggleModal={throttledToggleModal}
                 />
             }
 
@@ -114,7 +117,7 @@ const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
                             direction={direction}
                             scrollLeft={scrollLeft}
                             scrollRight={scrollRight}
-                            toggleModal={toggleModal}
+                            toggleModal={throttledToggleModal}
                         />
                     </div>
                 </div >
