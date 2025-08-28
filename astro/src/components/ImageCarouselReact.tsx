@@ -1,10 +1,11 @@
 import type { AvailableSizes, ImageWrapper, Photoset } from "../../../photo-cms/src/types/apiTypes";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { CustomCursor } from "./CustomCursor";
 import { imageCarouselSliderVariants } from "../util/motionSliderVariants";
 import { getImageSrcSet, getAllURLs, getImageURLForGivenWidth } from "../util/imageUtil";
 import { preload } from "react-dom";
+import { useThrottledCallback } from "use-debounce";
 
 const db_url = import.meta.env.PUBLIC_API_URL as String
 
@@ -29,18 +30,6 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
     // const imageWidthScaling = isFullscreen ? 1 : 0.6
     const imageWidthScaling = isFullscreen ? "100vw" : "60vw"
 
-    useEffect(() => {
-        // small delay for loading blurry images so that it doesnt flicker on fast connections
-        setShowBlurImage(false)
-
-        const blurLoadingDelay = setTimeout(() => {
-            setShowBlurImage(true);
-            console.log("show blur image")
-        }, 200)
-        return () => clearTimeout(blurLoadingDelay)
-
-    }, [imageIndex])
-
     /**
      * @todo setup proper caching tags in response headers in cloudflare when hosting, for proper preloading
      */
@@ -52,7 +41,7 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
     const currImgWrapper = photoSet.images[imageIndex]
     const nextImgWrapper = photoSet.images[nextIndex]
 
-    // preloading left neighbor image
+    // preloading left neighbor image, using Image() to use srcset
     const img = new Image()
     img.src = db_url + prevImgWrapper.image.url
     img.srcset = getImageSrcSet(db_url, prevImgWrapper)
@@ -69,6 +58,23 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
     preload(db_url + currImgWrapper.image.sizes.tinyPreview.url, { as: "image" })
     preload(db_url + nextImgWrapper.image.sizes.tinyPreview.url, { as: "image" })
 
+    useEffect(() => {
+        // small delay for loading blurry images so that it doesnt flicker on fast connections
+        setShowBlurImage(false)
+
+        const blurLoadingDelay = setTimeout(() => {
+            setShowBlurImage(true);
+            // console.log("show blur image")
+        }, 200)
+        return () => clearTimeout(blurLoadingDelay)
+
+    }, [imageIndex])
+
+
+    const throttledScrollLeft = useThrottledCallback(scrollLeft, 400, { leading: true, trailing: false })
+    const throttledScrollRight = useThrottledCallback(scrollRight, 400, { leading: true, trailing: false })
+
+
     return (
         <>
             <div className={`flex flex-col justify-center items-center relative cursor-none w-full overflow-x-hidden ${isFullscreen ? "backdrop-blur-lg backdrop-grayscale-25" : ""} `}
@@ -77,7 +83,7 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
 
                 <button
                     className={`absolute left-0 w-1/3 z-5 h-full cursor-none invisible lg:visible`}
-                    onClick={() => scrollLeft()}
+                    onClick={throttledScrollLeft}
                     onPointerOver={() => CustomCursor.setCursorType({ type: "arrowLeft" })}
                     onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
                 />
@@ -110,8 +116,8 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
                             dragConstraints={{ left: 0, right: 0 }}
                             onDragStart={() => setIsClickBlocked(true)}
                             onDragEnd={(_, { offset }) => {
-                                if (offset.x < -100) scrollRight()
-                                else if (offset.x > 100) scrollLeft()
+                                if (offset.x < -100) throttledScrollRight()
+                                else if (offset.x > 100) throttledScrollLeft()
                                 setIsClickBlocked(false)
                             }}
 
@@ -175,12 +181,12 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
 
                 <button
                     className={`absolute right-0 w-1/3 z-5 h-full cursor-none invisible lg:visible `}
-                    onClick={() => scrollRight()}
+                    onClick={throttledScrollRight}
                     onPointerOver={() => CustomCursor.setCursorType({ type: "arrowRight" })}
                     onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
                 />
 
-                <div className="py-2  w-full flex justify-center items-center">
+                <div className="py-2 w-full flex justify-center items-center">
                     {`${imageIndex + 1} / ${photoSet.images.length}`}
                 </div>
 

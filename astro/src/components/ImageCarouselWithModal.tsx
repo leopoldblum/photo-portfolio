@@ -4,6 +4,8 @@ import ImageCarouselReact from "./ImageCarouselReact";
 import { CustomCursor } from "./CustomCursor";
 import { motion } from "motion/react";
 import { X } from "lucide-react";
+import { useThrottledCallback } from "use-debounce";
+
 
 const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
 
@@ -42,6 +44,11 @@ const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
         setImageIndex(prev => prev < photoSet.images.length - 1 ? prev + 1 : 0);
     };
 
+
+    const throttledScrollLeft = useThrottledCallback(scrollLeft, 500, { leading: true, trailing: false })
+    const throttledScrollRight = useThrottledCallback(scrollRight, 500, { leading: true, trailing: false })
+
+
     const handleKeyDown = (e: KeyboardEvent) => {
         console.log("pressed key")
 
@@ -51,10 +58,12 @@ const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
                 break;
 
             case "ArrowLeft":
-                scrollLeft(); break;
+                throttledScrollLeft();
+                break;
 
             case "ArrowRight":
-                scrollRight(); break;
+                throttledScrollRight();
+                break;
 
             default:
         }
