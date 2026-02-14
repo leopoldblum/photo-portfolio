@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react"
-import { ChevronLeft, ChevronRight, Maximize2Icon, Minimize2Icon, X } from "lucide-react";
+import { ArrowUpRight, ChevronLeft, ChevronRight, Maximize2Icon, Minimize2Icon, X } from "lucide-react";
 
 type CursorType =
     | { type: "hidden" }
@@ -10,6 +10,7 @@ type CursorType =
     | { type: "zoomIn" }
     | { type: "zoomOut" }
     | { type: "close" }
+    | { type: "link" }
     | { type: "displayTitle", displayText: string }
 
 export const CustomCursor = () => {
@@ -81,6 +82,13 @@ export const CustomCursor = () => {
                     </div>
                 )
 
+            case "link":
+                return (
+                    <div className="cursor-base-style p-2 rounded-3xl">
+                        <ArrowUpRight strokeWidth={2.5} />
+                    </div>
+                )
+
             case "close":
                 return (
                     <div className="cursor-base-style p-2 rounded-3xl">
@@ -90,7 +98,7 @@ export const CustomCursor = () => {
 
             case "displayTitle":
                 return (
-                    <div className="cursor-base-style px-5 py-2 rounded-md text-sm tracking-widest">
+                    <div className="cursor-base-style px-5 py-2 rounded-md text-sm tracking-widest bg-neutral-800/70 backdrop-blur-md">
                         {cursor.displayText}
                     </div>
                 )

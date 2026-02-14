@@ -2,12 +2,83 @@
 
 ---
 
-<div class="pt-5">
-    <div
-        class="flex justify-between items-center border-y-1 py-3 font-bold w-[95vw] mx-auto"
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+    href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@1,400&display=swap"
+    rel="stylesheet"
+/>
+
+<header
+    class="flex items-center gap-5 md:gap-8 w-[93vw] mx-auto py-7 md:py-9 select-none"
+>
+    <a href="/" class="header-mark text-neutral-200/80 cursor-none" data-cursor="link">LB</a>
+    <div class="header-rule flex-1 h-px bg-neutral-700/40"></div>
+    <a
+        href="#"
+        class="header-link text-[10px] tracking-[0.25em] uppercase text-neutral-500/60 cursor-none"
+        data-cursor="link"
     >
-        <div class="pr-5 md:pr-10">LB</div>
-        <div class="">TITLE</div>
-        <div class="pl-5 md:pl-10">insta</div>
-    </div>
-</div>
+        instagram
+    </a>
+</header>
+
+<style>
+    .header-mark {
+        font-family: "Bodoni Moda", serif;
+        font-style: italic;
+        font-size: 1.15rem;
+        line-height: 1;
+        animation: fadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .header-rule {
+        transform: scaleX(0);
+        animation: drawLine 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+    }
+
+    .header-link {
+        line-height: 1;
+        animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes drawLine {
+        from {
+            transform: scaleX(0);
+        }
+        to {
+            transform: scaleX(1);
+        }
+    }
+</style>
+
+<script>
+    function setupCursorLinks() {
+        document.querySelectorAll("[data-cursor='link']").forEach((el) => {
+            el.addEventListener("pointerenter", () => {
+                document.dispatchEvent(
+                    new CustomEvent("cursor-text", { detail: { type: "link" } })
+                );
+            });
+            el.addEventListener("pointerleave", () => {
+                document.dispatchEvent(
+                    new CustomEvent("cursor-text", {
+                        detail: { type: "default" },
+                    })
+                );
+            });
+        });
+    }
+
+    setupCursorLinks();
+    document.addEventListener("astro:after-swap", setupCursorLinks);
+</script>

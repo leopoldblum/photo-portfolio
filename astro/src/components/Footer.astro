@@ -1,0 +1,49 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer
+    class="flex items-center gap-4 md:gap-6 w-[93vw] mx-auto py-7 md:py-9 select-none"
+>
+    <div class="footer-line-left flex-1 h-px bg-neutral-700/40"></div>
+    <span class="footer-year text-[10px] tracking-[0.3em] text-neutral-500/40">
+        {year}
+    </span>
+    <div class="footer-line-right flex-1 h-px bg-neutral-700/40"></div>
+</footer>
+
+<style>
+    .footer-line-left {
+        transform: scaleX(0);
+        transform-origin: left;
+        animation: drawLine 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .footer-line-right {
+        transform: scaleX(0);
+        transform-origin: right;
+        animation: drawLine 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .footer-year {
+        animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+    }
+
+    @keyframes drawLine {
+        from {
+            transform: scaleX(0);
+        }
+        to {
+            transform: scaleX(1);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+</style>
