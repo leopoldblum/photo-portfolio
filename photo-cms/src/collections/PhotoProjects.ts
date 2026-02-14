@@ -5,7 +5,7 @@ export const PhotoProjects: CollectionConfig = {
     slug: "photo-projects",
     admin: {
         useAsTitle: "title",
-        defaultColumns: ['thumbnail', 'title', 'date'],
+        defaultColumns: ['title', 'thumbnail', 'date'],
     },
     access: {
         read: () => true,

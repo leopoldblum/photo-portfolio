@@ -145,7 +145,7 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                                 srcSet={getImageSrcSet(db_url, photoProject.images[imageIndex])}
                                 sizes={imageWidthScaling}
                                 alt={currImgWrapper.image.alt}
-                                loading="lazy"
+                                loading="eager"
 
                                 initial={{ opacity: isImageLoaded.get(currImgWrapper) ? 1 : 0 }}
                                 animate={{ opacity: isImageLoaded.get(currImgWrapper) ? 1 : 0 }}

@@ -1,7 +1,7 @@
 import type { ImageWrapper, AvailableSizes } from "../../../photo-cms/src/types/apiTypes";
 
 const sizeBreakpoints: Record<keyof AvailableSizes, number> = {
-    tinyPreview: 100,
+    tinyPreview: 50,
     small: 800,
     res1080: 1920,
     res1440: 2560,
@@ -21,11 +21,9 @@ export const getImageSrcSet = (db_url: String, image: ImageWrapper) => {
     const sizes = image.image.sizes
     if (!sizes) return "";
 
-    return Object.keys(sizes)
-        .map(sizeName => {
-            const sizeKey = sizeName as keyof AvailableSizes;
-            return `${getImageUrl(db_url, image, sizeKey)} ${sizeBreakpoints[sizeKey]}w`;
-        }).join(', \n');
+    return orderedSizes
+        .map(({ size, width }) => `${getImageUrl(db_url, image, size)} ${width}w`)
+        .join(', \n');
 }
 
 

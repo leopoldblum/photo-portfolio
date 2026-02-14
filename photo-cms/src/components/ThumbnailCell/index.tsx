@@ -1,6 +1,7 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { useConfig } from '@payloadcms/ui'
 import type { DefaultCellComponentProps } from 'payload'
 import styles from './styles.module.css'
 
@@ -10,17 +11,30 @@ type ImageEntry = {
 }
 
 const ThumbnailCell: React.FC<DefaultCellComponentProps> = ({ rowData }) => {
-  const images = rowData?.images as ImageEntry[] | undefined
-  if (!images?.length) return <span className={styles.empty}>No images</span>
+  const [src, setSrc] = useState<string | null>(null)
+  const { config } = useConfig()
+  const apiRoute = config.routes?.api || '/api'
 
-  const thumb = images.find((img) => img.isThumbnail) ?? images[0]
-  const media = thumb?.image
+  useEffect(() => {
+    if (!rowData?.id) return
 
-  if (!media || typeof media === 'string') {
-    return <span className={styles.empty}>—</span>
-  }
+    fetch(`${apiRoute}/photo-projects/${rowData.id}?depth=1&select[images]=true`, {
+      credentials: 'include',
+    })
+      .then((res) => res.json())
+      .then((doc) => {
+        const images = doc?.images as ImageEntry[] | undefined
+        if (!images?.length) return
 
-  const src = media.thumbnailURL ?? media.url
+        const thumb = images.find((img) => img.isThumbnail) ?? images[0]
+        const media = thumb?.image
+        if (!media || typeof media === 'string') return
+
+        setSrc(media.thumbnailURL ?? media.url ?? null)
+      })
+      .catch(() => {})
+  }, [rowData?.id, apiRoute])
+
   if (!src) return <span className={styles.empty}>—</span>
 
   return <img src={src} alt="" className={styles.thumb} />
