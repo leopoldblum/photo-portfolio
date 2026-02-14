@@ -5,22 +5,12 @@ export const PhotoProjects: CollectionConfig = {
     slug: "photo-projects",
     admin: {
         useAsTitle: "title",
-        defaultColumns: ['title', 'thumbnail', 'date'],
+        defaultColumns: ['title', 'date'],
     },
     access: {
         read: () => true,
     },
     fields: [
-        {
-            type: 'ui',
-            name: 'thumbnail',
-            label: ' ',
-            admin: {
-                components: {
-                    Cell: '@/components/ThumbnailCell',
-                },
-            },
-        },
         {
             type: "row",
             fields: [
@@ -31,6 +21,9 @@ export const PhotoProjects: CollectionConfig = {
                     unique: true,
                     admin: {
                         width: "75%",
+                        components: {
+                            Cell: '@/components/ThumbnailCell',
+                        },
                     }
                 },
                 {

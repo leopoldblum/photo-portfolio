@@ -10,10 +10,16 @@ type ImageEntry = {
   isThumbnail?: boolean
 }
 
-const ThumbnailCell: React.FC<DefaultCellComponentProps> = ({ rowData }) => {
+const ThumbnailCell: React.FC<DefaultCellComponentProps> = ({
+  rowData,
+  cellData,
+  link,
+  linkURL,
+}) => {
   const [src, setSrc] = useState<string | null>(null)
   const { config } = useConfig()
   const apiRoute = config.routes?.api || '/api'
+  const adminRoute = config.routes?.admin || '/admin'
 
   useEffect(() => {
     if (!rowData?.id) return
@@ -35,9 +41,27 @@ const ThumbnailCell: React.FC<DefaultCellComponentProps> = ({ rowData }) => {
       .catch(() => {})
   }, [rowData?.id, apiRoute])
 
-  if (!src) return <span className={styles.empty}>—</span>
+  const content = (
+    <span className={styles.row}>
+      {src ? (
+        <img src={src} alt="" className={styles.thumb} />
+      ) : (
+        <span className={styles.thumbPlaceholder} />
+      )}
+      <span className={styles.title}>{cellData as string}</span>
+    </span>
+  )
 
-  return <img src={src} alt="" className={styles.thumb} />
+  if (link) {
+    const href = linkURL ?? `${adminRoute}/collections/photo-projects/${rowData.id}`
+    return (
+      <a href={href} className={styles.link}>
+        {content}
+      </a>
+    )
+  }
+
+  return content
 }
 
 export default ThumbnailCell
