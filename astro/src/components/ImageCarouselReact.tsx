@@ -105,7 +105,7 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                             initial="incoming"
                             animate="active"
                             exit="exit"
-                            transition={{ duration: 0.25, ease: "easeInOut" }}
+                            transition={{ duration: 0.18, ease: "easeInOut" }}
 
                             drag="x"
                             dragConstraints={{ left: 0, right: 0 }}
