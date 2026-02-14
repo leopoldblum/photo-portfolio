@@ -71,6 +71,7 @@ export interface Config {
     media: Media;
     projects: Project;
     photoSet: PhotoSet;
+    'photo-projects': PhotoProject;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -81,6 +82,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     photoSet: PhotoSetSelect<false> | PhotoSetSelect<true>;
+    'photo-projects': PhotoProjectsSelect<false> | PhotoProjectsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -243,6 +245,36 @@ export interface PhotoSet {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "photo-projects".
+ */
+export interface PhotoProject {
+  id: string;
+  title: string;
+  date: string;
+  description?: string | null;
+  slugTitle?: string | null;
+  /**
+   * Upload the Picture(s) and choose 1 – 5 thumbnails which get displayed on the main page.
+   */
+  images?:
+    | {
+        image?: (string | null) | Media;
+        description?: string | null;
+        isThumbnail?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  thumbnailImages?:
+    | {
+        image?: (string | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -263,6 +295,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'photoSet';
         value: string | PhotoSet;
+      } | null)
+    | ({
+        relationTo: 'photo-projects';
+        value: string | PhotoProject;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -426,6 +462,32 @@ export interface PhotoSetSelect<T extends boolean = true> {
         id?: T;
       };
   title?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "photo-projects_select".
+ */
+export interface PhotoProjectsSelect<T extends boolean = true> {
+  title?: T;
+  date?: T;
+  description?: T;
+  slugTitle?: T;
+  images?:
+    | T
+    | {
+        image?: T;
+        description?: T;
+        isThumbnail?: T;
+        id?: T;
+      };
+  thumbnailImages?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

@@ -23,7 +23,6 @@ export const PhotoSet: CollectionConfig = {
             admin: {
                 description: "Choose the associated project",
             },
-            // validate here... for checking if a project already has a photoset
         },
         {
             name: 'images',

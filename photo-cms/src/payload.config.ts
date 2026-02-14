@@ -11,6 +11,7 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Projects } from './collections/Projects'
 import { PhotoSet } from './collections/PhotoSets'
+import { PhotoProjects } from "./collections/PhotoProjects"
 import { WebsiteLayout } from './globals/WebsiteLayouts'
 
 const filename = fileURLToPath(import.meta.url)
@@ -24,7 +25,7 @@ export default buildConfig({
     },
   },
   globals: [WebsiteLayout],
-  collections: [Users, Media, Projects, PhotoSet],
+  collections: [Users, Media, Projects, PhotoSet, PhotoProjects],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
