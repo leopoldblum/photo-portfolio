@@ -1,63 +1,59 @@
-export interface Image {
-    createdAt: string;
-    updatedAt: string;
-    alt: string;
-    filename: string;
-    mimeType: string;
-    filesize: number;
-    width: number;
-    height: number;
-    focalX: number;
-    focalY: number;
-    id: string;
-    url: string;
-    thumbnailURL: string | null;
-    sizes: AvailableSizes
+/**
+ * API response types derived from Payload's auto-generated types.
+ *
+ * These represent the shape of REST API responses when relationships are
+ * fully populated (?depth=N). Run `npm run generate:types` after changing
+ * any collection schema — these types will update automatically.
+ */
+import type {
+  Media as PayloadMedia,
+  PhotoProject as PayloadPhotoProject,
+  WebsiteLayout as PayloadWebsiteLayout,
+} from '../payload-types'
+
+/** Make every property required and strip `| null`. */
+type Strict<T> = {
+  [K in keyof T]-?: NonNullable<T[K]>
 }
 
-export interface AvailableSizes {
-    tinyPreview: ImageSize
-    small: ImageSize;
-    res1080: ImageSize;
-    res1440: ImageSize;
-    res4k: ImageSize;
+// -- Image sizes --
+
+type PayloadSizes = NonNullable<PayloadMedia['sizes']>
+
+export type ImageSize = Strict<NonNullable<PayloadSizes[keyof PayloadSizes]>>
+
+export type AvailableSizes = { [K in keyof PayloadSizes]-?: ImageSize }
+
+// -- Image (populated Media with all sizes present) --
+
+export type Image = Strict<Omit<PayloadMedia, 'sizes' | 'thumbnailURL'>> & {
+  thumbnailURL: string | null
+  sizes: AvailableSizes
 }
 
-export interface ImageSize {
-    url: string;
-    width: number;
-    height: number;
-    mimeType: string;
-    filesize: number;
-    filename: string;
+// -- Image entry within a PhotoProject --
+
+export type ImageWrapper = {
+  image: Image
+  isThumbnail: boolean
+  id: string
 }
 
-export interface ImageWrapper {
-    image: Image;
-    isThumbnail: boolean;
-    id: string;
+// -- PhotoProject (with populated images) --
+
+export type PhotoProject = Strict<Omit<PayloadPhotoProject, 'images' | 'description'>> & {
+  description?: string
+  images: ImageWrapper[]
 }
 
-export interface PhotoProject {
-    createdAt: string;
-    updatedAt: string;
-    title: string;
-    date: string;
-    description?: string;
-    slugTitle: string;
-    images: ImageWrapper[];
-    id: string;
+// -- WebsiteLayout wrappers --
+
+export type PhotoProjectWrapper = {
+  photoProject: PhotoProject
+  id: string
 }
 
-export interface PhotoProjectWrapper {
-    photoProject: PhotoProject;
-    id: string;
-}
-
-export interface WebsiteLayout {
-    createdAt: string;
-    updatedAt: string;
-    globalType: string;
-    photoProjects: PhotoProjectWrapper[];
-    id: string;
+export type WebsiteLayout = Strict<Omit<PayloadWebsiteLayout, 'photoProjects'>> & {
+  globalType: string
+  photoProjects: PhotoProjectWrapper[]
 }

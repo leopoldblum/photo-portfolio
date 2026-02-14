@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react"
 import { ChevronLeft, ChevronRight, Maximize2Icon, Minimize2Icon, X } from "lucide-react";
 
@@ -13,7 +13,7 @@ type CursorType =
     | { type: "displayTitle", displayText: string }
 
 export const CustomCursor = () => {
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const containerRef = useRef<HTMLDivElement>(null);
     const [cursor, setCursor] = useState<CursorType>({ type: "default" })
 
     const handleCursorTypeChange = (event: CustomEvent<CursorType>) => {
@@ -22,7 +22,9 @@ export const CustomCursor = () => {
 
     useEffect(() => {
         const updateMousePosition = (event: MouseEvent) => {
-            setMousePosition({ x: event.clientX, y: event.clientY });
+            if (containerRef.current) {
+                containerRef.current.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
+            }
         };
 
         const resetCursor = () => setCursor({ type: "default" });
@@ -88,7 +90,7 @@ export const CustomCursor = () => {
 
             case "displayTitle":
                 return (
-                    <div className="cursor-base-style px-5 py-2 rounded-full text-sm tracking-widest">
+                    <div className="cursor-base-style px-5 py-2 rounded-md text-sm tracking-widest">
                         {cursor.displayText}
                     </div>
                 )
@@ -105,12 +107,8 @@ export const CustomCursor = () => {
 
     return (
         <div
-            className="fixed z-100 text-xl select-none pointer-events-none text-nowrap cursor-none"
-            style={{
-                top: `${mousePosition.y}px`,
-                left: `${mousePosition.x}px`,
-                transform: "translate(-50%, -50%)",
-            }}
+            ref={containerRef}
+            className="fixed top-0 left-0 z-100 text-xl select-none pointer-events-none text-nowrap cursor-none will-change-transform"
         >
             <AnimatePresence mode="popLayout">
                 {cursor.type !== "hidden" && (
