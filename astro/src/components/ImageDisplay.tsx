@@ -29,7 +29,7 @@ const ImageDisplay = ({ photoProject }: { photoProject: PhotoProject }) => {
                             layout
                         >
                             <a
-                                href={`${main_url}/projects/${photoProject.slugTitle}`}
+                                href={`${main_url}/projects/${photoProject.slug}`}
                                 className="cursor-none"
                             >
                                 <img

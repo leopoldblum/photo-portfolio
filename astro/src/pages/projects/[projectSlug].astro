@@ -13,7 +13,7 @@ export async function getStaticPaths() {
 
     return allPhotoProjectWrappers.map(({ photoProject }) => ({
         params: {
-            projectSlug: photoProject.slugTitle,
+            projectSlug: photoProject.slug,
         },
         props: { photoProject },
     }));

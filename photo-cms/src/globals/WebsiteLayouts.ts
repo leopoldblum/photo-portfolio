@@ -23,7 +23,10 @@ export const WebsiteLayout: GlobalConfig = {
                     required: true,
                     label: "Select a project:",
                     admin: {
-                        width: "40%"
+                        width: "40%",
+                        components: {
+                            Field: '@/components/ProjectPicker',
+                        },
                     },
                 },
             ],
@@ -38,7 +41,7 @@ export const WebsiteLayout: GlobalConfig = {
                 const uniqueIds = new Set(ids)
 
                 if (ids.length !== uniqueIds.size) {
-                    return 'you selected duplicate projects'
+                    return 'Duplicate projects are not allowed.'
                 }
 
                 return true

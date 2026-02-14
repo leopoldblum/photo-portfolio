@@ -215,7 +215,7 @@ export interface PhotoProject {
   title: string;
   date: string;
   description?: string | null;
-  slugTitle: string;
+  slug: string;
   /**
    * Upload the Picture(s) and choose 1 – 5 thumbnails which get displayed on the main page.
    */
@@ -410,7 +410,7 @@ export interface PhotoProjectsSelect<T extends boolean = true> {
   title?: T;
   date?: T;
   description?: T;
-  slugTitle?: T;
+  slug?: T;
   images?:
     | T
     | {

@@ -1,16 +1,26 @@
 import { CollectionConfig } from "payload";
-import { ImageWrapper } from '@/types/apiTypes';
 import slugify from "slugify";
 
 export const PhotoProjects: CollectionConfig = {
     slug: "photo-projects",
     admin: {
         useAsTitle: "title",
+        defaultColumns: ['thumbnail', 'title', 'date'],
     },
     access: {
         read: () => true,
     },
     fields: [
+        {
+            type: 'ui',
+            name: 'thumbnail',
+            label: ' ',
+            admin: {
+                components: {
+                    Cell: '@/components/ThumbnailCell',
+                },
+            },
+        },
         {
             type: "row",
             fields: [
@@ -38,14 +48,14 @@ export const PhotoProjects: CollectionConfig = {
             type: "row", fields: [
                 {
                     name: "description",
-                    type: "text",
+                    type: "textarea",
                     required: false,
                     admin: {
                         width: "75%",
                     }
                 },
                 {
-                    name: "slugTitle",
+                    name: "slug",
                     label: "URL Ending",
                     type: "text",
                     unique: true,
@@ -58,11 +68,25 @@ export const PhotoProjects: CollectionConfig = {
             ]
         },
         {
+            type: 'ui',
+            name: 'bulkUpload',
+            label: 'Bulk Image Upload',
+            admin: {
+                components: {
+                    Field: '@/components/BulkImageUpload',
+                },
+            },
+        },
+        {
             name: "images",
             type: "array",
             label: "Project Images",
             admin: {
                 description: "Upload the Picture(s) and choose 1 – 5 thumbnails which get displayed on the main page.",
+                initCollapsed: true,
+                components: {
+                    RowLabel: '@/components/ImageRowLabel',
+                },
             },
             fields: [
                 {
@@ -101,9 +125,9 @@ export const PhotoProjects: CollectionConfig = {
                 }
             ],
             validate: (pics: any) => {
-                const thumbnails: ImageWrapper[] = pics?.filter((pic: ImageWrapper) => pic.isThumbnail);
-                if (thumbnails.length > 5) return ("Youre selecting way too many thumbnails lol")
-                if (thumbnails.length === 0) return ("You have to pick atleast 1 thumbnail")
+                const thumbnails = pics?.filter((pic: { isThumbnail?: boolean }) => pic.isThumbnail);
+                if (thumbnails.length > 5) return ("A project can have at most 5 thumbnails.")
+                if (thumbnails.length === 0) return ("Select at least 1 thumbnail.")
                 return true;
             }
         },
@@ -112,7 +136,7 @@ export const PhotoProjects: CollectionConfig = {
         beforeChange: [
             ({ data }) => {
                 if (data.title) {
-                    data.slugTitle = slugify(data.title, { lower: true, strict: true });
+                    data.slug = slugify(data.title, { lower: true, strict: true });
                 }
                 return data;
             },

@@ -1,0 +1,35 @@
+.row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem 0.2rem 0.4rem;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--theme-success-500) 12%, var(--theme-elevation-100));
+  color: var(--theme-success-500);
+  border: 1px solid color-mix(in srgb, var(--theme-success-500) 20%, transparent);
+}
+
+.badgeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--theme-success-500);
+  box-shadow: 0 0 4px color-mix(in srgb, var(--theme-success-500) 50%, transparent);
+}
