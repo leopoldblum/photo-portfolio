@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "motion/react"
-import { ChevronLeft, ChevronRight, DotIcon, Maximize2Icon, Minimize2Icon, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize2Icon, Minimize2Icon, X } from "lucide-react";
 
 type CursorType =
     | { type: "hidden" }
@@ -48,9 +48,7 @@ export const CustomCursor = () => {
 
             case "default":
                 return (
-                    <div className="cursor-base-style text-xs rounded-3xl">
-                        <DotIcon strokeWidth={2.5} />
-                    </div>
+                    <div className="cursor-base-style size-6 rounded-full" />
                 )
 
             case "arrowLeft":
@@ -90,8 +88,7 @@ export const CustomCursor = () => {
 
             case "displayTitle":
                 return (
-
-                    <div className="cursor-base-style px-5 py-2 rounded-md text-sm tracking-widest drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
+                    <div className="cursor-base-style px-5 py-2 rounded-full text-sm tracking-widest">
                         {cursor.displayText}
                     </div>
                 )
@@ -101,32 +98,35 @@ export const CustomCursor = () => {
         }
     }
 
-    return (
-        <>
-            <motion.div
-                className={`fixed z-100 text-xl select-none pointer-events-none text-nowrap cursor-none ${cursor.type === "displayTitle" ? "rounded-md" : "rounded-3xl"} mix-blend-luminosity backdrop-blur-[2px]`}
-                style={{
-                    top: `${mousePosition.y}px`,
-                    left: `${mousePosition.x}px`,
-                    translateX: "-50%",
-                    translateY: "-50%",
-                }}
-                key={
-                    cursor.type === "displayTitle"
-                        ? `${cursor.type}-${cursor.displayText}`
-                        : cursor.type
-                }
+    const cursorKey =
+        cursor.type === "displayTitle"
+            ? `${cursor.type}-${cursor.displayText}`
+            : cursor.type;
 
-                initial={{ scaleY: 0.5, scaleX: 0.2, y: -15 }}
-                animate={{ scaleY: 1, scaleX: 1, y: 0 }}
-                exit={{ scaleY: 0.5, scaleX: 0.2, y: 15 }}
-                transition={{ duration: 0.2, ease: "easeInOut" }}
-            >
-                {
-                    renderCursor(cursor)
-                }
-            </motion.div>
-        </>
+    return (
+        <div
+            className="fixed z-100 text-xl select-none pointer-events-none text-nowrap cursor-none"
+            style={{
+                top: `${mousePosition.y}px`,
+                left: `${mousePosition.x}px`,
+                transform: "translate(-50%, -50%)",
+            }}
+        >
+            <AnimatePresence mode="popLayout">
+                {cursor.type !== "hidden" && (
+                    <motion.div
+                        key={cursorKey}
+                        className={`rounded-full ${cursor.type !== "displayTitle" ? "mix-blend-luminosity backdrop-blur-[2px]" : ""}`}
+                        initial={{ opacity: 0, scale: 0.5, filter: "blur(4px)" }}
+                        animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                        exit={{ opacity: 0, scale: 0.5, filter: "blur(4px)" }}
+                        transition={{ duration: 0.15, ease: [0.32, 0.72, 0, 1] }}
+                    >
+                        {renderCursor(cursor)}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
     );
 };
 
