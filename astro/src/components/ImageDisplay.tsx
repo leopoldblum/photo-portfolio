@@ -1,7 +1,6 @@
-import { preload } from "react-dom";
-import type { PhotoProject, ImageWrapper, AvailableSizes, Image } from "../../../photo-cms/src/types/apiTypes.js";
+import type { PhotoProject, ImageWrapper } from "../../../photo-cms/src/types/apiTypes";
 import { CustomCursor } from "./CustomCursor.tsx";
-import { AnimatePresence, easeIn, motion } from "motion/react"
+import { motion } from "motion/react"
 import { getImageSrcSet } from "../util/imageUtil.tsx";
 
 

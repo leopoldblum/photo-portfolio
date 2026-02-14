@@ -25,9 +25,6 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
     const [isImageLoaded, setIsImageLoaded] = useState<Map<ImageWrapper, Boolean>>(new Map(photoProject.images.map(img => [img, false])))
     const [showBlurImage, setShowBlurImage] = useState(false)
     const [isFirstLoad, setIsFirstLoad] = useState(true)
-    // const [isDraggable, setIsDraggable] = useState(true)
-
-    // const imageWidthScaling = isFullscreen ? 1 : 0.6
     const imageWidthScaling = isFullscreen ? "100vw" : "60vw"
 
     /**
@@ -110,7 +107,6 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                             exit="exit"
                             transition={{ duration: 0.25, ease: "easeInOut" }}
 
-                            // drag={isDraggable ? "x" : false}
                             drag="x"
                             dragConstraints={{ left: 0, right: 0 }}
                             onDragStart={() => setIsClickBlocked(true)}
@@ -120,13 +116,6 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                                 setIsClickBlocked(false)
                             }}
 
-                        // onAnimationStart={() => setIsDraggable(false)}
-                        // onAnimationComplete={() => setIsDraggable(true)}
-
-                        // onAnimationStart={() => {
-                        //     setIsDraggable(false)
-                        //     setTimeout(() => setIsDraggable(true), 0.85 * 0.25)
-                        // }}
                         >
 
                             {/* blurry image */}
@@ -143,7 +132,6 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
 
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: isImageLoaded.get(currImgWrapper) ? 0 : (showBlurImage ? 1 : 0) }}
-                                        // animate={{ opacity: 0 }}
                                         transition={{ duration: isImageLoaded.get(currImgWrapper) ? 1.5 : 0.15, ease: "easeIn" }}
                                     />
                                 </motion.div>

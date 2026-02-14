@@ -1,5 +1,4 @@
-import { image, main } from "motion/react-client";
-import type { ImageWrapper, AvailableSizes, Image } from "../../../photo-cms/src/types/apiTypes";
+import type { ImageWrapper, AvailableSizes } from "../../../photo-cms/src/types/apiTypes";
 
 const sizeBreakpoints: Record<keyof AvailableSizes, number> = {
     tinyPreview: 100,
@@ -9,13 +8,9 @@ const sizeBreakpoints: Record<keyof AvailableSizes, number> = {
     res4k: 3840
 };
 
-const sizeBreakpoints_2: { size: keyof AvailableSizes; width: number }[] = [
-    { size: "small", width: 800 },
-    { size: "res1080", width: 1920 },
-    { size: "res1440", width: 2560 },
-    { size: "res4k", width: 3840 },
-
-]
+const orderedSizes = (Object.entries(sizeBreakpoints) as [keyof AvailableSizes, number][])
+    .filter(([size]) => size !== "tinyPreview")
+    .map(([size, width]) => ({ size, width }))
 
 const getImageUrl = (dbUrl: String, image: ImageWrapper, sizeName: keyof AvailableSizes) => {
     return dbUrl + (image.image.sizes?.[sizeName].url || image.image.url)
@@ -67,9 +62,7 @@ export const getImageURLForGivenWidth = (db_url: String, image: ImageWrapper, cl
 
     const calcDisplayWidth = clientWidth * imageWidthScaler
 
-    const firstBestSize = sizeBreakpoints_2.find(bp => calcDisplayWidth <= bp.width) ?? sizeBreakpoints_2.find(biggestBP => biggestBP.size === "res4k")!
-
-    // console.log("best size found: ", firstBestSize)
+    const firstBestSize = orderedSizes.find(bp => calcDisplayWidth <= bp.width) ?? orderedSizes.find(biggestBP => biggestBP.size === "res4k")!
 
     return getImageUrl(db_url, image, firstBestSize.size)
 }

@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "motion/react"
-import { ChevronLeft, ChevronRight, Circle, DotIcon, Maximize2Icon, Minimize2Icon, PlusIcon, SparkleIcon, Triangle, X, ZoomInIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, DotIcon, Maximize2Icon, Minimize2Icon, X } from "lucide-react";
 
 type CursorType =
     | { type: "hidden" }
@@ -25,14 +25,17 @@ export const CustomCursor = () => {
             setMousePosition({ x: event.clientX, y: event.clientY });
         };
 
+        const resetCursor = () => setCursor({ type: "default" });
+
         document.addEventListener("pointerenter", updateMousePosition, true)
         document.addEventListener("pointermove", updateMousePosition);
         document.addEventListener("cursor-text", handleCursorTypeChange as EventListener);
+        document.addEventListener("astro:after-swap", resetCursor);
 
         return () => {
             document.removeEventListener("pointermove", updateMousePosition);
             document.removeEventListener("cursor-text", handleCursorTypeChange as EventListener);
-
+            document.removeEventListener("astro:after-swap", resetCursor);
         };
     }, []);
 
@@ -129,7 +132,6 @@ export const CustomCursor = () => {
 
 
 CustomCursor.setCursorType = (cursorType: CursorType) => {
-    // console.log("changing type to: " + cursorType.type)
     const event = new CustomEvent<CursorType>("cursor-text", { detail: cursorType });
     document.dispatchEvent(event);
 };
