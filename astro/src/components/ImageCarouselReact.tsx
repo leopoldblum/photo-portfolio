@@ -1,4 +1,4 @@
-import type { AvailableSizes, ImageWrapper, Photoset } from "../../../photo-cms/src/types/apiTypes";
+import type { AvailableSizes, ImageWrapper, PhotoProject } from "../../../photo-cms/src/types/apiTypes";
 import { useEffect, useState, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { CustomCursor } from "./CustomCursor";
@@ -10,7 +10,7 @@ import { useThrottledCallback } from "use-debounce";
 const db_url = import.meta.env.PUBLIC_API_URL as String
 
 interface CarouselProps {
-    photoSet: Photoset,
+    photoProject: PhotoProject,
     isFullscreen: boolean,
     imageIndex: number,
     direction: number
@@ -19,10 +19,10 @@ interface CarouselProps {
     toggleModal: () => void,
 }
 
-const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scrollLeft, scrollRight, toggleModal }: CarouselProps) => {
+const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction, scrollLeft, scrollRight, toggleModal }: CarouselProps) => {
 
     const [isClickBlocked, setIsClickBlocked] = useState(false)
-    const [isImageLoaded, setIsImageLoaded] = useState<Map<ImageWrapper, Boolean>>(new Map(photoSet.images.map(img => [img, false])))
+    const [isImageLoaded, setIsImageLoaded] = useState<Map<ImageWrapper, Boolean>>(new Map(photoProject.images.map(img => [img, false])))
     const [showBlurImage, setShowBlurImage] = useState(false)
     const [isFirstLoad, setIsFirstLoad] = useState(true)
     // const [isDraggable, setIsDraggable] = useState(true)
@@ -34,12 +34,12 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
      * @todo setup proper caching tags in response headers in cloudflare when hosting, for proper preloading
      */
 
-    const previousIndex = (imageIndex - 1 + photoSet.images.length) % photoSet.images.length
-    const nextIndex = (imageIndex + 1) % photoSet.images.length
+    const previousIndex = (imageIndex - 1 + photoProject.images.length) % photoProject.images.length
+    const nextIndex = (imageIndex + 1) % photoProject.images.length
 
-    const prevImgWrapper = photoSet.images[previousIndex]
-    const currImgWrapper = photoSet.images[imageIndex]
-    const nextImgWrapper = photoSet.images[nextIndex]
+    const prevImgWrapper = photoProject.images[previousIndex]
+    const currImgWrapper = photoProject.images[imageIndex]
+    const nextImgWrapper = photoProject.images[nextIndex]
 
     // preloading left neighbor image, using Image() to use srcset
     const img = new Image()
@@ -64,7 +64,6 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
 
         const blurLoadingDelay = setTimeout(() => {
             setShowBlurImage(true);
-            // console.log("show blur image")
         }, 200)
         return () => clearTimeout(blurLoadingDelay)
 
@@ -155,7 +154,7 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
                                 className="absolute object-contain w-full h-full pointer-events-none"
 
                                 src={db_url + currImgWrapper.image.url}
-                                srcSet={getImageSrcSet(db_url, photoSet.images[imageIndex])}
+                                srcSet={getImageSrcSet(db_url, photoProject.images[imageIndex])}
                                 sizes={imageWidthScaling}
                                 alt={currImgWrapper.image.alt}
                                 loading="lazy"
@@ -187,7 +186,7 @@ const ImageCarouselReact = ({ photoSet, isFullscreen, imageIndex, direction, scr
                 />
 
                 <div className="py-2 w-full flex justify-center items-center">
-                    {`${imageIndex + 1} / ${photoSet.images.length}`}
+                    {`${imageIndex + 1} / ${photoProject.images.length}`}
                 </div>
 
             </div >

@@ -2,8 +2,6 @@ import { CollectionConfig } from "payload";
 import { ImageWrapper } from '@/types/apiTypes';
 import slugify from "slugify";
 
-
-
 export const PhotoProjects: CollectionConfig = {
     slug: "photo-projects",
     admin: {
@@ -51,7 +49,7 @@ export const PhotoProjects: CollectionConfig = {
                     label: "URL Ending",
                     type: "text",
                     unique: true,
-                    // required: true,
+                    required: true,
                     admin: {
                         readOnly: true,
                         width: "25%",
@@ -71,8 +69,9 @@ export const PhotoProjects: CollectionConfig = {
                     name: "image",
                     type: "upload",
                     relationTo: "media",
+                    required: true,
+                    displayPreview: true,
                     label: "Choose or upload your image:",
-
                 },
                 {
                     type: "row",
@@ -108,28 +107,15 @@ export const PhotoProjects: CollectionConfig = {
                 return true;
             }
         },
-        {
-            name: "thumbnailImages",
-            type: "array",
-            fields: [
-                {
-                    name: "image",
-                    type: "upload",
-                    relationTo: "media",
-                },
-            ],
-
-        },
     ],
-    // hooks: {
-    //     beforeChange: [
-    //         ({ data }) => {
-    //             if (data.title) {
-    //                 data.slugTitle = slugify(data.title, { lower: true, strict: true });
-    //             }
-    //             return data;
-    //         },
-    //     ],
-    // },
+    hooks: {
+        beforeChange: [
+            ({ data }) => {
+                if (data.title) {
+                    data.slugTitle = slugify(data.title, { lower: true, strict: true });
+                }
+                return data;
+            },
+        ],
+    },
 };
-

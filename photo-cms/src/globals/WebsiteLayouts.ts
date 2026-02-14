@@ -9,36 +9,36 @@ export const WebsiteLayout: GlobalConfig = {
 
     fields: [
         {
-            name: "photosets",
+            name: "photoProjects",
             type: "array",
             admin: {
-                description: "Pick your sets and organize them in display order, starting from the top."
+                description: "Pick your projects and organize them in display order, starting from the top."
 
             },
             fields: [
                 {
-                    name: "photoset",
+                    name: "photoProject",
                     type: "relationship",
-                    relationTo: "photoSet",
+                    relationTo: "photo-projects",
                     required: true,
-                    label: "Select a set:",
+                    label: "Select a project:",
                     admin: {
                         width: "40%"
                     },
                 },
             ],
-            validate: (photosets) => {
-                if (!Array.isArray(photosets)) return true
+            validate: (photoProjects) => {
+                if (!Array.isArray(photoProjects)) return true
 
-                const ids = photosets.map((set) => {
-                    const photoset = (set as any)?.photoset
-                    return typeof photoset === 'object' ? photoset.id : photoset
+                const ids = photoProjects.map((entry) => {
+                    const photoProject = (entry as any)?.photoProject
+                    return typeof photoProject === 'object' ? photoProject.id : photoProject
                 })
 
                 const uniqueIds = new Set(ids)
 
                 if (ids.length !== uniqueIds.size) {
-                    return 'you selected duplicate sets'
+                    return 'you selected duplicate projects'
                 }
 
                 return true

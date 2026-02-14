@@ -1,4 +1,4 @@
-import type { Photoset } from "../../../photo-cms/src/types/apiTypes";
+import type { PhotoProject } from "../../../photo-cms/src/types/apiTypes";
 import { useState, useEffect } from "react";
 import ImageCarouselReact from "./ImageCarouselReact";
 import { CustomCursor } from "./CustomCursor";
@@ -7,7 +7,7 @@ import { X } from "lucide-react";
 import { useThrottledCallback } from "use-debounce";
 
 
-const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
+const ImageCarouselWithModal = ({ photoProject }: { photoProject: PhotoProject }) => {
 
     const [imageIndex, setImageIndex] = useState(0);
     const [direction, setDirection] = useState(1);
@@ -36,12 +36,12 @@ const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
 
     const scrollLeft = () => {
         setDirection(-1);
-        setImageIndex(prev => prev > 0 ? prev - 1 : photoSet.images.length - 1);
+        setImageIndex(prev => prev > 0 ? prev - 1 : photoProject.images.length - 1);
     };
 
     const scrollRight = () => {
         setDirection(1);
-        setImageIndex(prev => prev < photoSet.images.length - 1 ? prev + 1 : 0);
+        setImageIndex(prev => prev < photoProject.images.length - 1 ? prev + 1 : 0);
     };
 
 
@@ -53,8 +53,6 @@ const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
 
 
     const handleKeyDown = (e: KeyboardEvent) => {
-        console.log("pressed key")
-
         switch (e.key) {
             case "Escape":
                 if (showModal) toggleModal();
@@ -77,7 +75,7 @@ const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
         <>
             {!showModal &&
                 <ImageCarouselReact
-                    photoSet={photoSet}
+                    photoProject={photoProject}
                     isFullscreen={false}
                     imageIndex={imageIndex}
                     direction={direction}
@@ -111,7 +109,7 @@ const ImageCarouselWithModal = ({ photoSet }: { photoSet: Photoset }) => {
                     {/* image display */}
                     <div className="h-full w-full flex justify-center items-center">
                         <ImageCarouselReact
-                            photoSet={photoSet}
+                            photoProject={photoProject}
                             isFullscreen={true}
                             imageIndex={imageIndex}
                             direction={direction}

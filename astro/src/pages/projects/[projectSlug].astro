@@ -1,7 +1,6 @@
 ---
 import type { WebsiteLayout } from "../../../../photo-cms/src/types/apiTypes";
 import LayoutProjects from "../../layouts/LayoutProjects.astro";
-import ImageCarouselReact from "../../components/ImageCarouselReact";
 import ImageCarouselWithModal from "../../components/ImageCarouselWithModal";
 
 export async function getStaticPaths() {
@@ -10,23 +9,21 @@ export async function getStaticPaths() {
     const res = await fetch(`${db_url}/api/globals/websiteLayout`);
     const websitelayout: WebsiteLayout = await res.json();
 
-    const allPhotoSetWrappers = websitelayout.photosets;
+    const allPhotoProjectWrappers = websitelayout.photoProjects;
 
-    allPhotoSetWrappers.map((el) => console.log(el.photoset.project.slugTitle));
-
-    return allPhotoSetWrappers.map(({ photoset }) => ({
+    return allPhotoProjectWrappers.map(({ photoProject }) => ({
         params: {
-            projectSlug: photoset.project.slugTitle,
+            projectSlug: photoProject.slugTitle,
         },
-        props: { photoset },
+        props: { photoProject },
     }));
 }
 
-const { photoset } = Astro.props;
+const { photoProject } = Astro.props;
 ---
 
-<LayoutProjects title={photoset.project.title}>
+<LayoutProjects title={photoProject.title}>
     <div class="w-full">
-        <ImageCarouselWithModal client:only photoSet={photoset} />
+        <ImageCarouselWithModal client:only photoProject={photoProject} />
     </div>
 </LayoutProjects>

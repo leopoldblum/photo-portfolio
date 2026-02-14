@@ -38,26 +38,19 @@ export interface ImageWrapper {
     id: string;
 }
 
-export interface Project {
+export interface PhotoProject {
     createdAt: string;
     updatedAt: string;
     title: string;
     date: string;
-    id: string;
+    description?: string;
     slugTitle: string;
-}
-
-export interface Photoset {
-    createdAt: string;
-    updatedAt: string;
-    project: Project;
     images: ImageWrapper[];
-    title: string;
     id: string;
 }
 
-export interface PhotosetsWrapper {
-    photoset: Photoset;
+export interface PhotoProjectWrapper {
+    photoProject: PhotoProject;
     id: string;
 }
 
@@ -65,6 +58,6 @@ export interface WebsiteLayout {
     createdAt: string;
     updatedAt: string;
     globalType: string;
-    photosets: PhotosetsWrapper[];
+    photoProjects: PhotoProjectWrapper[];
     id: string;
 }

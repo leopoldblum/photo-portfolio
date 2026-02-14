@@ -9,8 +9,6 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
-import { Projects } from './collections/Projects'
-import { PhotoSet } from './collections/PhotoSets'
 import { PhotoProjects } from "./collections/PhotoProjects"
 import { WebsiteLayout } from './globals/WebsiteLayouts'
 
@@ -25,7 +23,7 @@ export default buildConfig({
     },
   },
   globals: [WebsiteLayout],
-  collections: [Users, Media, Projects, PhotoSet, PhotoProjects],
+  collections: [Users, Media, PhotoProjects],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

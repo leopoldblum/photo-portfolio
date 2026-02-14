@@ -1,5 +1,5 @@
 import { preload } from "react-dom";
-import type { Photoset, ImageWrapper, AvailableSizes, Image } from "../../../photo-cms/src/types/apiTypes.js";
+import type { PhotoProject, ImageWrapper, AvailableSizes, Image } from "../../../photo-cms/src/types/apiTypes.js";
 import { CustomCursor } from "./CustomCursor.tsx";
 import { AnimatePresence, easeIn, motion } from "motion/react"
 import { getImageSrcSet } from "../util/imageUtil.tsx";
@@ -9,10 +9,10 @@ const db_url = import.meta.env.PUBLIC_API_URL as String
 const main_url = import.meta.env.PUBLIC_BASE_URL
 
 
-const ImageDisplay = ({ photoSet }: { photoSet: Photoset }) => {
+const ImageDisplay = ({ photoProject }: { photoProject: PhotoProject }) => {
 
-    const thumbnails = photoSet.images.filter((image) => image.isThumbnail);
-    const projectTitle = photoSet.project.title
+    const thumbnails = photoProject.images.filter((image) => image.isThumbnail);
+    const projectTitle = photoProject.title
 
     const basePicture = thumbnails[0].image;
 
@@ -30,7 +30,7 @@ const ImageDisplay = ({ photoSet }: { photoSet: Photoset }) => {
                             layout
                         >
                             <a
-                                href={`${main_url}/projects/${photoSet.project.slugTitle}`}
+                                href={`${main_url}/projects/${photoProject.slugTitle}`}
                                 className="cursor-none"
                             >
                                 <img

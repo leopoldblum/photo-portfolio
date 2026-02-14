@@ -8,15 +8,14 @@ const db_url = import.meta.env.PUBLIC_API_URL;
 const res = await fetch(`${db_url}/api/globals/websiteLayout`);
 const websitelayout: WebsiteLayout = await res.json();
 
-const allPhotoSetWrappers = websitelayout.photosets;
+const allPhotoProjectWrappers = websitelayout.photoProjects;
 ---
 
 <Layout title="LB Fotos">
     {
-        allPhotoSetWrappers.map((photoSetWrapper) => (
+        allPhotoProjectWrappers.map((wrapper) => (
             <>
-                {/* Display Thumbnails here */}
-                <ImageDisplay photoSet={photoSetWrapper.photoset} client:load />
+                <ImageDisplay photoProject={wrapper.photoProject} client:load />
             </>
         ))
     }
