@@ -24,6 +24,6 @@ const { photoProject } = Astro.props;
 
 <LayoutProjects title={photoProject.title}>
     <div class="w-full">
-        <ImageCarouselWithModal client:load photoProject={photoProject} />
+        <ImageCarouselWithModal client:only="react" photoProject={photoProject} />
     </div>
 </LayoutProjects>
