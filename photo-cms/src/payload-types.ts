@@ -69,8 +69,6 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
-    projects: Project;
-    photoSet: PhotoSet;
     'photo-projects': PhotoProject;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -81,8 +79,6 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    projects: ProjectsSelect<false> | ProjectsSelect<true>;
-    photoSet: PhotoSetSelect<false> | PhotoSetSelect<true>;
     'photo-projects': PhotoProjectsSelect<false> | PhotoProjectsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -212,41 +208,6 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "projects".
- */
-export interface Project {
-  id: string;
-  title: string;
-  date: string;
-  description?: string | null;
-  slugTitle: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "photoSet".
- */
-export interface PhotoSet {
-  id: string;
-  /**
-   * Choose the associated project
-   */
-  project: string | Project;
-  /**
-   * Upload the Picture(s) and choose 1 – 5 thumbnails which get displayed on the main page.
-   */
-  images: {
-    image: string | Media;
-    isThumbnail?: boolean | null;
-    id?: string | null;
-  }[];
-  title?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "photo-projects".
  */
 export interface PhotoProject {
@@ -254,21 +215,15 @@ export interface PhotoProject {
   title: string;
   date: string;
   description?: string | null;
-  slugTitle?: string | null;
+  slugTitle: string;
   /**
    * Upload the Picture(s) and choose 1 – 5 thumbnails which get displayed on the main page.
    */
   images?:
     | {
-        image?: (string | null) | Media;
+        image: string | Media;
         description?: string | null;
         isThumbnail?: boolean | null;
-        id?: string | null;
-      }[]
-    | null;
-  thumbnailImages?:
-    | {
-        image?: (string | null) | Media;
         id?: string | null;
       }[]
     | null;
@@ -306,14 +261,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: string | Media;
-      } | null)
-    | ({
-        relationTo: 'projects';
-        value: string | Project;
-      } | null)
-    | ({
-        relationTo: 'photoSet';
-        value: string | PhotoSet;
       } | null)
     | ({
         relationTo: 'photo-projects';
@@ -457,35 +404,6 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "projects_select".
- */
-export interface ProjectsSelect<T extends boolean = true> {
-  title?: T;
-  date?: T;
-  description?: T;
-  slugTitle?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "photoSet_select".
- */
-export interface PhotoSetSelect<T extends boolean = true> {
-  project?: T;
-  images?:
-    | T
-    | {
-        image?: T;
-        isThumbnail?: T;
-        id?: T;
-      };
-  title?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "photo-projects_select".
  */
 export interface PhotoProjectsSelect<T extends boolean = true> {
@@ -499,12 +417,6 @@ export interface PhotoProjectsSelect<T extends boolean = true> {
         image?: T;
         description?: T;
         isThumbnail?: T;
-        id?: T;
-      };
-  thumbnailImages?:
-    | T
-    | {
-        image?: T;
         id?: T;
       };
   updatedAt?: T;
@@ -557,11 +469,11 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface WebsiteLayout {
   id: string;
   /**
-   * Pick your sets and organize them in display order, starting from the top.
+   * Pick your projects and organize them in display order, starting from the top.
    */
-  photosets?:
+  photoProjects?:
     | {
-        photoset: string | PhotoSet;
+        photoProject: string | PhotoProject;
         id?: string | null;
       }[]
     | null;
@@ -573,10 +485,10 @@ export interface WebsiteLayout {
  * via the `definition` "websiteLayout_select".
  */
 export interface WebsiteLayoutSelect<T extends boolean = true> {
-  photosets?:
+  photoProjects?:
     | T
     | {
-        photoset?: T;
+        photoProject?: T;
         id?: T;
       };
   updatedAt?: T;
