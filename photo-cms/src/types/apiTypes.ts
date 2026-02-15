@@ -24,17 +24,31 @@ export type ImageSize = Strict<NonNullable<PayloadSizes[keyof PayloadSizes]>>
 
 export type AvailableSizes = { [K in keyof PayloadSizes]-?: ImageSize }
 
+// -- EXIF metadata (auto-extracted from uploaded image) --
+
+export type ExifData = {
+  cameraMake?: string | null
+  cameraModel?: string | null
+  lens?: string | null
+  focalLength?: number | null
+  aperture?: number | null
+  shutterSpeed?: number | null
+  iso?: number | null
+}
+
 // -- Image (populated Media with all sizes present) --
 
-export type Image = Strict<Omit<PayloadMedia, 'sizes' | 'thumbnailURL'>> & {
+export type Image = Strict<Omit<PayloadMedia, 'sizes' | 'thumbnailURL' | 'exif'>> & {
   thumbnailURL: string | null
   sizes: AvailableSizes
+  exif?: ExifData | null
 }
 
 // -- Image entry within a PhotoProject --
 
 export type ImageWrapper = {
   image: Image
+  description?: string | null
   isThumbnail: boolean
   id: string
 }

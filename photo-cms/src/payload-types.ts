@@ -152,6 +152,18 @@ export interface User {
 export interface Media {
   id: string;
   alt: string;
+  /**
+   * Automatically extracted from uploaded image.
+   */
+  exif?: {
+    cameraMake?: string | null;
+    cameraModel?: string | null;
+    lens?: string | null;
+    focalLength?: number | null;
+    aperture?: number | null;
+    shutterSpeed?: number | null;
+    iso?: number | null;
+  };
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -336,6 +348,17 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  exif?:
+    | T
+    | {
+        cameraMake?: T;
+        cameraModel?: T;
+        lens?: T;
+        focalLength?: T;
+        aperture?: T;
+        shutterSpeed?: T;
+        iso?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   url?: T;
