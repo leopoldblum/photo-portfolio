@@ -29,6 +29,7 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
     const [isClickBlocked, setIsClickBlocked] = useState(false)
     const [isImageLoaded, setIsImageLoaded] = useState<Map<ImageWrapper, Boolean>>(new Map(photoProject.images.map(img => [img, false])))
     const [showBlurImage, setShowBlurImage] = useState(false)
+    const firstImageShown = useRef(false)
     const imageWidthScaling = isFullscreen ? "100vw" : "60vw"
 
     const totalImages = photoProject.images.length;
@@ -234,7 +235,7 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
 
                                     initial={{ opacity: isImageLoaded.get(currImgWrapper) ? 1 : 0 }}
                                     animate={{ opacity: isImageLoaded.get(currImgWrapper) ? 1 : 0 }}
-                                    transition={{ opacity: { duration: 0.15, ease: "easeIn" } }}
+                                    transition={{ opacity: { duration: (imageIndex === 0 && !firstImageShown.current) ? 0 : 0.15, ease: "easeIn" } }}
 
                                     onLoad={() => {
                                         setIsImageLoaded(prev => {
@@ -242,8 +243,11 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                                             newMap.set(currImgWrapper, true);
                                             return newMap;
                                         })
-                                        if (imageIndex === 0 && onFirstImageReady) {
-                                            onFirstImageReady();
+                                        if (imageIndex === 0 && !firstImageShown.current && onFirstImageReady) {
+                                            firstImageShown.current = true;
+                                            requestAnimationFrame(() => {
+                                                onFirstImageReady();
+                                            });
                                         }
                                     }}
                                 />
