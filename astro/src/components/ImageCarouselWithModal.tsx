@@ -5,6 +5,7 @@ import { CustomCursor } from "./CustomCursor";
 import { AnimatePresence, motion } from "motion/react";
 import { X } from "lucide-react";
 import { useThrottledCallback } from "use-debounce";
+import { navigate } from "astro:transitions/client";
 
 export type AdjacentProject = {
     slug: string;
@@ -23,6 +24,7 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: Caro
     const [imageIndex, setImageIndex] = useState(0);
     const [direction, setDirection] = useState(1);
     const [showModal, setShowModal] = useState(false)
+    const [showInfo, setShowInfo] = useState(false)
     const wasModalOpen = useRef(false)
     const closeCursorType = useRef<"zoomIn" | "default">("zoomIn")
 
@@ -49,6 +51,10 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: Caro
         const timer = setTimeout(hidePlaceholder, 800);
         return () => clearTimeout(timer);
     }, []);
+
+    useEffect(() => {
+        setShowInfo(false)
+    }, [imageIndex])
 
     useEffect(() => {
         document.body.classList.add("overflow-hidden")
@@ -85,8 +91,10 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: Caro
         setImageIndex(prev => prev < totalImages ? prev + 1 : prev);
     };
 
-    const navigateToProject = (slug: string) => {
-        document.getElementById(`project-link-${slug}`)?.click();
+    const navigateToProject = (slug: string, dir: 'prev' | 'next') => {
+        document.documentElement.dataset.slide = dir;
+        navigate(`/projects/${slug}`);
+        setTimeout(() => { delete document.documentElement.dataset.slide; }, 400);
     };
 
 
@@ -105,7 +113,7 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: Caro
 
             case "ArrowLeft":
                 if (imageIndex === -1) {
-                    navigateToProject(prevProject.slug);
+                    navigateToProject(prevProject.slug, 'prev');
                 } else {
                     throttledScrollLeft();
                 }
@@ -113,10 +121,15 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: Caro
 
             case "ArrowRight":
                 if (imageIndex === totalImages) {
-                    navigateToProject(nextProject.slug);
+                    navigateToProject(nextProject.slug, 'next');
                 } else {
                     throttledScrollRight();
                 }
+                break;
+
+            case "i":
+            case "I":
+                if (!isOnCard) setShowInfo(prev => !prev)
                 break;
 
             default:
@@ -137,6 +150,8 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: Caro
                 prevProject={prevProject}
                 nextProject={nextProject}
                 onFirstImageReady={hidePlaceholder}
+                showInfo={showInfo}
+                onToggleInfo={() => setShowInfo(prev => !prev)}
             />
 
             <AnimatePresence>
@@ -200,6 +215,8 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: Caro
                                 toggleModal={throttledToggleModal}
                                 prevProject={prevProject}
                                 nextProject={nextProject}
+                                showInfo={showInfo}
+                                onToggleInfo={() => setShowInfo(prev => !prev)}
                             />
                         </motion.div>
                     </motion.div>

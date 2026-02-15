@@ -7,7 +7,16 @@ import { imageCarouselSliderVariants } from "../util/motionSliderVariants";
 import { getImageSrcSet, getAllURLs, getImageURLForGivenWidth } from "../util/imageUtil";
 import { preload } from "react-dom";
 import { useThrottledCallback } from "use-debounce";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Info } from "lucide-react";
+import { navigate } from "astro:transitions/client";
+import ImageInfoOverlay from "./ImageInfoOverlay";
+import { hasAnyExif } from "../util/exifFormatters";
+
+const navigateSlide = (slug: string, dir: 'prev' | 'next') => {
+    document.documentElement.dataset.slide = dir;
+    navigate(`/projects/${slug}`);
+    setTimeout(() => { delete document.documentElement.dataset.slide; }, 400);
+};
 
 const db_url = import.meta.env.PUBLIC_API_URL as String
 
@@ -22,10 +31,13 @@ interface CarouselProps {
     prevProject: AdjacentProject,
     nextProject: AdjacentProject,
     onFirstImageReady?: () => void,
+    showInfo: boolean,
+    onToggleInfo: () => void,
 }
 
-const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction, scrollLeft, scrollRight, toggleModal, prevProject, nextProject, onFirstImageReady }: CarouselProps) => {
+const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction, scrollLeft, scrollRight, toggleModal, prevProject, nextProject, onFirstImageReady, showInfo, onToggleInfo }: CarouselProps) => {
 
+    const [isInfoHovered, setIsInfoHovered] = useState(false)
     const [isClickBlocked, setIsClickBlocked] = useState(false)
     const [isImageLoaded, setIsImageLoaded] = useState<Map<ImageWrapper, Boolean>>(new Map(photoProject.images.map(img => [img, false])))
     const [showBlurImage, setShowBlurImage] = useState(false)
@@ -95,20 +107,20 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
 
     return (
         <>
-            <div className={`flex flex-col justify-center items-center relative cursor-none w-full overflow-x-hidden`}
+            <div className={`flex flex-col justify-center items-center relative cursor-none w-full overflow-x-clip`}
                 onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
             >
 
                 <button
                     className={`absolute left-0 w-1/3 z-5 h-full cursor-none invisible lg:visible`}
                     onClick={isOnPrevCard
-                        ? () => document.getElementById(`project-link-${prevProject.slug}`)?.click()
+                        ? () => navigateSlide(prevProject.slug, 'prev')
                         : throttledScrollLeft}
                     onPointerOver={() => CustomCursor.setCursorType({ type: "arrowLeft" })}
                     onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
                 />
 
-                <div className={`flex items-center justify-center ${isFullscreen ? "h-[95vh]" : "h-[70vh]"} w-full `}
+                <div className={`relative flex items-center justify-center ${isFullscreen ? "h-[95vh]" : "h-[70vh]"} w-full `}
                     onPointerOver={isOnCard ? undefined : (isFullscreen ? () => CustomCursor.setCursorType({ type: "zoomOut" }) : () => CustomCursor.setCursorType({ type: "zoomIn" }))}
                     onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
                     onClick={!isClickBlocked && !isOnCard ? () => toggleModal() : undefined}
@@ -136,9 +148,9 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                                 dragConstraints={{ left: 0, right: 0 }}
                                 onDragEnd={(_, { offset }) => {
                                     if (isOnPrevCard && offset.x > 100) {
-                                        document.getElementById(`project-link-${prevProject.slug}`)?.click();
+                                        navigateSlide(prevProject.slug, 'prev');
                                     } else if (isOnNextCard && offset.x < -100) {
-                                        document.getElementById(`project-link-${nextProject.slug}`)?.click();
+                                        navigateSlide(nextProject.slug, 'next');
                                     } else if (isOnPrevCard && offset.x < -100) {
                                         scrollRight();
                                     } else if (isOnNextCard && offset.x > 100) {
@@ -147,9 +159,12 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                                 }}
                             >
                                 <a
-                                    id={`project-link-${adjacentProject.slug}`}
                                     href={`/projects/${adjacentProject.slug}`}
                                     className="flex flex-col lg:flex-row items-center gap-6 lg:gap-16 cursor-none group px-6"
+                                    onClick={() => {
+                                        document.documentElement.dataset.slide = isOnPrevCard ? 'prev' : 'next';
+                                        setTimeout(() => { delete document.documentElement.dataset.slide; }, 400);
+                                    }}
                                     onPointerOver={() => CustomCursor.setCursorType({ type: "default" })}
                                     onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
                                 >
@@ -159,7 +174,6 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                                             src={adjacentProject.thumbnailUrl}
                                             alt={adjacentProject.title}
                                             className="max-h-[50vh] object-contain opacity-70 group-hover:opacity-100 scale-100 group-hover:scale-[1.03] transition-all duration-500"
-                                            style={{ viewTransitionName: `project-${adjacentProject.slug}` }}
                                             draggable={false}
                                         />
                                     </div>
@@ -262,15 +276,36 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                 <button
                     className={`absolute right-0 w-1/3 z-5 h-full cursor-none invisible lg:visible `}
                     onClick={isOnNextCard
-                        ? () => document.getElementById(`project-link-${nextProject.slug}`)?.click()
+                        ? () => navigateSlide(nextProject.slug, 'next')
                         : throttledScrollRight}
                     onPointerOver={() => CustomCursor.setCursorType({ type: "arrowRight" })}
                     onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
                 />
 
                 {!isOnCard && (
-                    <div className="py-2 w-full flex justify-center items-center">
+                    <div className="py-2 w-full flex justify-center items-center relative">
                         {`${imageIndex + 1} / ${photoProject.images.length}`}
+                        {(currImgWrapper.description || hasAnyExif(currImgWrapper.image.exif)) && (
+                            <div
+                                className="absolute right-2 top-1/2 -translate-y-1/2 z-20"
+                                onMouseEnter={() => setIsInfoHovered(true)}
+                                onMouseLeave={() => setIsInfoHovered(false)}
+                            >
+                                <button
+                                    className={`cursor-none p-3 transition-colors duration-200 ${showInfo || isInfoHovered ? 'text-neutral-300' : 'text-neutral-500 hover:text-neutral-300'}`}
+                                    onClick={(e) => { e.stopPropagation(); onToggleInfo(); }}
+                                    onPointerOver={() => CustomCursor.setCursorType({ type: "default" })}
+                                    onPointerLeave={() => CustomCursor.setCursorType({ type: isFullscreen ? "zoomOut" : "zoomIn" })}
+                                >
+                                    <Info size={20} />
+                                </button>
+                                <AnimatePresence>
+                                    {(showInfo || isInfoHovered) && (
+                                        <ImageInfoOverlay imageWrapper={currImgWrapper} />
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        )}
                     </div>
                 )}
 

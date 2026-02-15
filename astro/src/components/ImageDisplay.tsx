@@ -31,10 +31,6 @@ const ImageDisplay = ({ photoProject }: { photoProject: PhotoProject }) => {
                             <a
                                 href={`${main_url}/projects/${photoProject.slug}`}
                                 className="cursor-none"
-                                onMouseDown={(e) => {
-                                    const img = e.currentTarget.querySelector('img');
-                                    if (img) img.style.viewTransitionName = `project-${photoProject.slug}`;
-                                }}
                             >
                                 <img
                                     src={db_url + thumbnailImg.image.url}

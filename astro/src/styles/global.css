@@ -34,44 +34,40 @@ body::after {
 
 /* --- View Transitions --- */
 
-/*
- * Smooth crossfade with object-fit: contain to prevent aspect-ratio
- * distortion while the group geometry transitions between source and target.
- */
-::view-transition-old(*) {
-    animation: vt-fade-out 0.4s ease both;
-    height: 100%;
-    object-fit: contain;
+@keyframes vt-slide-out {
+    from { opacity: 1; transform: translateY(0); }
+    to   { opacity: 0; transform: translateY(-32px); }
+}
+
+@keyframes vt-slide-in {
+    from { opacity: 0; transform: translateY(32px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+::view-transition-old(root) {
+    animation: vt-slide-out 0.4s ease both;
+    mix-blend-mode: plus-lighter;
+}
+::view-transition-new(root) {
+    animation: vt-slide-in 0.4s ease both;
     mix-blend-mode: plus-lighter;
 }
 
-::view-transition-new(*) {
-    animation: vt-fade-in 0.4s ease both;
-    height: 100%;
-    object-fit: contain;
+/* Adjacent project navigation — clean crossfade, no vertical slide */
+html[data-slide] ::view-transition-old(root) {
+    animation: vt-fade-out 0.35s ease both;
     mix-blend-mode: plus-lighter;
 }
-
-@keyframes vt-fade-in {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+html[data-slide] ::view-transition-new(root) {
+    animation: vt-fade-in 0.35s ease both;
+    mix-blend-mode: plus-lighter;
 }
 
 @keyframes vt-fade-out {
     from { opacity: 1; }
     to   { opacity: 0; }
 }
-
-/* Root (page-level): faster standard crossfade */
-::view-transition-old(root) {
-    animation: vt-fade-out 0.3s ease both;
+@keyframes vt-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
-::view-transition-new(root) {
-    animation: vt-fade-in 0.3s ease both;
-}
-
-/* DEBUG: uncomment to slow down transitions */
-/* ::view-transition-old(*),
-::view-transition-new(*) {
-    animation-duration: 3s !important;
-} */
