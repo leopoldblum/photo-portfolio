@@ -1,7 +1,8 @@
 ---
-import type { WebsiteLayout } from "../../../../photo-cms/src/types/apiTypes";
+import type { WebsiteLayout, PhotoProject } from "../../../../photo-cms/src/types/apiTypes";
 import LayoutProjects from "../../layouts/LayoutProjects.astro";
 import ImageCarouselWithModal from "../../components/ImageCarouselWithModal";
+import { getImageSrcSet } from "../../util/imageUtil";
 
 export async function getStaticPaths() {
     const db_url = import.meta.env.PUBLIC_API_URL;
@@ -9,21 +10,63 @@ export async function getStaticPaths() {
     const res = await fetch(`${db_url}/api/globals/websiteLayout`);
     const websitelayout: WebsiteLayout = await res.json();
 
-    const allPhotoProjectWrappers = websitelayout.photoProjects;
+    const projects = websitelayout.photoProjects.map(w => w.photoProject);
 
-    return allPhotoProjectWrappers.map(({ photoProject }) => ({
-        params: {
-            projectSlug: photoProject.slug,
+    const getAdjacentInfo = (p: PhotoProject) => {
+        const thumb = p.images.find(img => img.isThumbnail) ?? p.images[0];
+        return {
+            slug: p.slug,
+            title: p.title,
+            thumbnailUrl: db_url + (thumb.image.sizes?.small?.url ?? thumb.image.url),
+        };
+    };
+
+    return projects.map((photoProject, i) => ({
+        params: { projectSlug: photoProject.slug },
+        props: {
+            photoProject,
+            prevProject: getAdjacentInfo(projects[(i - 1 + projects.length) % projects.length]),
+            nextProject: getAdjacentInfo(projects[(i + 1) % projects.length]),
         },
-        props: { photoProject },
     }));
 }
 
-const { photoProject } = Astro.props;
+const db_url = import.meta.env.PUBLIC_API_URL;
+const { photoProject, prevProject, nextProject } = Astro.props;
+const thumbImage = photoProject.images.find(img => img.isThumbnail) ?? photoProject.images[0];
+const placeholderSrc = db_url + (thumbImage.image.sizes?.small?.url ?? thumbImage.image.url);
+const placeholderSrcSet = getImageSrcSet(db_url, thumbImage);
 ---
 
 <LayoutProjects title={photoProject.title}>
-    <div class="w-full">
-        <ImageCarouselWithModal client:only="react" photoProject={photoProject} />
+    <div class="w-full relative">
+        <!-- Server-rendered placeholder for view transition morph target -->
+        <div id="project-placeholder" class="flex flex-col justify-center items-center w-full">
+            <div class="flex items-center justify-center h-[70vh] w-full">
+                <img
+                    src={placeholderSrc}
+                    srcset={placeholderSrcSet}
+                    sizes="60vw"
+                    width={thumbImage.image.width}
+                    height={thumbImage.image.height}
+                    alt={thumbImage.image.alt}
+                    class="max-w-full max-h-full"
+                    transition:name={`project-${photoProject.slug}`}
+                />
+            </div>
+            <div class="py-2 w-full flex justify-center items-center text-neutral-400">
+                {`1 / ${photoProject.images.length}`}
+            </div>
+        </div>
+
+        <!-- React carousel mounts on top -->
+        <div class="absolute inset-0">
+            <ImageCarouselWithModal
+                client:only="react"
+                photoProject={photoProject}
+                prevProject={prevProject}
+                nextProject={nextProject}
+            />
+        </div>
     </div>
 </LayoutProjects>

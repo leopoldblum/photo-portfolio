@@ -6,14 +6,47 @@ import { AnimatePresence, motion } from "motion/react";
 import { X } from "lucide-react";
 import { useThrottledCallback } from "use-debounce";
 
+export type AdjacentProject = {
+    slug: string;
+    title: string;
+    thumbnailUrl: string;
+};
 
-const ImageCarouselWithModal = ({ photoProject }: { photoProject: PhotoProject }) => {
+interface CarouselWithModalProps {
+    photoProject: PhotoProject;
+    prevProject: AdjacentProject;
+    nextProject: AdjacentProject;
+}
+
+const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: CarouselWithModalProps) => {
 
     const [imageIndex, setImageIndex] = useState(0);
     const [direction, setDirection] = useState(1);
     const [showModal, setShowModal] = useState(false)
     const wasModalOpen = useRef(false)
     const closeCursorType = useRef<"zoomIn" | "default">("zoomIn")
+
+    const totalImages = photoProject.images.length;
+    const isOnCard = imageIndex === -1 || imageIndex === totalImages;
+
+    const placeholderHidden = useRef(false);
+
+    const hidePlaceholder = () => {
+        if (placeholderHidden.current) return;
+        placeholderHidden.current = true;
+        const el = document.getElementById('project-placeholder');
+        if (el) {
+            el.style.transition = 'opacity 0.15s ease-out';
+            el.style.opacity = '0';
+            setTimeout(() => { el.style.visibility = 'hidden'; }, 150);
+        }
+    };
+
+    // Safety timeout: hide placeholder even if onLoad never fires
+    useEffect(() => {
+        const timer = setTimeout(hidePlaceholder, 800);
+        return () => clearTimeout(timer);
+    }, []);
 
     useEffect(() => {
         document.body.classList.add("overflow-hidden")
@@ -33,21 +66,25 @@ const ImageCarouselWithModal = ({ photoProject }: { photoProject: PhotoProject }
             document.body.classList.remove("overflow-hidden")
         }
 
-    }, [showModal])
+    }, [showModal, imageIndex])
 
 
     const toggleModal = () => {
-        setShowModal(prev => !prev);
+        if (!isOnCard) setShowModal(prev => !prev);
     }
 
     const scrollLeft = () => {
         setDirection(-1);
-        setImageIndex(prev => prev > 0 ? prev - 1 : photoProject.images.length - 1);
+        setImageIndex(prev => prev > -1 ? prev - 1 : prev);
     };
 
     const scrollRight = () => {
         setDirection(1);
-        setImageIndex(prev => prev < photoProject.images.length - 1 ? prev + 1 : 0);
+        setImageIndex(prev => prev < totalImages ? prev + 1 : prev);
+    };
+
+    const navigateToProject = (slug: string) => {
+        document.getElementById(`project-link-${slug}`)?.click();
     };
 
 
@@ -65,11 +102,19 @@ const ImageCarouselWithModal = ({ photoProject }: { photoProject: PhotoProject }
                 break;
 
             case "ArrowLeft":
-                throttledScrollLeft();
+                if (imageIndex === -1) {
+                    navigateToProject(prevProject.slug);
+                } else {
+                    throttledScrollLeft();
+                }
                 break;
 
             case "ArrowRight":
-                throttledScrollRight();
+                if (imageIndex === totalImages) {
+                    navigateToProject(nextProject.slug);
+                } else {
+                    throttledScrollRight();
+                }
                 break;
 
             default:
@@ -87,21 +132,31 @@ const ImageCarouselWithModal = ({ photoProject }: { photoProject: PhotoProject }
                 scrollLeft={scrollLeft}
                 scrollRight={scrollRight}
                 toggleModal={throttledToggleModal}
+                prevProject={prevProject}
+                nextProject={nextProject}
+                onFirstImageReady={hidePlaceholder}
             />
 
             <AnimatePresence>
                 {showModal && (
                     <motion.div
                         key="modal"
-                        className="h-screen w-screen fixed top-0 left-0 z-10 flex flex-col justify-center items-center bg-neutral-950/70 backdrop-blur-sm"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0, transition: { duration: 1, ease: [0.32, 0.72, 0, 1] } }}
+                        className="h-screen w-screen fixed top-0 left-0 z-10 flex flex-col justify-center items-center"
+                        initial={{ backgroundColor: "rgba(10,10,10,0)", backdropFilter: "blur(0px)" }}
+                        animate={{ backgroundColor: "rgba(10,10,10,0.7)", backdropFilter: "blur(4px)" }}
+                        exit={{
+                            backgroundColor: "rgba(10,10,10,0)",
+                            backdropFilter: "blur(0px)",
+                            transition: {
+                                backgroundColor: { duration: 1, ease: [0.32, 0.72, 0, 1] },
+                                backdropFilter: { duration: 0.4, ease: [0.32, 0.72, 0, 1] },
+                            },
+                        }}
                         transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
                     >
                         {/* close button — enters last, exits first */}
                         <motion.button
-                            className="fixed top-0 right-0 mx-7 my-7 lg:mx-20 lg:my-5 z-15 w-10 h-10 lg:w-15 lg:h-15 ring-1 rounded-sm cursor-none flex justify-center items-center"
+                            className="fixed top-0 right-0 mx-7 my-7 lg:mx-20 lg:my-5 z-15 w-10 h-10 lg:w-15 lg:h-15 cursor-none flex justify-center items-center"
                             onClick={() => { closeCursorType.current = "default"; toggleModal() }}
                             onPointerOver={() => CustomCursor.setCursorType({ type: "close" })}
                             initial={{ opacity: 0, y: -8 }}
@@ -141,6 +196,8 @@ const ImageCarouselWithModal = ({ photoProject }: { photoProject: PhotoProject }
                                 scrollLeft={scrollLeft}
                                 scrollRight={scrollRight}
                                 toggleModal={throttledToggleModal}
+                                prevProject={prevProject}
+                                nextProject={nextProject}
                             />
                         </motion.div>
                     </motion.div>

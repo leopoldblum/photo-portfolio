@@ -23,7 +23,7 @@ const ImageDisplay = ({ photoProject }: { photoProject: PhotoProject }) => {
 
             <div className="flex justify-center items-center gap-1 lg:gap-2">
                 {
-                    thumbnails.map((thumbnailImg) => (
+                    thumbnails.map((thumbnailImg, index) => (
                         <motion.div className="transition-all duration-300 ring-neutral-400 hover:ring-0 hover:ring-offset-3 ring-offset-neutral-800/90 overflow-hidden"
                             key={thumbnailImg.id}
                             layout
@@ -31,6 +31,10 @@ const ImageDisplay = ({ photoProject }: { photoProject: PhotoProject }) => {
                             <a
                                 href={`${main_url}/projects/${photoProject.slug}`}
                                 className="cursor-none"
+                                onMouseDown={(e) => {
+                                    const img = e.currentTarget.querySelector('img');
+                                    if (img) img.style.viewTransitionName = `project-${photoProject.slug}`;
+                                }}
                             >
                                 <img
                                     src={db_url + thumbnailImg.image.url}

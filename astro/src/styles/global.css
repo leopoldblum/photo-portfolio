@@ -31,3 +31,54 @@ body::after {
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1024 1024' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     background-repeat: repeat;
 }
+
+/* --- View Transitions --- */
+
+/*
+ * Project image morph: old stays fully visible while geometry (position/size)
+ * animates. New image fades in on top — no opacity gap or abrupt swap.
+ *
+ * isolation: auto lets old + new layer naturally instead of compositing
+ * in an isolated stacking context (which forces a crossfade).
+ */
+::view-transition-image-pair(*) {
+    isolation: auto;
+}
+
+::view-transition-old(*) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+
+::view-transition-new(*) {
+    animation: vt-fade-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+    mix-blend-mode: normal;
+}
+
+@keyframes vt-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Root (page-level): restore standard crossfade */
+::view-transition-image-pair(root) {
+    isolation: isolate;
+}
+
+::view-transition-old(root) {
+    animation: vt-fade-out 0.3s ease both;
+}
+::view-transition-new(root) {
+    animation: vt-fade-in 0.3s ease both;
+}
+
+@keyframes vt-fade-out {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
+
+/* DEBUG: uncomment to slow down transitions */
+/* ::view-transition-old(*),
+::view-transition-new(*) {
+    animation-duration: 3s !important;
+} */
