@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { AnimatePresence, motion } from "motion/react"
+import { motion } from "motion/react"
 import { ArrowUpRight, ChevronLeft, ChevronRight, Maximize2Icon, Minimize2Icon, X } from "lucide-react";
 
 type CursorType =
@@ -42,96 +42,63 @@ export const CustomCursor = () => {
         };
     }, []);
 
-
-
-    const renderCursor = (cursor: CursorType) => {
+    const renderIcon = (cursor: CursorType) => {
         switch (cursor.type) {
             case "hidden":
-                return null;
-
             case "default":
-                return (
-                    <div className="cursor-base-style size-6 rounded-full" />
-                )
-
+                return null;
             case "arrowLeft":
-                return (
-                    <div className="cursor-base-style px-1 py-2 rounded-md">
-                        <ChevronLeft strokeWidth={2.5} />
-                    </div>
-                )
-
+                return <ChevronLeft strokeWidth={2.5} />;
             case "arrowRight":
-                return (
-                    <div className="cursor-base-style px-1 py-2 rounded-md">
-                        <ChevronRight strokeWidth={2.5} />
-                    </div>
-                )
-
+                return <ChevronRight strokeWidth={2.5} />;
             case "zoomIn":
-                return (
-                    <div className="cursor-base-style p-2 rounded-3xl">
-                        <Maximize2Icon strokeWidth={2.5} />
-                    </div>
-                )
-
+                return <Maximize2Icon strokeWidth={2.5} />;
             case "zoomOut":
-                return (
-                    <div className="cursor-base-style p-2 rounded-3xl">
-                        <Minimize2Icon strokeWidth={2.5} />
-                    </div>
-                )
-
+                return <Minimize2Icon strokeWidth={2.5} />;
             case "link":
-                return (
-                    <div className="cursor-base-style p-2 rounded-3xl">
-                        <ArrowUpRight strokeWidth={2.5} />
-                    </div>
-                )
-
+                return <ArrowUpRight strokeWidth={2.5} />;
             case "close":
-                return (
-                    <div className="cursor-base-style p-2 rounded-3xl">
-                        <X strokeWidth={2.5} />
-                    </div>
-                )
-
+                return <X strokeWidth={2.5} />;
             case "displayTitle":
-                return (
-                    <div className="cursor-base-style px-5 py-2 rounded-md text-sm tracking-widest bg-neutral-800/70 backdrop-blur-md">
-                        {cursor.displayText}
-                    </div>
-                )
-
-            default:
-                return null
+                return <span className="text-sm tracking-widest">{cursor.displayText}</span>;
         }
     }
 
-    const cursorKey =
-        cursor.type === "displayTitle"
-            ? `${cursor.type}-${cursor.displayText}`
-            : cursor.type;
+    const isIcon = cursor.type !== "hidden" && cursor.type !== "default" && cursor.type !== "displayTitle";
+    const isTitle = cursor.type === "displayTitle";
 
     return (
         <div
             ref={containerRef}
             className="fixed top-0 left-0 z-100 text-xl select-none pointer-events-none text-nowrap cursor-none will-change-transform"
         >
-            <AnimatePresence mode="popLayout">
-                {cursor.type !== "hidden" && (
-                    <motion.div
-                        key={cursorKey}
-                        className={`rounded-full ${cursor.type !== "displayTitle" ? "mix-blend-luminosity backdrop-blur-[2px]" : ""}`}
-                        initial={{ opacity: 0, scale: 0.5, filter: "blur(4px)" }}
-                        animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                        exit={{ opacity: 0, scale: 0.5, filter: "blur(4px)" }}
-                        transition={{ duration: 0.15, ease: [0.32, 0.72, 0, 1] }}
-                    >
-                        {renderCursor(cursor)}
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            <motion.div
+                layout
+                className={`text-neutral-100 overflow-hidden ${isTitle ? "px-5 py-2" : isIcon ? "p-2" : "size-6"} ${!isTitle ? "mix-blend-luminosity" : ""}`}
+                animate={{
+                    opacity: cursor.type === "hidden" ? 0 : 1,
+                    scale: isTitle ? 1 : cursor.type === "hidden" ? 0.5 : 1,
+                    borderRadius: isTitle ? 6 : isIcon ? 24 : 9999,
+                    backgroundColor: "rgba(38, 38, 38, 0.7)",
+                    boxShadow: "0 0 0 2px rgba(245, 245, 245, 0.3)",
+                    backdropFilter: isTitle ? "blur(12px)" : "blur(2px)",
+                }}
+                initial={false}
+                transition={{
+                    layout: { duration: 0.15, ease: [0.32, 0.72, 0, 1] },
+                    duration: 0.15,
+                    ease: [0.32, 0.72, 0, 1],
+                }}
+            >
+                <motion.div
+                    key={isTitle ? cursor.displayText : cursor.type}
+                    initial={{ opacity: 0, filter: "blur(4px)" }}
+                    animate={{ opacity: 1, filter: "blur(0px)" }}
+                    transition={{ duration: 0.12, ease: [0.32, 0.72, 0, 1] }}
+                >
+                    {renderIcon(cursor)}
+                </motion.div>
+            </motion.div>
         </div>
     );
 };

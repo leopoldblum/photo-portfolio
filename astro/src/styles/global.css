@@ -1,5 +1,1 @@
 @import "tailwindcss";
-
-@utility cursor-base-style {
-    @apply text-neutral-100 bg-neutral-600/30 ring-[2px] ring-neutral-100/30;
-}
