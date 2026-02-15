@@ -39,15 +39,17 @@ body::after {
  * distortion while the group geometry transitions between source and target.
  */
 ::view-transition-old(*) {
-    animation: vt-fade-out 0.45s ease-out both;
+    animation: vt-fade-out 0.4s ease both;
     height: 100%;
     object-fit: contain;
+    mix-blend-mode: plus-lighter;
 }
 
 ::view-transition-new(*) {
-    animation: vt-fade-in 0.45s ease-in both;
+    animation: vt-fade-in 0.4s ease both;
     height: 100%;
     object-fit: contain;
+    mix-blend-mode: plus-lighter;
 }
 
 @keyframes vt-fade-in {
