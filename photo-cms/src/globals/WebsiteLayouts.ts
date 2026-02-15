@@ -30,8 +30,10 @@ export const WebsiteLayout: GlobalConfig = {
             name: "photoProjects",
             type: "array",
             admin: {
-                description: "Pick your projects and organize them in display order, starting from the top."
-
+                description: "Pick your projects and organize them in display order, starting from the top.",
+                components: {
+                    RowLabel: '@/components/ProjectRowLabel',
+                },
             },
             fields: [
                 {
