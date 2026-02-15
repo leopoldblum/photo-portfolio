@@ -35,7 +35,13 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: Caro
         if (placeholderHidden.current) return;
         placeholderHidden.current = true;
         const el = document.getElementById('project-placeholder');
-        if (el) el.style.visibility = 'hidden';
+        if (el) {
+            el.style.transition = 'opacity 0.12s ease-out';
+            el.style.opacity = '0';
+            const hide = () => { el.style.visibility = 'hidden'; };
+            el.addEventListener('transitionend', hide, { once: true });
+            setTimeout(hide, 200);
+        }
     };
 
     // Safety timeout: hide placeholder even if onLoad never fires
