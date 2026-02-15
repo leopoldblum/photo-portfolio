@@ -9,9 +9,15 @@ const res = await fetch(`${db_url}/api/globals/websiteLayout`);
 const websitelayout: WebsiteLayout = await res.json();
 
 const allPhotoProjectWrappers = websitelayout.photoProjects;
+
+const siteName = websitelayout.siteMetadata?.siteName ?? "LB Fotos";
+const siteDescription = websitelayout.siteMetadata?.siteDescription ?? undefined;
+const firstProject = allPhotoProjectWrappers[0]?.photoProject;
+const firstThumb = firstProject?.images.find(img => img.isThumbnail) ?? firstProject?.images[0];
+const ogImage = firstThumb ? db_url + (firstThumb.image.sizes?.res1080?.url ?? firstThumb.image.url) : undefined;
 ---
 
-<Layout title="LB Fotos">
+<Layout title={siteName} description={siteDescription} ogImage={ogImage} siteName={siteName}>
     {
         allPhotoProjectWrappers.map((wrapper) => (
             <>

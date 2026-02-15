@@ -36,9 +36,10 @@ const { photoProject, prevProject, nextProject } = Astro.props;
 const thumbImage = photoProject.images.find(img => img.isThumbnail) ?? photoProject.images[0];
 const placeholderSrc = db_url + (thumbImage.image.sizes?.small?.url ?? thumbImage.image.url);
 const placeholderSrcSet = getImageSrcSet(db_url, thumbImage);
+const ogImage = db_url + (thumbImage.image.sizes?.res1080?.url ?? thumbImage.image.sizes?.small?.url ?? thumbImage.image.url);
 ---
 
-<LayoutProjects title={photoProject.title}>
+<LayoutProjects title={photoProject.title} description={photoProject.description} ogImage={ogImage}>
     <div class="w-full relative">
         <!-- Server-rendered placeholder for view transition morph target -->
         <div id="project-placeholder" class="flex flex-col justify-center items-center w-full">

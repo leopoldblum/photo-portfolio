@@ -9,6 +9,24 @@ export const WebsiteLayout: GlobalConfig = {
 
     fields: [
         {
+            name: 'siteMetadata',
+            type: 'group',
+            admin: {
+                description: 'SEO defaults for the homepage and site-wide meta tags.',
+            },
+            fields: [
+                {
+                    name: 'siteName',
+                    type: 'text',
+                    defaultValue: 'LB Fotos',
+                },
+                {
+                    name: 'siteDescription',
+                    type: 'textarea',
+                },
+            ],
+        },
+        {
             name: "photoProjects",
             type: "array",
             admin: {

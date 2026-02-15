@@ -1,0 +1,28 @@
+---
+interface Props {
+    title: string;
+    description?: string;
+    ogImage?: string;
+    siteName?: string;
+}
+
+const baseUrl = import.meta.env.PUBLIC_BASE_URL;
+const { title, description, ogImage, siteName } = Astro.props;
+const canonicalUrl = new URL(Astro.url.pathname, baseUrl).href;
+---
+
+{description && <meta name="description" content={description} />}
+
+<meta property="og:title" content={title} />
+{description && <meta property="og:description" content={description} />}
+<meta property="og:type" content="website" />
+<meta property="og:url" content={canonicalUrl} />
+{ogImage && <meta property="og:image" content={ogImage} />}
+{siteName && <meta property="og:site_name" content={siteName} />}
+
+<meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
+<meta name="twitter:title" content={title} />
+{description && <meta name="twitter:description" content={description} />}
+{ogImage && <meta name="twitter:image" content={ogImage} />}
+
+<link rel="canonical" href={canonicalUrl} />

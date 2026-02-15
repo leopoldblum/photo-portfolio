@@ -53,7 +53,13 @@ export type PhotoProjectWrapper = {
   id: string
 }
 
-export type WebsiteLayout = Strict<Omit<PayloadWebsiteLayout, 'photoProjects'>> & {
+export type SiteMetadata = {
+  siteName?: string | null
+  siteDescription?: string | null
+}
+
+export type WebsiteLayout = Strict<Omit<PayloadWebsiteLayout, 'photoProjects' | 'siteMetadata'>> & {
   globalType: string
+  siteMetadata?: SiteMetadata
   photoProjects: PhotoProjectWrapper[]
 }

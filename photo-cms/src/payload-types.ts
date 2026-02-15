@@ -469,6 +469,13 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface WebsiteLayout {
   id: string;
   /**
+   * SEO defaults for the homepage and site-wide meta tags.
+   */
+  siteMetadata?: {
+    siteName?: string | null;
+    siteDescription?: string | null;
+  };
+  /**
    * Pick your projects and organize them in display order, starting from the top.
    */
   photoProjects?:
@@ -485,6 +492,12 @@ export interface WebsiteLayout {
  * via the `definition` "websiteLayout_select".
  */
 export interface WebsiteLayoutSelect<T extends boolean = true> {
+  siteMetadata?:
+    | T
+    | {
+        siteName?: T;
+        siteDescription?: T;
+      };
   photoProjects?:
     | T
     | {
