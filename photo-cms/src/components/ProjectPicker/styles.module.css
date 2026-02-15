@@ -128,6 +128,12 @@
   background-color: var(--theme-elevation-100);
 }
 
+.optionTaken {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+}
+
 .optionThumbWrap {
   flex-shrink: 0;
   width: 56px;

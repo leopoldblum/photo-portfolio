@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { useField, useConfig, FieldLabel } from '@payloadcms/ui'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useField, useConfig, useAllFormFields, FieldLabel } from '@payloadcms/ui'
 import type { RelationshipFieldClientComponent } from 'payload'
 import styles from './styles.module.css'
 
@@ -76,6 +76,22 @@ const ProjectPicker: RelationshipFieldClientComponent = ({ field, path }) => {
     }
   }, [isOpen])
 
+  // Collect IDs selected by sibling pickers in the array
+  const [fields] = useAllFormFields()
+  const siblingSelectedIds = useMemo(() => {
+    const ids = new Set<string>()
+    for (const [fieldPath, fieldState] of Object.entries(fields)) {
+      if (
+        fieldPath !== path &&
+        fieldPath.match(/^photoProjects\.\d+\.photoProject$/) &&
+        fieldState.value
+      ) {
+        ids.add(fieldState.value as string)
+      }
+    }
+    return ids
+  }, [fields, path])
+
   const selectedProject = projects.find((p) => p.id === value)
 
   const handleSelect = useCallback(
@@ -140,17 +156,20 @@ const ProjectPicker: RelationshipFieldClientComponent = ({ field, path }) => {
           {projects.length === 0 && !isLoading ? (
             <div className={styles.empty}>No projects found</div>
           ) : (
-            projects.map((project) => (
+            projects.map((project) => {
+              const isTaken = siblingSelectedIds.has(project.id)
+              return (
               <div
                 key={project.id}
-                className={`${styles.option} ${project.id === value ? styles.optionSelected : ''}`}
-                onClick={() => handleSelect(project.id)}
+                className={`${styles.option} ${project.id === value ? styles.optionSelected : ''} ${isTaken ? styles.optionTaken : ''}`}
+                onClick={() => !isTaken && handleSelect(project.id)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleSelect(project.id)
+                  if (e.key === 'Enter' && !isTaken) handleSelect(project.id)
                 }}
                 role="option"
                 aria-selected={project.id === value}
-                tabIndex={0}
+                aria-disabled={isTaken}
+                tabIndex={isTaken ? -1 : 0}
               >
                 <div className={styles.optionThumbWrap}>
                   {project.thumbnailUrl ? (
@@ -168,7 +187,8 @@ const ProjectPicker: RelationshipFieldClientComponent = ({ field, path }) => {
                   )}
                 </div>
               </div>
-            ))
+              )
+            })
           )}
         </div>
       )}
