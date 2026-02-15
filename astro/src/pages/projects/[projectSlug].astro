@@ -50,7 +50,7 @@ const placeholderSrcSet = getImageSrcSet(db_url, thumbImage);
                     width={thumbImage.image.width}
                     height={thumbImage.image.height}
                     alt={thumbImage.image.alt}
-                    class="max-w-full max-h-full"
+                    class="max-w-full max-h-full object-contain"
                     transition:name={`project-${photoProject.slug}`}
                 />
             </div>

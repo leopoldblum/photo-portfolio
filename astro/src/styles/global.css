@@ -35,24 +35,19 @@ body::after {
 /* --- View Transitions --- */
 
 /*
- * Project image morph: old stays fully visible while geometry (position/size)
- * animates. New image fades in on top — no opacity gap or abrupt swap.
- *
- * isolation: auto lets old + new layer naturally instead of compositing
- * in an isolated stacking context (which forces a crossfade).
+ * Smooth crossfade with object-fit: contain to prevent aspect-ratio
+ * distortion while the group geometry transitions between source and target.
  */
-::view-transition-image-pair(*) {
-    isolation: auto;
-}
-
 ::view-transition-old(*) {
-    animation: none;
-    mix-blend-mode: normal;
+    animation: vt-fade-out 0.45s ease-out both;
+    height: 100%;
+    object-fit: contain;
 }
 
 ::view-transition-new(*) {
-    animation: vt-fade-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
-    mix-blend-mode: normal;
+    animation: vt-fade-in 0.45s ease-in both;
+    height: 100%;
+    object-fit: contain;
 }
 
 @keyframes vt-fade-in {
@@ -60,21 +55,17 @@ body::after {
     to   { opacity: 1; }
 }
 
-/* Root (page-level): restore standard crossfade */
-::view-transition-image-pair(root) {
-    isolation: isolate;
+@keyframes vt-fade-out {
+    from { opacity: 1; }
+    to   { opacity: 0; }
 }
 
+/* Root (page-level): faster standard crossfade */
 ::view-transition-old(root) {
     animation: vt-fade-out 0.3s ease both;
 }
 ::view-transition-new(root) {
     animation: vt-fade-in 0.3s ease both;
-}
-
-@keyframes vt-fade-out {
-    from { opacity: 1; }
-    to   { opacity: 0; }
 }
 
 /* DEBUG: uncomment to slow down transitions */
