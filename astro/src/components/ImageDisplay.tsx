@@ -4,15 +4,16 @@ import { motion } from "motion/react"
 import { getImageSrcSet } from "../util/imageUtil.tsx";
 
 
-const db_url = import.meta.env.PUBLIC_API_URL as String
+const db_url = import.meta.env.PUBLIC_API_URL as string
 const main_url = import.meta.env.PUBLIC_BASE_URL
 
 
 const ImageDisplay = ({ photoProject }: { photoProject: PhotoProject }) => {
 
     const thumbnails = photoProject.images.filter((image) => image.isThumbnail);
-    const projectTitle = photoProject.title
+    if (thumbnails.length === 0) return null;
 
+    const projectTitle = photoProject.title
     const basePicture = thumbnails[0].image;
 
     return (

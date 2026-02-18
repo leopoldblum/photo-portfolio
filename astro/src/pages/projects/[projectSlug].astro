@@ -8,8 +8,10 @@ export async function getStaticPaths() {
     const db_url = import.meta.env.PUBLIC_API_URL;
 
     const res = await fetch(`${db_url}/api/globals/websiteLayout`);
+    if (!res.ok) throw new Error(`Failed to fetch WebsiteLayout from ${db_url}: ${res.status} ${res.statusText}`);
     const websitelayout: WebsiteLayout = await res.json();
 
+    const instagramUrl = websitelayout.siteMetadata?.instagramUrl ?? undefined;
     const projects = websitelayout.photoProjects.map(w => w.photoProject);
 
     const getAdjacentInfo = (p: PhotoProject) => {
@@ -18,6 +20,7 @@ export async function getStaticPaths() {
             slug: p.slug,
             title: p.title,
             thumbnailUrl: db_url + (thumb.image.sizes?.small?.url ?? thumb.image.url),
+            placeholderSrcSet: getImageSrcSet(db_url, thumb),
         };
     };
 
@@ -27,19 +30,20 @@ export async function getStaticPaths() {
             photoProject,
             prevProject: getAdjacentInfo(projects[(i - 1 + projects.length) % projects.length]),
             nextProject: getAdjacentInfo(projects[(i + 1) % projects.length]),
+            instagramUrl,
         },
     }));
 }
 
 const db_url = import.meta.env.PUBLIC_API_URL;
-const { photoProject, prevProject, nextProject } = Astro.props;
+const { photoProject, prevProject, nextProject, instagramUrl } = Astro.props;
 const thumbImage = photoProject.images.find(img => img.isThumbnail) ?? photoProject.images[0];
 const placeholderSrc = db_url + (thumbImage.image.sizes?.small?.url ?? thumbImage.image.url);
 const placeholderSrcSet = getImageSrcSet(db_url, thumbImage);
 const ogImage = db_url + (thumbImage.image.sizes?.res1080?.url ?? thumbImage.image.sizes?.small?.url ?? thumbImage.image.url);
 ---
 
-<LayoutProjects title={photoProject.title} description={photoProject.description} ogImage={ogImage}>
+<LayoutProjects title={photoProject.title} description={photoProject.description} ogImage={ogImage} instagramUrl={instagramUrl}>
     <div class="w-full relative">
         <!-- Server-rendered placeholder for view transition morph target -->
         <div id="project-placeholder" class="flex flex-col justify-center items-center w-full">

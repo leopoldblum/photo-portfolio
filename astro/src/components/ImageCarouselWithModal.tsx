@@ -11,6 +11,7 @@ export type AdjacentProject = {
     slug: string;
     title: string;
     thumbnailUrl: string;
+    placeholderSrcSet: string;
 };
 
 interface CarouselWithModalProps {
@@ -32,17 +33,26 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: Caro
     const isOnCard = imageIndex === -1 || imageIndex === totalImages;
 
     const placeholderHidden = useRef(false);
+    const arrivedViaCard = useRef(!!document.documentElement.dataset.slide);
 
     const hidePlaceholder = () => {
         if (placeholderHidden.current) return;
         placeholderHidden.current = true;
         const el = document.getElementById('project-placeholder');
         if (el) {
-            el.style.transition = 'opacity 0.12s ease-out';
-            el.style.opacity = '0';
-            const hide = () => { el.style.visibility = 'hidden'; };
-            el.addEventListener('transitionend', hide, { once: true });
-            setTimeout(hide, 200);
+            if (arrivedViaCard.current) {
+                el.style.transition = 'opacity 0.05s ease-out';
+                el.style.opacity = '0';
+                const hide = () => { el.style.visibility = 'hidden'; };
+                el.addEventListener('transitionend', hide, { once: true });
+                setTimeout(hide, 100);
+            } else {
+                el.style.transition = 'opacity 0.12s ease-out';
+                el.style.opacity = '0';
+                const hide = () => { el.style.visibility = 'hidden'; };
+                el.addEventListener('transitionend', hide, { once: true });
+                setTimeout(hide, 200);
+            }
         }
     };
 
@@ -94,7 +104,7 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: Caro
     const navigateToProject = (slug: string, dir: 'prev' | 'next') => {
         document.documentElement.dataset.slide = dir;
         navigate(`/projects/${slug}`);
-        setTimeout(() => { delete document.documentElement.dataset.slide; }, 400);
+        setTimeout(() => { delete document.documentElement.dataset.slide; }, 600);
     };
 
 
@@ -152,12 +162,16 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: Caro
                 onFirstImageReady={hidePlaceholder}
                 showInfo={showInfo}
                 onToggleInfo={() => setShowInfo(prev => !prev)}
+                skipInitialBlur={arrivedViaCard.current}
             />
 
             <AnimatePresence>
                 {showModal && (
                     <motion.div
                         key="modal"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Fullscreen image viewer"
                         className="h-screen w-screen fixed top-0 left-0 z-10 flex flex-col justify-center items-center"
                         initial={{ backgroundColor: "rgba(10,10,10,0)", backdropFilter: "blur(0px)" }}
                         animate={{ backgroundColor: "rgba(10,10,10,0.7)", backdropFilter: "blur(4px)" }}
@@ -173,6 +187,7 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: Caro
                     >
                         {/* close button — enters last, exits first */}
                         <motion.button
+                            aria-label="Close fullscreen"
                             className="fixed top-0 right-0 mx-7 my-7 lg:mx-20 lg:my-5 z-15 w-10 h-10 lg:w-15 lg:h-15 cursor-none flex justify-center items-center"
                             onClick={() => { closeCursorType.current = "default"; toggleModal() }}
                             onPointerOver={() => CustomCursor.setCursorType({ type: "close" })}

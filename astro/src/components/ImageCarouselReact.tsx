@@ -3,7 +3,7 @@ import type { AdjacentProject } from "./ImageCarouselWithModal";
 import { useEffect, useState, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { CustomCursor } from "./CustomCursor";
-import { imageCarouselSliderVariants } from "../util/motionSliderVariants";
+import { imageCarouselSliderVariants, adjacentCardVariants } from "../util/motionSliderVariants";
 import { getImageSrcSet, getAllURLs, getImageURLForGivenWidth } from "../util/imageUtil";
 import { preload } from "react-dom";
 import { useThrottledCallback } from "use-debounce";
@@ -15,10 +15,10 @@ import { hasAnyExif } from "../util/exifFormatters";
 const navigateSlide = (slug: string, dir: 'prev' | 'next') => {
     document.documentElement.dataset.slide = dir;
     navigate(`/projects/${slug}`);
-    setTimeout(() => { delete document.documentElement.dataset.slide; }, 400);
+    setTimeout(() => { delete document.documentElement.dataset.slide; }, 600);
 };
 
-const db_url = import.meta.env.PUBLIC_API_URL as String
+const db_url = import.meta.env.PUBLIC_API_URL as string
 
 interface CarouselProps {
     photoProject: PhotoProject,
@@ -33,15 +33,16 @@ interface CarouselProps {
     onFirstImageReady?: () => void,
     showInfo: boolean,
     onToggleInfo: () => void,
+    skipInitialBlur?: boolean,
 }
 
-const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction, scrollLeft, scrollRight, toggleModal, prevProject, nextProject, onFirstImageReady, showInfo, onToggleInfo }: CarouselProps) => {
+const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction, scrollLeft, scrollRight, toggleModal, prevProject, nextProject, onFirstImageReady, showInfo, onToggleInfo, skipInitialBlur }: CarouselProps) => {
 
     const [isInfoHovered, setIsInfoHovered] = useState(false)
     const [isClickBlocked, setIsClickBlocked] = useState(false)
-    const [isImageLoaded, setIsImageLoaded] = useState<Map<ImageWrapper, Boolean>>(new Map(photoProject.images.map(img => [img, false])))
-    const [showBlurImage, setShowBlurImage] = useState(false)
+    const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set())
     const firstImageShown = useRef(false)
+    const blurGracePeriod = useRef(true)
     const imageWidthScaling = isFullscreen ? "100vw" : "60vw"
 
     const totalImages = photoProject.images.length;
@@ -53,49 +54,36 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
      * @todo setup proper caching tags in response headers in cloudflare when hosting, for proper preloading
      */
 
-    // Guard preloading: only access photoProject.images for valid indices
     const clampedIndex = Math.max(0, Math.min(imageIndex, totalImages - 1));
     const currImgWrapper = photoProject.images[clampedIndex];
 
-    if (!isOnCard) {
-        const shouldPreloadPrev = imageIndex > 0;
-        const shouldPreloadNext = imageIndex < totalImages - 1;
-
-        if (shouldPreloadPrev) {
-            const prevImgWrapper = photoProject.images[imageIndex - 1];
-            const img = new Image();
-            img.src = db_url + prevImgWrapper.image.url;
-            img.srcset = getImageSrcSet(db_url, prevImgWrapper);
-            img.sizes = imageWidthScaling;
-            preload(db_url + prevImgWrapper.image.sizes.tinyPreview.url, { as: "image" });
-        }
-
-        if (shouldPreloadNext) {
-            const nextImgWrapper = photoProject.images[imageIndex + 1];
-            const img2 = new Image();
-            img2.src = db_url + nextImgWrapper.image.url;
-            img2.srcset = getImageSrcSet(db_url, nextImgWrapper);
-            img2.sizes = imageWidthScaling;
-            preload(db_url + nextImgWrapper.image.sizes.tinyPreview.url, { as: "image" });
-        }
-
-        // Preload current image tiny preview
-        preload(db_url + currImgWrapper.image.sizes.tinyPreview.url, { as: "image" });
-    }
-
-    // Preload adjacent project thumbnail when near the boundary
-    if (imageIndex === 0) preload(prevProject.thumbnailUrl, { as: "image" });
-    if (imageIndex === totalImages - 1) preload(nextProject.thumbnailUrl, { as: "image" });
-
+    // Preload adjacent images and project thumbnails near boundaries
     useEffect(() => {
-        // small delay for loading blurry images so that it doesnt flicker on fast connections
-        setShowBlurImage(false)
+        if (isOnCard) return;
 
-        const blurLoadingDelay = setTimeout(() => {
-            setShowBlurImage(true);
-        }, 200)
-        return () => clearTimeout(blurLoadingDelay)
+        if (imageIndex > 0) {
+            const prevImgWrapper = photoProject.images[imageIndex - 1];
+            preload(db_url + prevImgWrapper.image.url, { as: "image", imageSrcSet: getImageSrcSet(db_url, prevImgWrapper), imageSizes: imageWidthScaling });
+            const tinyUrl = prevImgWrapper.image.sizes?.tinyPreview?.url;
+            if (tinyUrl) preload(db_url + tinyUrl, { as: "image" });
+        }
 
+        if (imageIndex < totalImages - 1) {
+            const nextImgWrapper = photoProject.images[imageIndex + 1];
+            preload(db_url + nextImgWrapper.image.url, { as: "image", imageSrcSet: getImageSrcSet(db_url, nextImgWrapper), imageSizes: imageWidthScaling });
+            const tinyUrl = nextImgWrapper.image.sizes?.tinyPreview?.url;
+            if (tinyUrl) preload(db_url + tinyUrl, { as: "image" });
+        }
+
+        if (imageIndex === 0) preload(prevProject.thumbnailUrl, { as: "image", imageSrcSet: prevProject.placeholderSrcSet, imageSizes: "60vw" });
+        if (imageIndex === totalImages - 1) preload(nextProject.thumbnailUrl, { as: "image", imageSrcSet: nextProject.placeholderSrcSet, imageSizes: "60vw" });
+    }, [imageIndex, imageWidthScaling]);
+
+    // Grace period: if image loads within 200ms, use a quick blur fade-out instead of slow crossfade
+    useEffect(() => {
+        blurGracePeriod.current = true
+        const timer = setTimeout(() => { blurGracePeriod.current = false }, 200)
+        return () => clearTimeout(timer)
     }, [imageIndex])
 
 
@@ -105,6 +93,23 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
 
     const adjacentProject = isOnPrevCard ? prevProject : nextProject;
 
+    // Compute blur/image opacity — extracted for readability
+    const isCurrentLoaded = loadedImages.has(currImgWrapper.id)
+    const suppressBlur = skipInitialBlur && !firstImageShown.current
+    const blurOpacity = suppressBlur ? 0 : (isCurrentLoaded ? 0 : 1)
+    const blurFadeDuration = isCurrentLoaded ? (blurGracePeriod.current ? 0.1 : 1.5) : 0.15
+    const imageOpacity = suppressBlur ? 1 : (isCurrentLoaded ? 1 : 0)
+    const imageFadeDuration = (imageIndex === 0 && !firstImageShown.current) ? 0 : 0.15
+
+    const markLoaded = (imgId: string) => {
+        setLoadedImages(prev => {
+            if (prev.has(imgId)) return prev
+            const next = new Set(prev)
+            next.add(imgId)
+            return next
+        })
+    }
+
     return (
         <>
             <div className={`flex flex-col justify-center items-center relative cursor-none w-full overflow-x-clip`}
@@ -112,6 +117,7 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
             >
 
                 <button
+                    aria-label="Previous image"
                     className={`absolute left-0 w-1/3 z-5 h-full cursor-none invisible lg:visible`}
                     onClick={isOnPrevCard
                         ? () => navigateSlide(prevProject.slug, 'prev')
@@ -138,11 +144,11 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                                 className="relative flex-1 w-full h-full flex flex-col items-center justify-center select-none"
 
                                 custom={direction}
-                                variants={imageCarouselSliderVariants}
+                                variants={adjacentCardVariants}
                                 initial="incoming"
                                 animate="active"
                                 exit="exit"
-                                transition={{ duration: 0.18, ease: "easeInOut" }}
+                                transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
 
                                 drag="x"
                                 dragConstraints={{ left: 0, right: 0 }}
@@ -163,7 +169,7 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                                     className="flex flex-col lg:flex-row items-center gap-6 lg:gap-16 cursor-none group px-6"
                                     onClick={() => {
                                         document.documentElement.dataset.slide = isOnPrevCard ? 'prev' : 'next';
-                                        setTimeout(() => { delete document.documentElement.dataset.slide; }, 400);
+                                        setTimeout(() => { delete document.documentElement.dataset.slide; }, 600);
                                     }}
                                     onPointerOver={() => CustomCursor.setCursorType({ type: "default" })}
                                     onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
@@ -188,7 +194,7 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
 
                                         <div className="h-px bg-neutral-600/50 w-12 group-hover:w-20 transition-all duration-500" />
 
-                                        <span className="text-lg font-['Bodoni_Moda'] italic text-neutral-400 group-hover:text-[#cd5c5c] transition-colors duration-300">
+                                        <span className="text-lg font-sans text-neutral-400 group-hover:text-[#cd5c5c] transition-colors duration-300">
                                             {adjacentProject.title}
                                         </span>
                                     </div>
@@ -231,14 +237,19 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                                             loading="eager"
 
                                             initial={{ opacity: 0 }}
-                                            animate={{ opacity: isImageLoaded.get(currImgWrapper) ? 0 : (showBlurImage ? 1 : 0) }}
-                                            transition={{ duration: isImageLoaded.get(currImgWrapper) ? 1.5 : 0.15, ease: "easeIn" }}
+                                            animate={{ opacity: blurOpacity }}
+                                            transition={{ duration: blurFadeDuration, ease: "easeIn" }}
                                         />
                                     </motion.div>
                                 </motion.div>
 
                                 {/* real image */}
                                 <motion.img
+                                    ref={(el) => {
+                                        if (el?.complete && !loadedImages.has(currImgWrapper.id)) {
+                                            markLoaded(currImgWrapper.id)
+                                        }
+                                    }}
                                     className="absolute object-contain w-full h-full pointer-events-none"
 
                                     src={db_url + currImgWrapper.image.url}
@@ -247,23 +258,25 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                                     alt={currImgWrapper.image.alt}
                                     loading="eager"
 
-                                    initial={{ opacity: isImageLoaded.get(currImgWrapper) ? 1 : 0 }}
-                                    animate={{ opacity: isImageLoaded.get(currImgWrapper) ? 1 : 0 }}
-                                    transition={{ opacity: { duration: (imageIndex === 0 && !firstImageShown.current) ? 0 : 0.15, ease: "easeIn" } }}
+                                    initial={{ opacity: imageOpacity }}
+                                    animate={{ opacity: imageOpacity }}
+                                    transition={{ opacity: { duration: imageFadeDuration, ease: "easeIn" } }}
 
-                                    onLoad={() => {
-                                        setIsImageLoaded(prev => {
-                                            const newMap = new Map(prev);
-                                            newMap.set(currImgWrapper, true);
-                                            return newMap;
-                                        })
+                                    onLoad={(e) => {
+                                        markLoaded(currImgWrapper.id)
                                         if (imageIndex === 0 && !firstImageShown.current && onFirstImageReady) {
                                             firstImageShown.current = true;
-                                            requestAnimationFrame(() => {
-                                                onFirstImageReady();
-                                            });
+                                            const imgEl = e.currentTarget as HTMLImageElement;
+                                            if (skipInitialBlur && imgEl.decode) {
+                                                imgEl.decode().then(() => onFirstImageReady()).catch(() => onFirstImageReady());
+                                            } else {
+                                                requestAnimationFrame(() => {
+                                                    onFirstImageReady();
+                                                });
+                                            }
                                         }
                                     }}
+                                    onError={() => markLoaded(currImgWrapper.id)}
                                 />
 
                             </motion.div>
@@ -274,6 +287,7 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                 </div>
 
                 <button
+                    aria-label="Next image"
                     className={`absolute right-0 w-1/3 z-5 h-full cursor-none invisible lg:visible `}
                     onClick={isOnNextCard
                         ? () => navigateSlide(nextProject.slug, 'next')
@@ -284,7 +298,9 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
 
                 {!isOnCard && (
                     <div className="py-2 w-full flex justify-center items-center relative">
-                        {`${imageIndex + 1} / ${photoProject.images.length}`}
+                        <span role="status" aria-live="polite" aria-label={`Image ${imageIndex + 1} of ${photoProject.images.length}`}>
+                            {`${imageIndex + 1} / ${photoProject.images.length}`}
+                        </span>
                         {(currImgWrapper.description || hasAnyExif(currImgWrapper.image.exif)) && (
                             <div
                                 className="absolute right-2 top-1/2 -translate-y-1/2 z-20"
@@ -292,6 +308,7 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                                 onMouseLeave={() => setIsInfoHovered(false)}
                             >
                                 <button
+                                    aria-label="Image info"
                                     className={`cursor-none p-3 transition-colors duration-200 ${showInfo || isInfoHovered ? 'text-neutral-300' : 'text-neutral-500 hover:text-neutral-300'}`}
                                     onClick={(e) => { e.stopPropagation(); onToggleInfo(); }}
                                     onPointerOver={() => CustomCursor.setCursorType({ type: "default" })}

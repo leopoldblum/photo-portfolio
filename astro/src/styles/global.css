@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme {
+    --font-sans: "Space Grotesk", sans-serif;
+}
+
 /* --- Background depth treatment --- */
 
 body {
@@ -45,29 +49,35 @@ body::after {
 }
 
 ::view-transition-old(root) {
+    display: none;
+}
+::view-transition-new(root) {
+    animation: none;
+}
+
+::view-transition-old(page-content) {
     animation: vt-slide-out 0.4s ease both;
     mix-blend-mode: plus-lighter;
 }
-::view-transition-new(root) {
+::view-transition-new(page-content) {
     animation: vt-slide-in 0.4s ease both;
     mix-blend-mode: plus-lighter;
 }
 
-/* Adjacent project navigation — clean crossfade, no vertical slide */
-html[data-slide] ::view-transition-old(root) {
-    animation: vt-fade-out 0.35s ease both;
-    mix-blend-mode: plus-lighter;
+/* Adjacent project navigation — keyframes only, applied via JS in LayoutProjects.astro */
+@keyframes vt-hslide-left-out {
+    from { opacity: 1; transform: translateX(0) scale(1); }
+    to   { opacity: 0; transform: translateX(-120px) scale(0.95); }
 }
-html[data-slide] ::view-transition-new(root) {
-    animation: vt-fade-in 0.35s ease both;
-    mix-blend-mode: plus-lighter;
+@keyframes vt-hslide-left-in {
+    from { opacity: 0; transform: translateX(120px) scale(0.95); }
+    to   { opacity: 1; transform: translateX(0) scale(1); }
 }
-
-@keyframes vt-fade-out {
-    from { opacity: 1; }
-    to   { opacity: 0; }
+@keyframes vt-hslide-right-out {
+    from { opacity: 1; transform: translateX(0) scale(1); }
+    to   { opacity: 0; transform: translateX(120px) scale(1.05); }
 }
-@keyframes vt-fade-in {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+@keyframes vt-hslide-right-in {
+    from { opacity: 0; transform: translateX(-120px); }
+    to   { opacity: 1; transform: translateX(0); }
 }
