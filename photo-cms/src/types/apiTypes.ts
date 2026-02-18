@@ -70,6 +70,7 @@ export type PhotoProjectWrapper = {
 export type SiteMetadata = {
   siteName?: string | null
   siteDescription?: string | null
+  instagramUrl?: string | null
 }
 
 export type WebsiteLayout = Strict<Omit<PayloadWebsiteLayout, 'photoProjects' | 'siteMetadata'>> & {

@@ -24,6 +24,13 @@ export const WebsiteLayout: GlobalConfig = {
                     name: 'siteDescription',
                     type: 'textarea',
                 },
+                {
+                    name: 'instagramUrl',
+                    type: 'text',
+                    admin: {
+                        placeholder: 'https://instagram.com/...',
+                    },
+                },
             ],
         },
         {

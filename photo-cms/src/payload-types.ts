@@ -497,6 +497,7 @@ export interface WebsiteLayout {
   siteMetadata?: {
     siteName?: string | null;
     siteDescription?: string | null;
+    instagramUrl?: string | null;
   };
   /**
    * Pick your projects and organize them in display order, starting from the top.
@@ -520,6 +521,7 @@ export interface WebsiteLayoutSelect<T extends boolean = true> {
     | {
         siteName?: T;
         siteDescription?: T;
+        instagramUrl?: T;
       };
   photoProjects?:
     | T
