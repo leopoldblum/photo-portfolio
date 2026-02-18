@@ -22,7 +22,7 @@ export const CustomCursor = () => {
     }
 
     useEffect(() => {
-        const updateMousePosition = (event: MouseEvent) => {
+        const updateMousePosition = (event: MouseEvent | PointerEvent) => {
             if (containerRef.current) {
                 containerRef.current.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
             }
@@ -30,12 +30,20 @@ export const CustomCursor = () => {
 
         const resetCursor = () => setCursor({ type: "default" });
 
-        document.addEventListener("pointerenter", updateMousePosition, true)
+        const hasRawUpdate = "onpointerrawupdate" in window;
+
+        document.addEventListener("pointerenter", updateMousePosition, true);
+        if (hasRawUpdate) {
+            document.addEventListener("pointerrawupdate", updateMousePosition as EventListener);
+        }
         document.addEventListener("pointermove", updateMousePosition);
         document.addEventListener("cursor-text", handleCursorTypeChange as EventListener);
         document.addEventListener("astro:after-swap", resetCursor);
 
         return () => {
+            if (hasRawUpdate) {
+                document.removeEventListener("pointerrawupdate", updateMousePosition as EventListener);
+            }
             document.removeEventListener("pointermove", updateMousePosition);
             document.removeEventListener("cursor-text", handleCursorTypeChange as EventListener);
             document.removeEventListener("astro:after-swap", resetCursor);
@@ -85,16 +93,15 @@ export const CustomCursor = () => {
                 }}
                 initial={false}
                 transition={{
-                    layout: { duration: 0.15, ease: [0.32, 0.72, 0, 1] },
-                    duration: 0.15,
+                    duration: 0.25,
                     ease: [0.32, 0.72, 0, 1],
                 }}
             >
                 <motion.div
                     key={isTitle ? cursor.displayText : cursor.type}
-                    initial={{ opacity: 0, filter: "blur(4px)" }}
-                    animate={{ opacity: 1, filter: "blur(0px)" }}
-                    transition={{ duration: 0.12, ease: [0.32, 0.72, 0, 1] }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.15 }}
                 >
                     {renderIcon(cursor)}
                 </motion.div>
