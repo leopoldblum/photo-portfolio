@@ -1,7 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import type { WebsiteLayout } from "../../../photo-cms/src/types/apiTypes";
-import ImageDisplay from "../components/ImageDisplay";
 
 const db_url = import.meta.env.PUBLIC_API_URL;
 
@@ -20,11 +19,12 @@ const ogImage = firstThumb ? db_url + (firstThumb.image.sizes?.res1080?.url ?? f
 ---
 
 <Layout title={siteName} description={siteDescription} ogImage={ogImage} siteName={siteName} instagramUrl={instagramUrl}>
-    {
-        allPhotoProjectWrappers.map((wrapper) => (
-            <>
-                <ImageDisplay photoProject={wrapper.photoProject} client:load />
-            </>
-        ))
-    }
+    <script
+        id="shell-data"
+        type="application/json"
+        set:html={JSON.stringify({
+            view: "home",
+            projects: allPhotoProjectWrappers.map(w => w.photoProject),
+        })}
+    />
 </Layout>

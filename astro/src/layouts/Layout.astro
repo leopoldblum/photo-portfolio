@@ -6,6 +6,7 @@ import Footer from "../components/Footer.astro";
 import { CustomCursor } from "../components/CustomCursor";
 import AmbientBackground from "../components/AmbientBackground";
 import SEOHead from "../components/SEOHead.astro";
+import PortfolioShell from "../components/PortfolioShell";
 
 interface Props {
     title: string;
@@ -40,9 +41,8 @@ const { title, description, ogImage, siteName, instagramUrl } = Astro.props;
 
         <TopBar instagramUrl={instagramUrl} />
 
-        <div class="w-full lg:w-[50vw] mx-auto">
-            <slot />
-        </div>
+        <div class="hidden"><slot /></div>
+        <PortfolioShell client:only="react" transition:persist="portfolio-shell" />
 
         <Footer />
     </body>

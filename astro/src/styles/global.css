@@ -38,46 +38,9 @@ body::after {
 
 /* --- View Transitions --- */
 
-@keyframes vt-slide-out {
-    from { opacity: 1; transform: translateY(0); }
-    to   { opacity: 0; transform: translateY(-32px); }
-}
-
-@keyframes vt-slide-in {
-    from { opacity: 0; transform: translateY(32px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
 ::view-transition-old(root) {
     display: none;
 }
 ::view-transition-new(root) {
     animation: none;
-}
-
-::view-transition-old(page-content) {
-    animation: vt-slide-out 0.4s ease both;
-    mix-blend-mode: plus-lighter;
-}
-::view-transition-new(page-content) {
-    animation: vt-slide-in 0.4s ease both;
-    mix-blend-mode: plus-lighter;
-}
-
-/* Adjacent project navigation — keyframes only, applied via JS in LayoutProjects.astro */
-@keyframes vt-hslide-left-out {
-    from { opacity: 1; transform: translateX(0) scale(1); }
-    to   { opacity: 0; transform: translateX(-120px) scale(0.95); }
-}
-@keyframes vt-hslide-left-in {
-    from { opacity: 0; transform: translateX(120px) scale(0.95); }
-    to   { opacity: 1; transform: translateX(0) scale(1); }
-}
-@keyframes vt-hslide-right-out {
-    from { opacity: 1; transform: translateX(0) scale(1); }
-    to   { opacity: 0; transform: translateX(120px) scale(1.05); }
-}
-@keyframes vt-hslide-right-in {
-    from { opacity: 0; transform: translateX(-120px); }
-    to   { opacity: 1; transform: translateX(0); }
 }

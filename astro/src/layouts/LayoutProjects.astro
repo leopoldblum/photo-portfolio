@@ -5,6 +5,7 @@ import TopBar from "../components/TopBar.astro";
 import { CustomCursor } from "../components/CustomCursor";
 import AmbientBackground from "../components/AmbientBackground";
 import SEOHead from "../components/SEOHead.astro";
+import PortfolioShell from "../components/PortfolioShell";
 
 interface Props {
     title: string;
@@ -38,31 +39,8 @@ const { title, description, ogImage, siteName, instagramUrl } = Astro.props;
         <CustomCursor client:load transition:persist />
 
         <TopBar instagramUrl={instagramUrl} />
-        <div
-            class="flex-1 w-full lg:w-[65vw] mx-auto flex justify-center items-center"
-            style="view-transition-name: page-content"
-        >
-            <slot />
-        </div>
-        <script>
-            document.addEventListener('astro:before-swap', (e: any) => {
-                const dir = document.documentElement.dataset.slide;
-                if (!dir) return;
 
-                const style = document.createElement('style');
-                if (dir === 'next') {
-                    style.textContent = `
-                        ::view-transition-old(page-content) { animation: vt-hslide-left-out 0.45s cubic-bezier(0.32,0.72,0,1) both; mix-blend-mode: plus-lighter; }
-                        ::view-transition-new(page-content) { animation: vt-hslide-left-in 0.45s cubic-bezier(0.32,0.72,0,1) both; mix-blend-mode: plus-lighter; }
-                    `;
-                } else {
-                    style.textContent = `
-                        ::view-transition-old(page-content) { animation: vt-hslide-right-out 0.45s cubic-bezier(0.32,0.72,0,1) both; mix-blend-mode: plus-lighter; }
-                        ::view-transition-new(page-content) { animation: vt-hslide-right-in 0.45s cubic-bezier(0.32,0.72,0,1) both; mix-blend-mode: plus-lighter; }
-                    `;
-                }
-                e.newDocument.head.appendChild(style);
-            });
-        </script>
+        <div class="hidden"><slot /></div>
+        <PortfolioShell client:only="react" transition:persist="portfolio-shell" />
     </body>
 </html>

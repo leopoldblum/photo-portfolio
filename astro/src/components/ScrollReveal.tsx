@@ -4,13 +4,10 @@ import type { ReactNode, ComponentProps } from "react"
 type ScrollRevealProps = {
     children: ReactNode
     className?: string
+    skip?: boolean
 } & Omit<ComponentProps<typeof motion.div>, "initial" | "whileInView" | "viewport" | "transition">
 
-const ScrollReveal = ({ children, className, ...rest }: ScrollRevealProps) => {
-    // Skip entrance animation when arriving via morph transition (detail -> landing)
-    const skip = typeof document !== 'undefined' &&
-        document.documentElement.hasAttribute('data-morph-nav');
-
+const ScrollReveal = ({ children, className, skip = false, ...rest }: ScrollRevealProps) => {
     return (
         <motion.div
             initial={skip ? false : { opacity: 0, y: 30 }}

@@ -8,7 +8,6 @@ import { getImageSrcSet, getAllURLs, getImageURLForGivenWidth } from "../util/im
 import { preload } from "react-dom";
 import { useThrottledCallback } from "use-debounce";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { navigate } from "astro:transitions/client";
 import ImageInfoOverlay from "./ImageInfoOverlay";
 import { hasAnyExif } from "../util/exifFormatters";
 
@@ -55,12 +54,6 @@ function extractVibrantColors(source: ImageBitmap, count = 3): string[] {
     return colors
 }
 
-const navigateSlide = (slug: string, dir: 'prev' | 'next') => {
-    document.documentElement.dataset.slide = dir;
-    navigate(`/projects/${slug}`);
-    setTimeout(() => { delete document.documentElement.dataset.slide; }, 600);
-};
-
 const db_url = import.meta.env.PUBLIC_API_URL as string
 
 interface CarouselProps {
@@ -73,14 +66,13 @@ interface CarouselProps {
     toggleModal: () => void,
     prevProject: AdjacentProject,
     nextProject: AdjacentProject,
-    onFirstImageReady?: () => void,
+    onSlideNavigate: (slug: string, dir: 'prev' | 'next') => void,
     showInfo: boolean,
     onToggleInfo: () => void,
-    skipInitialBlur?: boolean,
     hideInfoIcon?: boolean,
 }
 
-const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction, scrollLeft, scrollRight, toggleModal, prevProject, nextProject, onFirstImageReady, showInfo, onToggleInfo, skipInitialBlur, hideInfoIcon }: CarouselProps) => {
+const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction, scrollLeft, scrollRight, toggleModal, prevProject, nextProject, onSlideNavigate, showInfo, onToggleInfo, hideInfoIcon }: CarouselProps) => {
 
     const [isInfoHovered, setIsInfoHovered] = useState(false)
     const [isClickBlocked, setIsClickBlocked] = useState(false)
@@ -155,10 +147,9 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
 
     // Compute blur/image opacity — extracted for readability
     const isCurrentLoaded = loadedImages.has(currImgWrapper.id)
-    const suppressBlur = skipInitialBlur && !firstImageShown.current
-    const blurOpacity = suppressBlur ? 0 : (isCurrentLoaded ? 0 : 1)
+    const blurOpacity = isCurrentLoaded ? 0 : 1
     const blurFadeDuration = isCurrentLoaded ? (blurGracePeriod.current ? 0.1 : 1.5) : 0.15
-    const imageOpacity = suppressBlur ? 1 : (isCurrentLoaded ? 1 : 0)
+    const imageOpacity = isCurrentLoaded ? 1 : 0
     const imageFadeDuration = (imageIndex === 0 && !firstImageShown.current) ? 0 : 0.15
 
     const markLoaded = (imgId: string) => {
@@ -180,14 +171,13 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                     aria-label="Previous image"
                     className={`absolute left-0 w-1/3 z-5 h-full cursor-none invisible lg:visible`}
                     onClick={isOnPrevCard
-                        ? () => navigateSlide(prevProject.slug, 'prev')
+                        ? () => onSlideNavigate(prevProject.slug, 'prev')
                         : throttledScrollLeft}
                     onPointerOver={() => CustomCursor.setCursorType({ type: "arrowLeft" })}
                     onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
                 />
 
                 <div className={`relative flex items-center justify-center ${isFullscreen ? "h-[95vh]" : "h-[70vh]"} w-full `}
-                    {...(!isFullscreen && { 'data-morph-target': '' })}
                     onPointerOver={isOnCard ? undefined : (isFullscreen ? () => CustomCursor.setCursorType({ type: "zoomOut" }) : () => CustomCursor.setCursorType({ type: "zoomIn" }))}
                     onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
                     onClick={!isClickBlocked && !isOnCard ? () => toggleModal() : undefined}
@@ -215,9 +205,9 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                                 dragConstraints={{ left: 0, right: 0 }}
                                 onDragEnd={(_, { offset }) => {
                                     if (isOnPrevCard && offset.x > 100) {
-                                        navigateSlide(prevProject.slug, 'prev');
+                                        onSlideNavigate(prevProject.slug, 'prev');
                                     } else if (isOnNextCard && offset.x < -100) {
-                                        navigateSlide(nextProject.slug, 'next');
+                                        onSlideNavigate(nextProject.slug, 'next');
                                     } else if (isOnPrevCard && offset.x < -100) {
                                         scrollRight();
                                     } else if (isOnNextCard && offset.x > 100) {
@@ -228,9 +218,9 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                                 <a
                                     href={`/projects/${adjacentProject.slug}`}
                                     className="flex flex-col lg:flex-row items-center gap-6 lg:gap-16 cursor-none group px-6"
-                                    onClick={() => {
-                                        document.documentElement.dataset.slide = isOnPrevCard ? 'prev' : 'next';
-                                        setTimeout(() => { delete document.documentElement.dataset.slide; }, 600);
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        onSlideNavigate(adjacentProject.slug, isOnPrevCard ? 'prev' : 'next');
                                     }}
                                     onPointerOver={() => CustomCursor.setCursorType({ type: "default" })}
                                     onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
@@ -325,19 +315,9 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                                     animate={{ opacity: imageOpacity }}
                                     transition={{ opacity: { duration: imageFadeDuration, ease: "easeIn" } }}
 
-                                    onLoad={(e) => {
+                                    onLoad={() => {
                                         markLoaded(currImgWrapper.id)
-                                        if (imageIndex === 0 && !firstImageShown.current && onFirstImageReady) {
-                                            firstImageShown.current = true;
-                                            const imgEl = e.currentTarget as HTMLImageElement;
-                                            if (skipInitialBlur && imgEl.decode) {
-                                                imgEl.decode().then(() => onFirstImageReady()).catch(() => onFirstImageReady());
-                                            } else {
-                                                requestAnimationFrame(() => {
-                                                    onFirstImageReady();
-                                                });
-                                            }
-                                        }
+                                        if (imageIndex === 0) firstImageShown.current = true;
                                     }}
                                     onError={() => markLoaded(currImgWrapper.id)}
                                 />
@@ -353,14 +333,13 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                     aria-label="Next image"
                     className={`absolute right-0 w-1/3 z-5 h-full cursor-none invisible lg:visible `}
                     onClick={isOnNextCard
-                        ? () => navigateSlide(nextProject.slug, 'next')
+                        ? () => onSlideNavigate(nextProject.slug, 'next')
                         : throttledScrollRight}
                     onPointerOver={() => CustomCursor.setCursorType({ type: "arrowRight" })}
                     onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
                 />
 
-                {!isOnCard && (
-                    <div className="py-2 w-full flex justify-center items-center">
+                <div className={`py-2 w-full flex justify-center items-center ${isOnCard ? "invisible" : ""}`}>
                         <div className="relative">
                             <span role="status" aria-live="polite" aria-label={`Image ${imageIndex + 1} of ${photoProject.images.length}`}>
                                 {`${imageIndex + 1} / ${photoProject.images.length}`}
@@ -413,8 +392,7 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                                 )}
                             </AnimatePresence>}
                         </div>
-                    </div>
-                )}
+                </div>
 
             </div >
         </>

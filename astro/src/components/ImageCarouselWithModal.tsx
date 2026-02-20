@@ -5,7 +5,6 @@ import { CustomCursor } from "./CustomCursor";
 import { AnimatePresence, motion } from "motion/react";
 import { X } from "lucide-react";
 import { useThrottledCallback } from "use-debounce";
-import { navigate } from "astro:transitions/client";
 
 export type AdjacentProject = {
     slug: string;
@@ -18,9 +17,10 @@ interface CarouselWithModalProps {
     photoProject: PhotoProject;
     prevProject: AdjacentProject;
     nextProject: AdjacentProject;
+    onSlideNavigate: (slug: string, dir: 'prev' | 'next') => void;
 }
 
-const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: CarouselWithModalProps) => {
+const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject, onSlideNavigate }: CarouselWithModalProps) => {
 
     const [imageIndex, setImageIndex] = useState(0);
     const [direction, setDirection] = useState(1);
@@ -31,43 +31,6 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: Caro
 
     const totalImages = photoProject.images.length;
     const isOnCard = imageIndex === -1 || imageIndex === totalImages;
-
-    const placeholderHidden = useRef(false);
-    const arrivedViaCard = useRef(!!document.documentElement.dataset.slide);
-    const arrivedViaMorph = useRef(!!document.documentElement.dataset.morphForward);
-
-    const hidePlaceholder = () => {
-        if (placeholderHidden.current) return;
-        // Delay hiding until after the morph animation completes
-        if (arrivedViaMorph.current) {
-            arrivedViaMorph.current = false;
-            setTimeout(hidePlaceholder, 500);
-            return;
-        }
-        placeholderHidden.current = true;
-        const el = document.getElementById('project-placeholder');
-        if (el) {
-            if (arrivedViaCard.current) {
-                el.style.transition = 'opacity 0.05s ease-out';
-                el.style.opacity = '0';
-                const hide = () => { el.style.visibility = 'hidden'; };
-                el.addEventListener('transitionend', hide, { once: true });
-                setTimeout(hide, 100);
-            } else {
-                el.style.transition = 'opacity 0.12s ease-out';
-                el.style.opacity = '0';
-                const hide = () => { el.style.visibility = 'hidden'; };
-                el.addEventListener('transitionend', hide, { once: true });
-                setTimeout(hide, 200);
-            }
-        }
-    };
-
-    // Safety timeout: hide placeholder even if onLoad never fires
-    useEffect(() => {
-        const timer = setTimeout(hidePlaceholder, 800);
-        return () => clearTimeout(timer);
-    }, []);
 
     useEffect(() => {
         setShowInfo(false)
@@ -108,12 +71,6 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: Caro
         setImageIndex(prev => prev < totalImages ? prev + 1 : prev);
     };
 
-    const navigateToProject = (slug: string, dir: 'prev' | 'next') => {
-        document.documentElement.dataset.slide = dir;
-        navigate(`/projects/${slug}`);
-        setTimeout(() => { delete document.documentElement.dataset.slide; }, 600);
-    };
-
 
     const throttledScrollLeft = useThrottledCallback(scrollLeft, 500, { leading: true, trailing: false })
     const throttledScrollRight = useThrottledCallback(scrollRight, 500, { leading: true, trailing: false })
@@ -130,7 +87,7 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: Caro
 
             case "ArrowLeft":
                 if (imageIndex === -1) {
-                    navigateToProject(prevProject.slug, 'prev');
+                    onSlideNavigate(prevProject.slug, 'prev');
                 } else {
                     throttledScrollLeft();
                 }
@@ -138,7 +95,7 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: Caro
 
             case "ArrowRight":
                 if (imageIndex === totalImages) {
-                    navigateToProject(nextProject.slug, 'next');
+                    onSlideNavigate(nextProject.slug, 'next');
                 } else {
                     throttledScrollRight();
                 }
@@ -166,10 +123,9 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: Caro
                 toggleModal={throttledToggleModal}
                 prevProject={prevProject}
                 nextProject={nextProject}
-                onFirstImageReady={hidePlaceholder}
+                onSlideNavigate={onSlideNavigate}
                 showInfo={showInfo}
                 onToggleInfo={() => setShowInfo(prev => !prev)}
-                skipInitialBlur={arrivedViaCard.current}
                 hideInfoIcon={showModal}
             />
 
@@ -238,6 +194,7 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: Caro
                                 toggleModal={throttledToggleModal}
                                 prevProject={prevProject}
                                 nextProject={nextProject}
+                                onSlideNavigate={onSlideNavigate}
                                 showInfo={showInfo}
                                 onToggleInfo={() => setShowInfo(prev => !prev)}
                             />
