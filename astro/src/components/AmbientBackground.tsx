@@ -8,7 +8,27 @@ import {
   useMotionTemplate,
 } from "motion/react";
 
-// --- Particle system ---
+// --- Grain layer ---
+
+interface GrainSpeck {
+  x: number;
+  y: number;
+  radius: number;
+  baseOpacity: number;
+}
+
+const GRAIN_COUNT = 300;
+
+function createGrainSpeck(w: number, h: number): GrainSpeck {
+  return {
+    x: Math.random() * w,
+    y: Math.random() * h,
+    radius: 0.8 + Math.random() * 1.0,
+    baseOpacity: 0.2 + Math.random() * 0.3,
+  };
+}
+
+// --- Floating particles ---
 
 interface Particle {
   x: number;
@@ -17,10 +37,10 @@ interface Particle {
   vy: number;
   radius: number;
   baseOpacity: number;
-  phaseOffset: number; // for sinusoidal twinkle
+  phaseOffset: number;
 }
 
-const PARTICLE_COUNT = 60;
+const PARTICLE_COUNT = 200;
 const CURSOR_RADIUS = 150;
 const CURSOR_FORCE = 0.8;
 
@@ -106,7 +126,10 @@ const AmbientBackground = () => {
     resize();
     window.addEventListener("resize", resize);
 
-    // Initialize particles
+    // Initialize grain specks + floating particles
+    const grain: GrainSpeck[] = Array.from({ length: GRAIN_COUNT }, () =>
+      createGrainSpeck(canvas.width, canvas.height)
+    );
     const particles: Particle[] = Array.from({ length: PARTICLE_COUNT }, () =>
       createParticle(canvas.width, canvas.height)
     );
@@ -123,8 +146,20 @@ const AmbientBackground = () => {
       const my = mouseRef.current.y;
       time += 0.01;
 
+      // --- Layer 1: film grain (flickering specks) ---
+      for (const g of grain) {
+        const drawX = g.x + (Math.random() - 0.5);
+        const drawY = g.y + (Math.random() - 0.5);
+        const opacity = g.baseOpacity * (0.3 + Math.random() * 0.7);
+
+        ctx.beginPath();
+        ctx.arc(drawX, drawY, g.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(200, 170, 110, ${opacity})`;
+        ctx.fill();
+      }
+
+      // --- Layer 2: floating particles (smooth drift + cursor repulsion) ---
       for (const p of particles) {
-        // Cursor repulsion
         const dx = p.x - mx;
         const dy = p.y - my;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -135,11 +170,9 @@ const AmbientBackground = () => {
           p.vy += (dy / dist) * force;
         }
 
-        // Dampen velocity so particles drift back
         p.vx *= 0.98;
         p.vy *= 0.98;
 
-        // Ensure minimum drift so particles don't stall
         const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
         if (speed < 0.1) {
           p.vx += (Math.random() - 0.5) * 0.05;
@@ -149,7 +182,6 @@ const AmbientBackground = () => {
         p.x = wrapCoord(p.x + p.vx, w);
         p.y = wrapCoord(p.y + p.vy, h);
 
-        // Twinkle: sinusoidal opacity pulse
         const twinkle = 0.7 + 0.3 * Math.sin(time * 2 + p.phaseOffset);
         const opacity = p.baseOpacity * twinkle;
 
