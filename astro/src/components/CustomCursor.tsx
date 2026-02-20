@@ -86,7 +86,7 @@ export const CustomCursor = () => {
                 animate={{
                     opacity: cursor.type === "hidden" ? 0 : 1,
                     scale: isTitle ? 1 : cursor.type === "hidden" ? 0.5 : 1,
-                    borderRadius: isTitle ? 6 : isIcon ? 24 : 9999,
+                    borderRadius: isTitle ? 6 : isIcon ? 24 : 12,
                     backgroundColor: "rgba(38, 38, 38, 0.7)",
                     boxShadow: "0 0 0 2px rgba(245, 245, 245, 0.3)",
                     backdropFilter: isTitle ? "blur(12px)" : "blur(2px)",
