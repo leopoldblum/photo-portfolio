@@ -29,37 +29,41 @@ const ImageInfoOverlay = ({ imageWrapper }: ImageInfoOverlayProps) => {
 
   return (
     <motion.div
-      className="absolute bottom-full mb-2 right-0 z-30 rounded-md px-4 py-2.5 pointer-events-auto whitespace-nowrap"
+      className="absolute bottom-full mb-3 right-0 z-30 rounded-lg overflow-hidden pointer-events-auto whitespace-nowrap"
       style={{
-        backgroundColor: 'rgba(38, 38, 38, 0.7)',
-        boxShadow: '0 0 0 2px rgba(245, 245, 245, 0.3)',
-        backdropFilter: 'blur(12px)',
+        backgroundColor: 'rgba(18, 18, 18, 0.82)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.06)',
+        backdropFilter: 'blur(20px)',
       }}
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 6 }}
-      transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
+      initial={{ opacity: 0, y: 8, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 6, scale: 0.97 }}
+      transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
     >
-      {description && (
-        <p className={`text-sm text-neutral-200 ${exifParts.length > 0 ? 'mb-0' : ''}`}>
-          {description}
-        </p>
-      )}
+      <div className="h-px bg-gradient-to-r from-transparent via-[#cd5c5c]/25 to-transparent" />
 
-      {description && exifParts.length > 0 && (
-        <div className="h-px bg-neutral-500/30 my-2" />
-      )}
+      <div className="px-4 py-3">
+        {description && (
+          <p className={`text-sm text-neutral-200/90 ${exifParts.length > 0 ? 'mb-0' : ''}`}>
+            {description}
+          </p>
+        )}
 
-      {exifParts.length > 0 && (
-        <p className="text-[10px] tracking-[0.2em] uppercase text-neutral-400">
-          {exifParts.map((part, i) => (
-            <span key={i}>
-              {i > 0 && <span className="mx-2 text-neutral-500/50">·</span>}
-              {part}
-            </span>
-          ))}
-        </p>
-      )}
+        {description && exifParts.length > 0 && (
+          <div className="h-px bg-gradient-to-r from-neutral-600/40 via-neutral-500/20 to-transparent my-2.5" />
+        )}
+
+        {exifParts.length > 0 && (
+          <p className="text-[10px] tracking-[0.2em] uppercase text-neutral-400/80">
+            {exifParts.map((part, i) => (
+              <span key={i}>
+                {i > 0 && <span className="mx-2 text-neutral-600">·</span>}
+                {part}
+              </span>
+            ))}
+          </p>
+        )}
+      </div>
     </motion.div>
   )
 }

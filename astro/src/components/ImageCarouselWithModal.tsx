@@ -34,9 +34,16 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: Caro
 
     const placeholderHidden = useRef(false);
     const arrivedViaCard = useRef(!!document.documentElement.dataset.slide);
+    const arrivedViaMorph = useRef(!!document.documentElement.dataset.morphForward);
 
     const hidePlaceholder = () => {
         if (placeholderHidden.current) return;
+        // Delay hiding until after the morph animation completes
+        if (arrivedViaMorph.current) {
+            arrivedViaMorph.current = false;
+            setTimeout(hidePlaceholder, 500);
+            return;
+        }
         placeholderHidden.current = true;
         const el = document.getElementById('project-placeholder');
         if (el) {
@@ -163,6 +170,7 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject }: Caro
                 showInfo={showInfo}
                 onToggleInfo={() => setShowInfo(prev => !prev)}
                 skipInitialBlur={arrivedViaCard.current}
+                hideInfoIcon={showModal}
             />
 
             <AnimatePresence>

@@ -7,10 +7,53 @@ import { imageCarouselSliderVariants, adjacentCardVariants } from "../util/motio
 import { getImageSrcSet, getAllURLs, getImageURLForGivenWidth } from "../util/imageUtil";
 import { preload } from "react-dom";
 import { useThrottledCallback } from "use-debounce";
-import { ChevronLeft, ChevronRight, Info } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { navigate } from "astro:transitions/client";
 import ImageInfoOverlay from "./ImageInfoOverlay";
 import { hasAnyExif } from "../util/exifFormatters";
+
+function extractVibrantColors(source: ImageBitmap, count = 3): string[] {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return ['#cd5c5c']
+
+    const w = 10
+    const h = Math.round(w * (source.height / source.width)) || 10
+    canvas.width = w; canvas.height = h
+    ctx.drawImage(source, 0, 0, w, h)
+
+    const { data } = ctx.getImageData(0, 0, w, h)
+
+    // Score pixels by vibrancy, group by hue bucket for color diversity
+    const buckets = new Map<number, { r: number, g: number, b: number, score: number }>()
+    for (let i = 0; i < data.length; i += 4) {
+        const r = data[i], g = data[i + 1], b = data[i + 2]
+        const brightness = (r + g + b) / 3
+        if (brightness < 25 || brightness > 230) continue
+        const max = Math.max(r, g, b), min = Math.min(r, g, b)
+        const sat = max - min
+        const score = sat * (1 - Math.abs(brightness - 128) / 128)
+        let hue = 0
+        if (sat > 0) {
+            if (max === r) hue = ((g - b) / sat) % 6
+            else if (max === g) hue = (b - r) / sat + 2
+            else hue = (r - g) / sat + 4
+        }
+        const bucket = Math.floor(((hue * 60 + 360) % 360) / 30)
+        const existing = buckets.get(bucket)
+        if (!existing || score > existing.score) buckets.set(bucket, { r, g, b, score })
+    }
+
+    const sorted = [...buckets.values()].sort((a, b) => b.score - a.score)
+    if (sorted.length === 0 || sorted[0].score < 15) return ['#cd5c5c']
+
+    const toHex = (c: { r: number, g: number, b: number }) =>
+        '#' + [c.r, c.g, c.b].map(v => v.toString(16).padStart(2, '0')).join('')
+
+    const colors = sorted.slice(0, count).map(toHex)
+    while (colors.length < count) colors.push(colors[0])
+    return colors
+}
 
 const navigateSlide = (slug: string, dir: 'prev' | 'next') => {
     document.documentElement.dataset.slide = dir;
@@ -34,12 +77,14 @@ interface CarouselProps {
     showInfo: boolean,
     onToggleInfo: () => void,
     skipInitialBlur?: boolean,
+    hideInfoIcon?: boolean,
 }
 
-const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction, scrollLeft, scrollRight, toggleModal, prevProject, nextProject, onFirstImageReady, showInfo, onToggleInfo, skipInitialBlur }: CarouselProps) => {
+const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction, scrollLeft, scrollRight, toggleModal, prevProject, nextProject, onFirstImageReady, showInfo, onToggleInfo, skipInitialBlur, hideInfoIcon }: CarouselProps) => {
 
     const [isInfoHovered, setIsInfoHovered] = useState(false)
     const [isClickBlocked, setIsClickBlocked] = useState(false)
+    const [imageColors, setImageColors] = useState(['#cd5c5c', '#cd5c5c', '#cd5c5c'])
     const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set())
     const firstImageShown = useRef(false)
     const blurGracePeriod = useRef(true)
@@ -86,6 +131,21 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
         return () => clearTimeout(timer)
     }, [imageIndex])
 
+    // Extract vibrant colors from tinyPreview for info icon gradient
+    useEffect(() => {
+        if (isOnCard) return
+        const tinyUrl = db_url + currImgWrapper.image.sizes.tinyPreview.url
+        fetch(tinyUrl)
+            .then(res => res.blob())
+            .then(blob => createImageBitmap(blob))
+            .then(bitmap => {
+                setImageColors(extractVibrantColors(bitmap, 3))
+                bitmap.close()
+            })
+            .catch(() => {})
+    }, [currImgWrapper, isOnCard])
+
+
 
     const throttledScrollLeft = useThrottledCallback(scrollLeft, 400, { leading: true, trailing: false })
     const throttledScrollRight = useThrottledCallback(scrollRight, 400, { leading: true, trailing: false })
@@ -127,6 +187,7 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                 />
 
                 <div className={`relative flex items-center justify-center ${isFullscreen ? "h-[95vh]" : "h-[70vh]"} w-full `}
+                    {...(!isFullscreen && { 'data-morph-target': '' })}
                     onPointerOver={isOnCard ? undefined : (isFullscreen ? () => CustomCursor.setCursorType({ type: "zoomOut" }) : () => CustomCursor.setCursorType({ type: "zoomIn" }))}
                     onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
                     onClick={!isClickBlocked && !isOnCard ? () => toggleModal() : undefined}
@@ -178,6 +239,8 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                                     <div className={`overflow-hidden ${isOnPrevCard ? "lg:order-1" : "lg:order-2"}`}>
                                         <img
                                             src={adjacentProject.thumbnailUrl}
+                                            srcSet={adjacentProject.placeholderSrcSet}
+                                            sizes="50vh"
                                             alt={adjacentProject.title}
                                             className="max-h-[50vh] object-contain opacity-70 group-hover:opacity-100 scale-100 group-hover:scale-[1.03] transition-all duration-500"
                                             draggable={false}
@@ -297,32 +360,59 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
                 />
 
                 {!isOnCard && (
-                    <div className="py-2 w-full flex justify-center items-center relative">
-                        <span role="status" aria-live="polite" aria-label={`Image ${imageIndex + 1} of ${photoProject.images.length}`}>
-                            {`${imageIndex + 1} / ${photoProject.images.length}`}
-                        </span>
-                        {(currImgWrapper.description || hasAnyExif(currImgWrapper.image.exif)) && (
-                            <div
-                                className="absolute right-2 top-1/2 -translate-y-1/2 z-20"
-                                onMouseEnter={() => setIsInfoHovered(true)}
-                                onMouseLeave={() => setIsInfoHovered(false)}
-                            >
-                                <button
-                                    aria-label="Image info"
-                                    className={`cursor-none p-3 transition-colors duration-200 ${showInfo || isInfoHovered ? 'text-neutral-300' : 'text-neutral-500 hover:text-neutral-300'}`}
-                                    onClick={(e) => { e.stopPropagation(); onToggleInfo(); }}
-                                    onPointerOver={() => CustomCursor.setCursorType({ type: "default" })}
-                                    onPointerLeave={() => CustomCursor.setCursorType({ type: isFullscreen ? "zoomOut" : "zoomIn" })}
-                                >
-                                    <Info size={20} />
-                                </button>
-                                <AnimatePresence>
-                                    {(showInfo || isInfoHovered) && (
-                                        <ImageInfoOverlay imageWrapper={currImgWrapper} />
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                        )}
+                    <div className="py-2 w-full flex justify-center items-center">
+                        <div className="relative">
+                            <span role="status" aria-live="polite" aria-label={`Image ${imageIndex + 1} of ${photoProject.images.length}`}>
+                                {`${imageIndex + 1} / ${photoProject.images.length}`}
+                            </span>
+                            {!hideInfoIcon && <AnimatePresence mode="wait">
+                                {(currImgWrapper.description || hasAnyExif(currImgWrapper.image.exif)) && (
+                                    <motion.div
+                                        key={currImgWrapper.id}
+                                        className="absolute left-full top-1/2 -translate-y-1/2 ml-1 z-20"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0, transition: { duration: 0.15 } }}
+                                        transition={{ duration: 0.5, delay: 0.12, ease: "easeOut" }}
+                                        onMouseEnter={() => setIsInfoHovered(true)}
+                                        onMouseLeave={() => setIsInfoHovered(false)}
+                                    >
+                                        <motion.button
+                                            aria-label="Image info"
+                                            className="cursor-none p-1.5"
+                                            onClick={(e) => { e.stopPropagation(); onToggleInfo(); }}
+                                            onPointerOver={() => CustomCursor.setCursorType({ type: "default" })}
+                                            onPointerLeave={() => CustomCursor.setCursorType({ type: isFullscreen ? "zoomOut" : "zoomIn" })}
+                                            whileHover={{ scale: 1.1 }}
+                                            whileTap={{ scale: 0.92 }}
+                                        >
+                                            <span
+                                                className={`
+                                                    flex items-center justify-center w-5 h-5 rounded-full
+                                                    text-[10px] font-serif italic leading-none select-none
+                                                    border transition-all duration-300
+                                                    ${showInfo || isInfoHovered
+                                                        ? 'border-transparent text-neutral-200'
+                                                        : 'border-neutral-400/50 text-neutral-400'
+                                                    }
+                                                `}
+                                                style={showInfo || isInfoHovered ? {
+                                                    background: `linear-gradient(rgba(23,23,23,0.85), rgba(23,23,23,0.85)) padding-box, linear-gradient(135deg, ${imageColors[0]}, ${imageColors[1]}, ${imageColors[2]}) border-box`,
+                                                    boxShadow: `0 0 10px ${imageColors[0]}33, 0 0 6px ${imageColors[1]}22`,
+                                                } : undefined}
+                                            >
+                                                i
+                                            </span>
+                                        </motion.button>
+                                        <AnimatePresence>
+                                            {(showInfo || isInfoHovered) && (
+                                                <ImageInfoOverlay imageWrapper={currImgWrapper} />
+                                            )}
+                                        </AnimatePresence>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>}
+                        </div>
                     </div>
                 )}
 

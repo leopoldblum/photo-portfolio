@@ -14,6 +14,12 @@
 - [x] Add Astro View Transitions for smooth navigation between home and project pages
 - [ ] Add view transition from detail page back to landing page (reverse morph)
 
+### Custom Cursor
+- [ ] Create a custom cursor type for hovering the info icon on project detail pages
+
+### Scroll Animations
+- [ ] Add clip-path reveal to the first image on project detail pages (on load)
+
 ### About/Contact Page
 - [ ] Design and build an about/contact page (pending content and design direction)
 
