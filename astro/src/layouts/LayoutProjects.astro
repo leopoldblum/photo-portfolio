@@ -3,6 +3,7 @@ import "/src/styles/global.css";
 import { ClientRouter } from "astro:transitions";
 import TopBar from "../components/TopBar.astro";
 import { CustomCursor } from "../components/CustomCursor";
+import AmbientBackground from "../components/AmbientBackground";
 import SEOHead from "../components/SEOHead.astro";
 
 interface Props {
@@ -33,6 +34,7 @@ const { title, description, ogImage, siteName, instagramUrl } = Astro.props;
     <body
         class="flex flex-col min-h-screen bg-neutral-900 text-neutral-400 cursor-none"
     >
+        <AmbientBackground client:only="react" />
         <CustomCursor client:load transition:persist />
 
         <TopBar instagramUrl={instagramUrl} />

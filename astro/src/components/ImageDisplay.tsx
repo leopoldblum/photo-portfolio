@@ -1,5 +1,6 @@
 import type { PhotoProject, ImageWrapper } from "../../../photo-cms/src/types/apiTypes";
 import { CustomCursor } from "./CustomCursor.tsx";
+import ScrollReveal from "./ScrollReveal.tsx";
 import { motion } from "motion/react"
 import { getImageSrcSet } from "../util/imageUtil.tsx";
 
@@ -17,7 +18,8 @@ const ImageDisplay = ({ photoProject }: { photoProject: PhotoProject }) => {
     const basePicture = thumbnails[0].image;
 
     return (
-        <div className="flex flex-col py-0.5 lg:py-1 cursor-none"
+        <ScrollReveal
+            className="flex flex-col py-0.5 lg:py-1 cursor-none"
             onPointerOver={() => CustomCursor.setCursorType({ type: "displayTitle", displayText: projectTitle })}
             onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
         >
@@ -53,7 +55,7 @@ const ImageDisplay = ({ photoProject }: { photoProject: PhotoProject }) => {
                     ))
                 }
             </div>
-        </div>
+        </ScrollReveal>
     )
 }
 
