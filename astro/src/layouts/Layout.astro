@@ -5,6 +5,7 @@ import TopBar from "../components/TopBar.astro";
 import Footer from "../components/Footer.astro";
 import { CustomCursor } from "../components/CustomCursor";
 import AmbientBackground from "../components/AmbientBackground";
+import CursorBloom from "../components/CursorBloom";
 import SEOHead from "../components/SEOHead.astro";
 import PortfolioShell from "../components/PortfolioShell";
 
@@ -37,6 +38,7 @@ const { title, description, ogImage, siteName, instagramUrl } = Astro.props;
         class="w-full mx-auto bg-neutral-900 text-neutral-400 min-h-screen cursor-none"
     >
         <AmbientBackground client:only="react" />
+        <CursorBloom client:only="react" />
         <CustomCursor client:load transition:persist />
 
         <TopBar instagramUrl={instagramUrl} />
