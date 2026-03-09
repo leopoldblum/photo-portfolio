@@ -64,8 +64,8 @@ interface Particle {
 }
 
 const PARTICLE_COUNT = 350;
-const BIG_STAR_COUNT = 25;
-const HUGE_STAR_COUNT = 10;
+const BIG_STAR_COUNT = 45;
+const HUGE_STAR_COUNT = 20;
 const CURSOR_RADIUS = 150;
 const CURSOR_FORCE = 0.8;
 
