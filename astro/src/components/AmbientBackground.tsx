@@ -17,7 +17,7 @@ interface GrainSpeck {
   baseOpacity: number;
 }
 
-const GRAIN_COUNT = 300;
+const GRAIN_COUNT = 500;
 
 function createGrainSpeck(w: number, h: number): GrainSpeck {
   return {
@@ -63,9 +63,9 @@ interface Particle {
   tint: [number, number, number];
 }
 
-const PARTICLE_COUNT = 200;
-const BIG_STAR_COUNT = 15;
-const HUGE_STAR_COUNT = 6;
+const PARTICLE_COUNT = 350;
+const BIG_STAR_COUNT = 25;
+const HUGE_STAR_COUNT = 10;
 const CURSOR_RADIUS = 150;
 const CURSOR_FORCE = 0.8;
 
@@ -126,7 +126,7 @@ interface LensFlare {
   hueOffset: number;
 }
 
-const LENS_FLARE_COUNT = 10;
+const LENS_FLARE_COUNT = 15;
 
 function createLensFlare(w: number, h: number): LensFlare {
   return {
@@ -140,35 +140,6 @@ function createLensFlare(w: number, h: number): LensFlare {
   };
 }
 
-// --- Celestial star-with-orbit ---
-
-interface CelestialShape {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  size: number;
-  baseOpacity: number;
-  phaseOffset: number;
-  rotationAngle: number;
-  rotationSpeed: number;
-}
-
-const CELESTIAL_COUNT = 5;
-
-function createCelestialShape(w: number, h: number): CelestialShape {
-  return {
-    x: Math.random() * w,
-    y: Math.random() * h,
-    vx: (Math.random() - 0.5) * 0.06,
-    vy: (Math.random() - 0.5) * 0.06,
-    size: 80 + Math.random() * 100,
-    baseOpacity: 0.04 + Math.random() * 0.04,
-    phaseOffset: Math.random() * Math.PI * 2,
-    rotationAngle: Math.random() * Math.PI * 2,
-    rotationSpeed: (Math.random() - 0.5) * 0.003,
-  };
-}
 
 // --- Utility ---
 
@@ -256,78 +227,6 @@ function drawStar(
   ctx.restore();
 }
 
-function drawCelestialShape(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  size: number,
-  opacity: number,
-  rotation: number,
-) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(rotation);
-
-  const color = (a: number) => `rgba(220, 230, 255, ${a})`;
-
-  // Central four-pointed star (tall and elongated)
-  const starH = size * 0.55;
-  const starW = size * 0.22;
-  const pinch = size * 0.04;
-
-  ctx.beginPath();
-  ctx.moveTo(0, -starH);
-  ctx.quadraticCurveTo(pinch, -pinch, starW, 0);
-  ctx.quadraticCurveTo(pinch, pinch, 0, starH);
-  ctx.quadraticCurveTo(-pinch, pinch, -starW, 0);
-  ctx.quadraticCurveTo(-pinch, -pinch, 0, -starH);
-  ctx.closePath();
-
-  const starGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, starH * 0.6);
-  starGrad.addColorStop(0, color(opacity * 2.5));
-  starGrad.addColorStop(0.5, color(opacity * 1.2));
-  starGrad.addColorStop(1, color(opacity * 0.3));
-  ctx.fillStyle = starGrad;
-  ctx.fill();
-
-  // Elliptical orbit ring
-  const orbitRX = size * 0.6;
-  const orbitRY = size * 0.18;
-  const orbitTilt = -0.35;
-
-  ctx.save();
-  ctx.rotate(orbitTilt);
-  ctx.beginPath();
-  ctx.ellipse(0, 0, orbitRX, orbitRY, 0, 0, Math.PI * 2);
-  ctx.strokeStyle = color(opacity * 1.8);
-  ctx.lineWidth = size * 0.012;
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.ellipse(0, 0, orbitRX * 1.06, orbitRY * 1.15, 0, 0, Math.PI * 2);
-  ctx.strokeStyle = color(opacity * 0.6);
-  ctx.lineWidth = size * 0.006;
-  ctx.stroke();
-
-  // Small accent stars at orbit ends
-  const accentSize = size * 0.07;
-  ctx.fillStyle = color(opacity * 2);
-  drawStar(ctx, orbitRX * 0.85, -orbitRY * 0.4, accentSize);
-  drawStar(ctx, -orbitRX * 0.7, orbitRY * 0.6, accentSize * 0.7);
-
-  ctx.restore();
-
-  // Soft glow behind everything
-  const glowGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 0.5);
-  glowGrad.addColorStop(0, color(opacity * 0.8));
-  glowGrad.addColorStop(1, color(0));
-  ctx.beginPath();
-  ctx.arc(0, 0, size * 0.5, 0, Math.PI * 2);
-  ctx.fillStyle = glowGrad;
-  ctx.fill();
-
-  ctx.restore();
-}
 
 // --- Component ---
 
@@ -420,12 +319,11 @@ const AmbientBackground = () => {
     const flares: LensFlare[] = Array.from({ length: LENS_FLARE_COUNT }, () =>
       createLensFlare(canvas.width, worldH())
     );
-    const celestials: CelestialShape[] = Array.from({ length: CELESTIAL_COUNT }, () =>
-      createCelestialShape(canvas.width, worldH())
-    );
-
     let frameId: number;
     let time = 0;
+    let prevWorldH = worldH();
+
+    const allLayers = [grain, particles, bigStars, hugeStars, flares];
 
     const animate = () => {
       const w = canvas.width;
@@ -436,6 +334,17 @@ const AmbientBackground = () => {
       const my = mouseRef.current.y + scrollRef.y;
       const sy = scrollRef.y;
       const wh = worldH();
+
+      // Rescale particle Y positions when document height changes
+      if (wh !== prevWorldH && prevWorldH > 0) {
+        const scale = wh / prevWorldH;
+        for (const layer of allLayers) {
+          for (const p of layer) {
+            p.y *= scale;
+          }
+        }
+        prevWorldH = wh;
+      }
       time += 0.01;
 
       // Update color-cycling hue values
@@ -492,6 +401,15 @@ const AmbientBackground = () => {
 
       // --- Layer 2b: big star sparkles ---
       for (const p of bigStars) {
+        const dx = p.x - mx;
+        const dy = p.y - my;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < CURSOR_RADIUS * 1.5 && dist > 0) {
+          const force = (1 - dist / (CURSOR_RADIUS * 1.5)) * CURSOR_FORCE * 0.4;
+          p.vx += (dx / dist) * force;
+          p.vy += (dy / dist) * force;
+        }
+
         p.vx *= 0.99;
         p.vy *= 0.99;
         const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
@@ -514,6 +432,15 @@ const AmbientBackground = () => {
 
       // --- Layer 2c: huge star sparkles ---
       for (const p of hugeStars) {
+        const dx = p.x - mx;
+        const dy = p.y - my;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < CURSOR_RADIUS * 2 && dist > 0) {
+          const force = (1 - dist / (CURSOR_RADIUS * 2)) * CURSOR_FORCE * 0.2;
+          p.vx += (dx / dist) * force;
+          p.vy += (dy / dist) * force;
+        }
+
         p.vx *= 0.995;
         p.vy *= 0.995;
         const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
@@ -536,6 +463,17 @@ const AmbientBackground = () => {
 
       // --- Layer 3: lens flare orbs ---
       for (const f of flares) {
+        const dx = f.x - mx;
+        const dy = f.y - my;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < CURSOR_RADIUS * 1.8 && dist > 0) {
+          const force = (1 - dist / (CURSOR_RADIUS * 1.8)) * CURSOR_FORCE * 0.3;
+          f.vx += (dx / dist) * force;
+          f.vy += (dy / dist) * force;
+        }
+        f.vx *= 0.985;
+        f.vy *= 0.985;
+
         f.x = wrapCoord(f.x + f.vx, w);
         f.y = wrapCoord(f.y + f.vy, wh);
 
@@ -554,21 +492,6 @@ const AmbientBackground = () => {
         ctx.arc(f.x, screenY, f.radius, 0, Math.PI * 2);
         ctx.fillStyle = grad;
         ctx.fill();
-      }
-
-      // --- Layer 4: celestial star-with-orbit shapes ---
-      for (const c of celestials) {
-        c.x = wrapCoord(c.x + c.vx, w);
-        c.y = wrapCoord(c.y + c.vy, wh);
-        c.rotationAngle += c.rotationSpeed;
-
-        const screenY = c.y - sy;
-        if (screenY < -c.size || screenY > h + c.size) continue;
-
-        const twinkle = 0.6 + 0.4 * Math.sin(time * 0.5 + c.phaseOffset);
-        const opacity = c.baseOpacity * twinkle;
-
-        drawCelestialShape(ctx, c.x, screenY, c.size, opacity, c.rotationAngle);
       }
 
       frameId = requestAnimationFrame(animate);
