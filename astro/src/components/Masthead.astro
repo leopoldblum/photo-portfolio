@@ -2,12 +2,17 @@
 interface Props {
     name: string;
     yearRange: string;
+    align?: "left" | "right";
 }
 
-const { name, yearRange } = Astro.props;
+const { name, yearRange, align = "left" } = Astro.props;
+const isRight = align === "right";
 ---
 
-<section id="masthead" class="masthead w-[93vw] mx-auto pt-10 md:pt-20 pb-12 md:pb-20 select-none">
+<section
+    id="masthead"
+    class:list={["masthead", "w-[93vw] mx-auto pt-10 md:pt-20 pb-12 md:pb-20 select-none", isRight && "masthead--right"]}
+>
     <h1 class="masthead-name text-neutral-100/90">{name}</h1>
     <div class="masthead-row">
         <span class="masthead-dash" aria-hidden="true">—</span>
@@ -19,6 +24,7 @@ const { name, yearRange } = Astro.props;
 <style>
     .masthead {
         font-feature-settings: "ss01", "ss02";
+        padding-left: clamp(2rem, 10vw, 9rem);
     }
 
     .masthead-name {
@@ -37,6 +43,24 @@ const { name, yearRange } = Astro.props;
         align-items: center;
         gap: 0.9rem;
         margin-top: 1.4rem;
+    }
+
+    .masthead--right {
+        text-align: right;
+        padding-right: clamp(2rem, 10vw, 9rem);
+    }
+
+    .masthead--right .masthead-row {
+        flex-direction: row-reverse;
+    }
+
+    .masthead--right .masthead-rule {
+        transform-origin: right center;
+        background: linear-gradient(
+            to left,
+            rgb(115 115 115 / 0.45),
+            rgb(115 115 115 / 0)
+        );
     }
 
     .masthead-dash {

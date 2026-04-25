@@ -16,10 +16,11 @@ interface Props {
     ogImage?: string;
     siteName?: string;
     instagramUrl?: string;
-    masthead?: { name: string; yearRange: string };
+    masthead?: { name: string; yearRange: string; align?: "left" | "right" };
+    revealMarkOnScroll?: boolean;
 }
 
-const { title, description, ogImage, siteName, instagramUrl, masthead } = Astro.props;
+const { title, description, ogImage, siteName, instagramUrl, masthead, revealMarkOnScroll = false } = Astro.props;
 ---
 
 <html lang="en">
@@ -44,9 +45,9 @@ const { title, description, ogImage, siteName, instagramUrl, masthead } = Astro.
         <CursorBloom client:only="react" />
         <CustomCursor client:load transition:persist />
 
-        <TopBar instagramUrl={instagramUrl} markBehavior={masthead ? "reveal-on-scroll" : "visible"} />
+        <TopBar instagramUrl={instagramUrl} markBehavior={revealMarkOnScroll ? "reveal-on-scroll" : "visible"} />
 
-        {masthead && <Masthead name={masthead.name} yearRange={masthead.yearRange} />}
+        {masthead && <Masthead name={masthead.name} yearRange={masthead.yearRange} align={masthead.align} />}
 
         <main class="min-h-[100svh]">
             <slot />
