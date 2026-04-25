@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { animate, type AnimationPlaybackControls } from 'motion/react'
 import { GrainGradient, NeuroNoise } from '@paper-design/shaders-react'
 import { buildPalette } from '../util/dominantColor'
 
@@ -216,17 +217,34 @@ function drawStar(
 
 // --- Component ---
 
-const DEFAULT_PALETTE: [string, string, string, string] = ['#2a1a4e', '#1a1030', '#0d0a1a', '#3a2d6e']
+const DEFAULT_RGB: [number, number, number] = [120, 80, 180]
+const COLOR_TRANSITION = { duration: 0.6, ease: [0.32, 0.72, 0, 1] as const }
 
 const AmbientBackground = () => {
   const [hasHover, setHasHover] = useState(true)
-  const [palette, setPalette] = useState<[string, string, string, string]>(DEFAULT_PALETTE)
+  const [currentRgb, setCurrentRgb] = useState<[number, number, number]>(DEFAULT_RGB)
+  const palette = useMemo(() => buildPalette(currentRgb), [currentRgb])
   const mouseRef = useRef({ x: 0, y: 0 })
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const colorAnimRef = useRef<AnimationPlaybackControls | null>(null)
+  const rgbRef = useRef<[number, number, number]>(DEFAULT_RGB)
 
   const onColorChange = useCallback((e: Event) => {
-    const rgb = (e as CustomEvent<[number, number, number]>).detail
-    setPalette(buildPalette(rgb))
+    const target = (e as CustomEvent<[number, number, number]>).detail
+    colorAnimRef.current?.stop()
+    const from: [number, number, number] = [...rgbRef.current]
+    colorAnimRef.current = animate(0, 1, {
+      ...COLOR_TRANSITION,
+      onUpdate: (t) => {
+        const next: [number, number, number] = [
+          Math.round(from[0] + (target[0] - from[0]) * t),
+          Math.round(from[1] + (target[1] - from[1]) * t),
+          Math.round(from[2] + (target[2] - from[2]) * t),
+        ]
+        rgbRef.current = next
+        setCurrentRgb(next)
+      },
+    })
   }, [])
 
   useEffect(() => {
@@ -244,6 +262,7 @@ const AmbientBackground = () => {
     return () => {
       window.removeEventListener('pointermove', onPointerMove)
       document.removeEventListener('background-color', onColorChange)
+      colorAnimRef.current?.stop()
     }
   }, [])
 
@@ -460,12 +479,12 @@ const AmbientBackground = () => {
         style={{ position: 'absolute', inset: 0, opacity: 0.4 }}
         colors={palette}
         colorBack="#0a0a0a"
-        speed={0.15}
-        noise={0.15}
-        softness={0.8}
-        intensity={0.3}
-        maxPixelCount={400000}
-        minPixelRatio={0.5}
+        speed={0.6}
+        noise={0.08}
+        softness={0.7}
+        intensity={0.55}
+        maxPixelCount={4000000}
+        minPixelRatio={1}
       />
       {/* Shader grain texture layer */}
       <div style={{ position: 'absolute', inset: 0, mixBlendMode: 'soft-light', opacity: 0.05 }}>
@@ -477,9 +496,9 @@ const AmbientBackground = () => {
           speed={0.3}
           brightness={0.4}
           contrast={0.5}
-          scale={1.5}
-          maxPixelCount={250000}
-          minPixelRatio={0.5}
+          scale={2.5}
+          maxPixelCount={3000000}
+          minPixelRatio={1}
         />
       </div>
       {/* Canvas particles on top */}

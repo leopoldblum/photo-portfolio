@@ -92,11 +92,6 @@ const HomeView = ({ projects, onProjectClick }: HomeViewProps) => {
                         className="flex flex-col py-0.5 lg:py-1 cursor-none"
                         onPointerOver={() => {
                             CustomCursor.setCursorType({ type: "displayTitle", displayText: projectTitle })
-                            const thumb = thumbnails[0]
-                            const tinyUrl = thumb.image.sizes?.tinyPreview?.url
-                            if (tinyUrl) {
-                                extractDominantColor(db_url + tinyUrl).then(dispatchBackgroundColor)
-                            }
                         }}
                         onPointerLeave={() => {
                             CustomCursor.setCursorType({ type: "default" })
@@ -108,6 +103,12 @@ const HomeView = ({ projects, onProjectClick }: HomeViewProps) => {
                                 <div
                                     className="transition-all duration-300 ring-neutral-400 hover:ring-0 hover:ring-offset-3 ring-offset-neutral-800/90 overflow-hidden"
                                     key={thumbnailImg.id}
+                                    onPointerEnter={() => {
+                                        const tinyUrl = thumbnailImg.image.sizes?.tinyPreview?.url
+                                        if (tinyUrl) {
+                                            extractDominantColor(db_url + tinyUrl).then(dispatchBackgroundColor)
+                                        }
+                                    }}
                                 >
                                     <a
                                         href={`${base_url}/projects/${project.slug}`}
