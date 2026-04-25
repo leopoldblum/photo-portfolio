@@ -1,0 +1,10 @@
+{
+  "name": "photo-portfolio",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n astro,cms -c cyan,magenta \"npm --prefix astro run dev\" \"npm --prefix photo-cms run dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
