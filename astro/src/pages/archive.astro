@@ -1,0 +1,157 @@
+---
+import Layout from "../layouts/Layout.astro";
+import type { PhotoProject, ImageWrapper, WebsiteLayout } from "../../../photo-cms/src/types/apiTypes";
+import { getImageSrcSet } from "../util/imageUtil";
+
+const db_url = import.meta.env.PUBLIC_API_URL;
+
+const layoutRes = await fetch(`${db_url}/api/globals/websiteLayout`);
+if (!layoutRes.ok) throw new Error(`Failed to fetch WebsiteLayout from ${db_url}: ${layoutRes.status} ${layoutRes.statusText}`);
+const websitelayout: WebsiteLayout = await layoutRes.json();
+const siteName = websitelayout.siteMetadata?.siteName ?? "LB Fotos";
+const siteDescription = websitelayout.siteMetadata?.siteDescription ?? undefined;
+const instagramUrl = websitelayout.siteMetadata?.instagramUrl ?? undefined;
+
+const projectsRes = await fetch(`${db_url}/api/photo-projects?depth=1&limit=200&sort=-date`);
+if (!projectsRes.ok) throw new Error(`Failed to fetch photo-projects from ${db_url}: ${projectsRes.status} ${projectsRes.statusText}`);
+const projectsData = await projectsRes.json();
+const allProjects: PhotoProject[] = projectsData.docs ?? [];
+
+const years = allProjects
+    .map(p => new Date(p.date).getFullYear())
+    .filter(y => Number.isFinite(y));
+const minYear = years.length ? Math.min(...years) : 2019;
+const maxYear = years.length ? Math.max(...years) : new Date().getFullYear();
+const yearRange = minYear === maxYear ? `${minYear}` : `${minYear}–${maxYear}`;
+
+const groups: { year: number; projects: PhotoProject[] }[] = [];
+for (const p of allProjects) {
+    const year = new Date(p.date).getFullYear();
+    if (!Number.isFinite(year)) continue;
+    const last = groups.at(-1);
+    if (last?.year === year) last.projects.push(p);
+    else groups.push({ year, projects: [p] });
+}
+
+function pickThumbnails(p: PhotoProject): ImageWrapper[] {
+    const flagged = p.images.filter(img => img.isThumbnail);
+    if (flagged.length > 0) return flagged;
+    return p.images.length > 0 ? [p.images[0]] : [];
+}
+
+const firstProject = allProjects[0];
+const firstThumbs = firstProject ? pickThumbnails(firstProject) : [];
+const firstThumb = firstThumbs[0];
+const ogImage = firstThumb ? db_url + (firstThumb.image.sizes?.res1080?.url ?? firstThumb.image.url) : undefined;
+---
+
+<Layout
+    title={`Archive — ${siteName}`}
+    description={siteDescription}
+    ogImage={ogImage}
+    siteName={siteName}
+    instagramUrl={instagramUrl}
+    masthead={{ name: "Archive", yearRange }}
+>
+    <div
+        class="archive-grid mx-auto grid grid-cols-1 lg:grid-cols-[1fr_minmax(0,50vw)_1fr] pb-16"
+    >
+        {groups.map((group, gi) => (
+            <>
+                <div
+                    class:list={[
+                        "year-marker",
+                        "text-[10px] tracking-[0.3em] uppercase text-neutral-500/40",
+                        "px-[3.5vw] lg:px-0",
+                        gi === 0 ? "mt-0" : "mt-12 lg:mt-16",
+                        "mb-3 lg:mb-0",
+                        "lg:col-start-1 lg:justify-self-end lg:self-start lg:pr-6 lg:pt-2",
+                    ]}
+                >
+                    {group.year}
+                </div>
+                <div class:list={["lg:col-start-2", gi === 0 ? "" : "lg:mt-16"]}>
+                    {group.projects.map((project) => {
+                        const thumbnails = pickThumbnails(project);
+                        if (thumbnails.length === 0) return null;
+                        const basePicture = thumbnails[0].image;
+                        return (
+                            <div
+                                class="archive-row flex flex-col py-0.5 lg:py-1 cursor-none"
+                                data-project-title={project.title}
+                            >
+                                <div class="flex justify-center items-center gap-1 lg:gap-2">
+                                    {thumbnails.map((thumb) => {
+                                        const tinyUrl = thumb.image.sizes?.tinyPreview?.url
+                                            ? db_url + thumb.image.sizes.tinyPreview.url
+                                            : "";
+                                        return (
+                                            <div
+                                                class="archive-thumb transition-all duration-300 ring-neutral-400 hover:ring-0 hover:ring-offset-3 ring-offset-neutral-800/90 overflow-hidden"
+                                                data-tiny-url={tinyUrl}
+                                            >
+                                                <a
+                                                    href={`/projects/${project.slug}`}
+                                                    class="cursor-none"
+                                                >
+                                                    <img
+                                                        src={db_url + thumb.image.url}
+                                                        srcSet={getImageSrcSet(db_url, thumb)}
+                                                        sizes="(max-width: 768px) 100vw, 30vw"
+                                                        class="hover:scale-105 transition-all duration-300 select-none"
+                                                        alt={thumb.image.alt}
+                                                        height={basePicture.height}
+                                                        width={
+                                                            (basePicture.height * thumb.image.width) /
+                                                            thumb.image.height
+                                                        }
+                                                        loading="lazy"
+                                                        draggable={false}
+                                                    />
+                                                </a>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </>
+        ))}
+    </div>
+</Layout>
+
+<script>
+    import { extractDominantColor, dispatchBackgroundColor } from "../util/dominantColor";
+
+    function setupArchiveHover() {
+        document.querySelectorAll<HTMLElement>(".archive-row").forEach((row) => {
+            const title = row.dataset.projectTitle ?? "";
+            row.addEventListener("pointerover", () => {
+                document.dispatchEvent(
+                    new CustomEvent("cursor-text", {
+                        detail: { type: "displayTitle", displayText: title },
+                    })
+                );
+            });
+            row.addEventListener("pointerleave", () => {
+                document.dispatchEvent(
+                    new CustomEvent("cursor-text", { detail: { type: "default" } })
+                );
+                dispatchBackgroundColor([120, 80, 180]);
+            });
+        });
+
+        document.querySelectorAll<HTMLElement>(".archive-thumb").forEach((thumb) => {
+            const tinyUrl = thumb.dataset.tinyUrl ?? "";
+            if (!tinyUrl) return;
+            thumb.addEventListener("pointerenter", () => {
+                extractDominantColor(tinyUrl).then(dispatchBackgroundColor);
+            });
+        });
+    }
+
+    setupArchiveHover();
+    document.addEventListener("astro:after-swap", setupArchiveHover);
+</script>
