@@ -5,6 +5,7 @@ import { CustomCursor } from "./CustomCursor";
 import { AnimatePresence, motion } from "motion/react";
 import { X } from "lucide-react";
 import { useThrottledCallback } from "use-debounce";
+import { extractDominantColor, dispatchBackgroundColor } from "../util/dominantColor";
 
 export type AdjacentProject = {
     slug: string;
@@ -34,6 +35,16 @@ const ImageCarouselWithModal = ({ photoProject, prevProject, nextProject, onSlid
 
     useEffect(() => {
         setShowInfo(false)
+
+        // Extract dominant color from current image and dispatch to background
+        if (imageIndex >= 0 && imageIndex < totalImages) {
+            const img = photoProject.images[imageIndex]
+            const tinyUrl = img.image.sizes?.tinyPreview?.url
+            if (tinyUrl) {
+                const db_url = import.meta.env.PUBLIC_API_URL as string
+                extractDominantColor(db_url + tinyUrl).then(dispatchBackgroundColor)
+            }
+        }
     }, [imageIndex])
 
     useEffect(() => {

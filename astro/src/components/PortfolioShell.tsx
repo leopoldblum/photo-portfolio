@@ -6,6 +6,7 @@ import ImageCarouselWithModal from "./ImageCarouselWithModal";
 import ScrollReveal from "./ScrollReveal";
 import { CustomCursor } from "./CustomCursor";
 import { getImageSrcSet } from "../util/imageUtil";
+import { extractDominantColor, dispatchBackgroundColor } from "../util/dominantColor";
 import { navigate } from "astro:transitions/client";
 
 // --- Types ---
@@ -89,10 +90,18 @@ const HomeView = ({ projects, onProjectClick }: HomeViewProps) => {
                     <ScrollReveal
                         key={project.slug}
                         className="flex flex-col py-0.5 lg:py-1 cursor-none"
-                        onPointerOver={() =>
+                        onPointerOver={() => {
                             CustomCursor.setCursorType({ type: "displayTitle", displayText: projectTitle })
-                        }
-                        onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
+                            const thumb = thumbnails[0]
+                            const tinyUrl = thumb.image.sizes?.tinyPreview?.url
+                            if (tinyUrl) {
+                                extractDominantColor(db_url + tinyUrl).then(dispatchBackgroundColor)
+                            }
+                        }}
+                        onPointerLeave={() => {
+                            CustomCursor.setCursorType({ type: "default" })
+                            dispatchBackgroundColor([120, 80, 180])
+                        }}
                     >
                         <div className="flex justify-center items-center gap-1 lg:gap-2">
                             {thumbnails.map((thumbnailImg) => (

@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { GrainGradient, NeuroNoise } from '@paper-design/shaders-react'
+import { buildPalette } from '../util/dominantColor'
 
 // --- Star shapes & tints ---
 
@@ -215,10 +216,18 @@ function drawStar(
 
 // --- Component ---
 
+const DEFAULT_PALETTE: [string, string, string, string] = ['#2a1a4e', '#1a1030', '#0d0a1a', '#3a2d6e']
+
 const AmbientBackground = () => {
   const [hasHover, setHasHover] = useState(true)
+  const [palette, setPalette] = useState<[string, string, string, string]>(DEFAULT_PALETTE)
   const mouseRef = useRef({ x: 0, y: 0 })
   const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  const onColorChange = useCallback((e: Event) => {
+    const rgb = (e as CustomEvent<[number, number, number]>).detail
+    setPalette(buildPalette(rgb))
+  }, [])
 
   useEffect(() => {
     setHasHover(window.matchMedia('(hover: hover)').matches)
@@ -231,7 +240,11 @@ const AmbientBackground = () => {
     mouseRef.current = { x: window.innerWidth / 2, y: window.innerHeight / 2 }
 
     window.addEventListener('pointermove', onPointerMove)
-    return () => window.removeEventListener('pointermove', onPointerMove)
+    document.addEventListener('background-color', onColorChange)
+    return () => {
+      window.removeEventListener('pointermove', onPointerMove)
+      document.removeEventListener('background-color', onColorChange)
+    }
   }, [])
 
   // Particle animation loop
@@ -445,7 +458,7 @@ const AmbientBackground = () => {
       {/* Shader atmosphere layer */}
       <GrainGradient
         style={{ position: 'absolute', inset: 0, opacity: 0.4 }}
-        colors={['#2a1a4e', '#1a1030', '#0d0a1a', '#3a2d6e']}
+        colors={palette}
         colorBack="#0a0a0a"
         speed={0.15}
         noise={0.15}
