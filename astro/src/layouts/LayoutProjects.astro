@@ -3,7 +3,7 @@ import "/src/styles/global.css";
 import { ClientRouter } from "astro:transitions";
 import TopBar from "../components/TopBar.astro";
 import { CustomCursor } from "../components/CustomCursor";
-import AmbientBackground from "../components/AmbientBackground";
+import CursorBloom from "../components/CursorBloom";
 import SEOHead from "../components/SEOHead.astro";
 import PortfolioShell from "../components/PortfolioShell";
 
@@ -27,6 +27,10 @@ const { title, description, ogImage, siteName, instagramUrl } = Astro.props;
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,700;1,6..96,800&display=swap"
+            rel="stylesheet"
+        />
         <link href="https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600&display=swap" rel="stylesheet" />
         <title>{title}</title>
         <SEOHead title={title} description={description} ogImage={ogImage} siteName={siteName} />
@@ -34,9 +38,18 @@ const { title, description, ogImage, siteName, instagramUrl } = Astro.props;
     </head>
 
     <body
-        class="flex flex-col min-h-screen bg-neutral-900 text-neutral-400 cursor-none"
+        class="flex flex-col min-h-screen text-neutral-300 cursor-none"
     >
-        <AmbientBackground client:only="react" />
+        <div class="atm-lights" aria-hidden="true"></div>
+        <div class="atm-vignette" aria-hidden="true"></div>
+        <CursorBloom client:only="react" transition:persist="cursor-bloom" />
+        <div class="atm-grain" aria-hidden="true"></div>
+
+        <span class="atm-reg atm-reg-tl" aria-hidden="true"></span>
+        <span class="atm-reg atm-reg-tr" aria-hidden="true"></span>
+        <span class="atm-reg atm-reg-bl" aria-hidden="true"></span>
+        <span class="atm-reg atm-reg-br" aria-hidden="true"></span>
+
         <CustomCursor client:load transition:persist />
 
         <TopBar instagramUrl={instagramUrl} />

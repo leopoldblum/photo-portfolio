@@ -1,12 +1,11 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { Fragment, useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import type { PhotoProject } from "../../../photo-cms/src/types/apiTypes";
+import type { PhotoProject, ImageWrapper } from "../../../photo-cms/src/types/apiTypes";
 import type { AdjacentProject } from "./ImageCarouselWithModal";
 import ImageCarouselWithModal from "./ImageCarouselWithModal";
-import ScrollReveal from "./ScrollReveal";
 import { CustomCursor } from "./CustomCursor";
 import { getImageSrcSet } from "../util/imageUtil";
-import { extractDominantColor, dispatchBackgroundColor } from "../util/dominantColor";
+import { assignLayouts, thumbsForLayout, type LayoutSpec } from "../util/layoutAssignment";
 import { navigate } from "astro:transitions/client";
 
 // --- Types ---
@@ -60,6 +59,125 @@ const pageVariants = {
 
 const pageTransition = { duration: 0.35, ease: [0.32, 0.72, 0, 1] as const };
 
+// --- Project row ---
+
+interface ProjectRowProps {
+    project: PhotoProject;
+    slots: ImageWrapper[];
+    layout: LayoutSpec;
+    onProjectClick: (slug: string) => void;
+}
+
+const sizesForLayout = (layout: LayoutSpec): string => {
+    switch (layout.type) {
+        case "hero":
+        case "bleed":
+            return "(max-width: 900px) 100vw, 1280px";
+        case "tower":
+        case "tall":
+            return "(max-width: 900px) 100vw, 50vw";
+        case "pair":
+            return "(max-width: 900px) 100vw, 45vw";
+        default:
+            return "(max-width: 900px) 50vw, 25vw";
+    }
+};
+
+const nativeAspect = (img: ImageWrapper): string => {
+    const w = img.image.width;
+    const h = img.image.height;
+    if (!w || !h) return "1 / 1";
+    return `${w} / ${h}`;
+};
+
+const ProjectRow = ({ project, slots, layout, onProjectClick }: ProjectRowProps) => {
+    const indentClass = layout.indent !== "none" ? `indent-${layout.indent[0]}` : "";
+    const className = [
+        "row",
+        `row--${layout.type}`,
+        layout.flip && "is-flipped",
+        indentClass,
+    ].filter(Boolean).join(" ");
+
+    const isCinematic = layout.type === "hero" || layout.type === "bleed";
+    const rowStyle: Record<string, string> = {};
+    if (isCinematic && layout.aspect !== "auto") {
+        rowStyle["--row-aspect"] = layout.aspect.replace("/", " / ");
+    }
+
+    return (
+        <motion.article
+            className={className}
+            data-slots={layout.slots}
+            style={Object.keys(rowStyle).length ? (rowStyle as React.CSSProperties) : undefined}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-8%" }}
+            transition={{ duration: 1, ease: [0.25, 1, 0.5, 1] }}
+            onPointerOver={() =>
+                CustomCursor.setCursorType({ type: "displayTitle", displayText: project.title })
+            }
+            onPointerLeave={() => CustomCursor.setCursorType({ type: "default" })}
+        >
+            <span className="mark-l" aria-hidden="true" />
+            {isCinematic && <span className="mark-r" aria-hidden="true" />}
+            {slots.map((thumb) => (
+                <a
+                    key={thumb.id}
+                    href={`${base_url}/projects/${project.slug}`}
+                    className="image cursor-none"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        onProjectClick(project.slug);
+                    }}
+                    style={{ "--native-aspect": nativeAspect(thumb) } as React.CSSProperties}
+                >
+                    <img
+                        src={db_url + thumb.image.url}
+                        srcSet={getImageSrcSet(db_url, thumb)}
+                        sizes={sizesForLayout(layout)}
+                        alt={thumb.image.alt || ""}
+                        loading="lazy"
+                        draggable={false}
+                    />
+                </a>
+            ))}
+            {layout.type === "tower" && (
+                <div className="glyph" aria-hidden="true">
+                    /<span className="dot">●</span>
+                </div>
+            )}
+        </motion.article>
+    );
+};
+
+// --- Punctuation divider ---
+
+const PunctuationDivider = ({ hot }: { hot: boolean }) => (
+    <motion.div
+        className="punct"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, margin: "-8%" }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        aria-hidden="true"
+    >
+        <hr />
+        <div className="glyph">
+            {hot ? (
+                <span className="d hot" />
+            ) : (
+                <>
+                    <span className="d" />
+                    <span className="d hot" />
+                    <span className="d" />
+                </>
+            )}
+        </div>
+        <hr />
+    </motion.div>
+);
+
 // --- HomeView ---
 
 interface HomeViewProps {
@@ -68,10 +186,12 @@ interface HomeViewProps {
 }
 
 const HomeView = ({ projects, onProjectClick }: HomeViewProps) => {
+    const layouts = useMemo(() => assignLayouts(projects), [projects]);
+
     return (
         <motion.div
             key="home-view"
-            className="lg:w-[50vw] mx-auto"
+            className="home-stage"
             custom={null}
             variants={pageVariants}
             initial="initial"
@@ -79,65 +199,23 @@ const HomeView = ({ projects, onProjectClick }: HomeViewProps) => {
             exit="exit"
             transition={pageTransition}
         >
-            {projects.map((project, index) => {
-                const thumbnails = project.images.filter((img) => img.isThumbnail);
-                if (thumbnails.length === 0) return null;
+            {projects.map((project, i) => {
+                const layout = layouts[i];
+                const slots = thumbsForLayout(project, layout.slots);
+                if (slots.length === 0) return null;
 
-                const basePicture = thumbnails[0].image;
-                const projectTitle = project.title;
+                const showPunct = i > 0 && i % 4 === 0;
 
                 return (
-                    <ScrollReveal
-                        key={project.slug}
-                        delay={index === 0 ? 0.95 : 0}
-                        className="flex flex-col py-0.5 lg:py-1 cursor-none"
-                        onPointerOver={() => {
-                            CustomCursor.setCursorType({ type: "displayTitle", displayText: projectTitle })
-                        }}
-                        onPointerLeave={() => {
-                            CustomCursor.setCursorType({ type: "default" })
-                            dispatchBackgroundColor([120, 80, 180])
-                        }}
-                    >
-                        <div className="flex justify-center items-center gap-1 lg:gap-2">
-                            {thumbnails.map((thumbnailImg) => (
-                                <div
-                                    className="transition-all duration-300 ring-neutral-400 hover:ring-0 hover:ring-offset-3 ring-offset-neutral-800/90 overflow-hidden"
-                                    key={thumbnailImg.id}
-                                    onPointerEnter={() => {
-                                        const tinyUrl = thumbnailImg.image.sizes?.tinyPreview?.url
-                                        if (tinyUrl) {
-                                            extractDominantColor(db_url + tinyUrl).then(dispatchBackgroundColor)
-                                        }
-                                    }}
-                                >
-                                    <a
-                                        href={`${base_url}/projects/${project.slug}`}
-                                        className="cursor-none"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            onProjectClick(project.slug);
-                                        }}
-                                    >
-                                        <img
-                                            src={db_url + thumbnailImg.image.url}
-                                            srcSet={getImageSrcSet(db_url, thumbnailImg)}
-                                            sizes="(max-width: 768px) 100vw, 30vw"
-                                            className="hover:scale-105 transition-all duration-300 select-none"
-                                            alt={thumbnailImg.image.alt}
-                                            height={basePicture.height}
-                                            width={
-                                                (basePicture.height * thumbnailImg.image.width) /
-                                                thumbnailImg.image.height
-                                            }
-                                            loading="lazy"
-                                            draggable={false}
-                                        />
-                                    </a>
-                                </div>
-                            ))}
-                        </div>
-                    </ScrollReveal>
+                    <Fragment key={project.slug}>
+                        {showPunct && <PunctuationDivider hot={i % 8 === 0} />}
+                        <ProjectRow
+                            project={project}
+                            slots={slots}
+                            layout={layout}
+                            onProjectClick={onProjectClick}
+                        />
+                    </Fragment>
                 );
             })}
         </motion.div>

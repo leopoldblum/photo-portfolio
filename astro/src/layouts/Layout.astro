@@ -5,7 +5,6 @@ import TopBar from "../components/TopBar.astro";
 import Footer from "../components/Footer.astro";
 import Masthead from "../components/Masthead.astro";
 import { CustomCursor } from "../components/CustomCursor";
-import AmbientBackground from "../components/AmbientBackground";
 import CursorBloom from "../components/CursorBloom";
 import SEOHead from "../components/SEOHead.astro";
 import PortfolioShell from "../components/PortfolioShell";
@@ -32,6 +31,10 @@ const { title, description, ogImage, siteName, instagramUrl, masthead, revealMar
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,700;1,6..96,800&display=swap"
+            rel="stylesheet"
+        />
         <link href="https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600&display=swap" rel="stylesheet" />
         <title>{title}</title>
         <SEOHead title={title} description={description} ogImage={ogImage} siteName={siteName} />
@@ -39,10 +42,20 @@ const { title, description, ogImage, siteName, instagramUrl, masthead, revealMar
     </head>
 
     <body
-        class="w-full mx-auto bg-neutral-900 text-neutral-400 min-h-screen cursor-none"
+        class="w-full mx-auto text-neutral-300 min-h-screen cursor-none"
     >
-        <AmbientBackground client:only="react" />
-        <CursorBloom client:only="react" />
+        <!-- atmosphere stack — static washes, vignette, grain. No breathing animation. -->
+        <div class="atm-lights" aria-hidden="true"></div>
+        <div class="atm-vignette" aria-hidden="true"></div>
+        <CursorBloom client:only="react" transition:persist="cursor-bloom" />
+        <div class="atm-grain" aria-hidden="true"></div>
+
+        <!-- registration corner crosses -->
+        <span class="atm-reg atm-reg-tl" aria-hidden="true"></span>
+        <span class="atm-reg atm-reg-tr" aria-hidden="true"></span>
+        <span class="atm-reg atm-reg-bl" aria-hidden="true"></span>
+        <span class="atm-reg atm-reg-br" aria-hidden="true"></span>
+
         <CustomCursor client:load transition:persist />
 
         <TopBar instagramUrl={instagramUrl} markBehavior={revealMarkOnScroll ? "reveal-on-scroll" : "visible"} />

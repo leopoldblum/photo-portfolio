@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Landing Grid — Design Explorations</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://api.fontshare.com" />
+<link
+  href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;1,6..96,400&display=swap"
+  rel="stylesheet"
+/>
+<link
+  href="https://api.fontshare.com/v2/css?f[]=general-sans@200,300,400,500&display=swap"
+  rel="stylesheet"
+/>
+
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --bg-2: #131316;
+    --ink: #e9e6df;
+    --ink-dim: #8a857c;
+    --ink-faint: #4a473f;
+    --rule: rgba(233, 230, 223, 0.08);
+    --accent: #c9a35a;
+    --serif: "Bodoni Moda", "Times New Roman", serif;
+    --sans: "General Sans", system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-weight: 300; }
+  body { isolation: isolate; min-height: 100vh; overflow-x: hidden; }
+  body::before {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: -1;
+    background: radial-gradient(ellipse at 50% 30%, rgba(210,220,255,0.05), transparent 60%);
+  }
+  img { display: block; max-width: 100%; user-select: none; -webkit-user-drag: none; }
+  a { color: inherit; text-decoration: none; }
+
+  /* ---------- top nav ---------- */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    backdrop-filter: blur(14px) saturate(140%);
+    background: rgba(10,10,12,0.55);
+    border-bottom: 1px solid var(--rule);
+    padding: 14px 28px;
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-dim);
+  }
+  .nav-brand { font-family: var(--serif); font-style: italic; font-weight: 400;
+    letter-spacing: 0; text-transform: none; color: var(--ink); font-size: 16px; }
+  .nav-links { display: flex; gap: 26px; }
+  .nav-links a { transition: color 200ms; }
+  .nav-links a:hover { color: var(--ink); }
+
+  /* ---------- section frames ---------- */
+  .section {
+    padding: 140px 0 160px;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+  }
+  .section-head {
+    max-width: 1180px; margin: 0 auto 64px; padding: 0 40px;
+    display: grid; grid-template-columns: 90px 1fr; gap: 48px; align-items: end;
+  }
+  .section-num {
+    font-family: var(--serif); font-size: 64px; line-height: 0.85; font-weight: 400;
+    color: transparent; -webkit-text-stroke: 1px var(--ink-faint);
+  }
+  .section-name {
+    font-family: var(--serif); font-style: italic; font-size: 38px; line-height: 1; font-weight: 400;
+    color: var(--ink);
+  }
+  .section-tag {
+    grid-column: 2; margin-top: 14px;
+    font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-dim);
+    max-width: 56ch; line-height: 1.7;
+  }
+
+  /* ====================================================== */
+  /*  A.  CONTACT SHEET                                     */
+  /* ====================================================== */
+  .v-contact .sheet {
+    max-width: 1180px; margin: 0 auto; padding: 0 40px;
+    position: relative;
+  }
+  .v-contact .roll {
+    display: grid; grid-template-columns: 56px 1fr 56px;
+    gap: 24px; align-items: center;
+    padding: 14px 0;
+  }
+  .v-contact .frame-meta {
+    font-family: "Courier New", ui-monospace, monospace; font-size: 10px;
+    letter-spacing: 0.08em; color: var(--ink-faint);
+    display: flex; flex-direction: column; gap: 6px; line-height: 1.2;
+  }
+  .v-contact .frame-meta.left { text-align: right; align-items: flex-end; }
+  .v-contact .frame-meta .num {
+    color: var(--ink-dim);
+    font-size: 14px;
+  }
+  .v-contact .frame-meta .tick { color: var(--ink-faint); letter-spacing: 0.4em; }
+  .v-contact .images {
+    display: flex; gap: 8px; justify-content: center;
+    position: relative;
+  }
+  .v-contact .images::before, .v-contact .images::after {
+    content: ''; position: absolute; top: -8px; bottom: -8px; width: 1px;
+    background: repeating-linear-gradient(to bottom,
+      var(--ink-faint) 0, var(--ink-faint) 4px,
+      transparent 4px, transparent 12px);
+  }
+  .v-contact .images::before { left: -14px; }
+  .v-contact .images::after  { right: -14px; }
+  .v-contact .images img {
+    height: 220px; width: auto; object-fit: cover;
+    transition: filter 250ms, transform 350ms;
+  }
+  .v-contact .images img:hover { filter: brightness(1.08); transform: scale(1.015); }
+  .v-contact .roll + .roll { border-top: 1px dashed var(--rule); }
+
+  /* ====================================================== */
+  /*  B.  EDITORIAL ASYMMETRY                               */
+  /* ====================================================== */
+  .v-editorial { background: linear-gradient(180deg, var(--bg) 0%, #0d0d10 100%); }
+  .v-editorial .stage {
+    max-width: 1320px; margin: 0 auto; padding: 0 40px;
+    display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px;
+  }
+  .v-editorial .row {
+    grid-column: span 12;
+    display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px;
+    align-items: end; margin-bottom: 80px;
+  }
+  /* row variants */
+  .v-editorial .row--hero { grid-column: 2 / span 10; }
+  .v-editorial .row--hero .image { grid-column: span 12; }
+  .v-editorial .row--hero img { width: 100%; height: 540px; object-fit: cover; }
+
+  .v-editorial .row--pair { grid-column: 1 / span 10; }
+  .v-editorial .row--pair .image:nth-child(1) { grid-column: span 7; }
+  .v-editorial .row--pair .image:nth-child(2) { grid-column: span 4; }
+  .v-editorial .row--pair img { width: 100%; height: 380px; object-fit: cover; }
+
+  .v-editorial .row--right { grid-column: 4 / span 9; justify-content: end; }
+  .v-editorial .row--right .image:nth-child(1) { grid-column: span 5; }
+  .v-editorial .row--right .image:nth-child(2) { grid-column: span 4; }
+  .v-editorial .row--right .image:nth-child(3) { grid-column: span 3; }
+  .v-editorial .row--right img { width: 100%; height: 280px; object-fit: cover; }
+
+  .v-editorial .row--strip { grid-column: 2 / span 10; }
+  .v-editorial .row--strip .image { grid-column: span 3; }
+  .v-editorial .row--strip img { width: 100%; height: 240px; object-fit: cover; }
+
+  .v-editorial .marker {
+    position: absolute; top: 0; left: -78px;
+    font-family: var(--serif); font-size: 11px; letter-spacing: 0.3em;
+    color: var(--ink-faint); text-transform: uppercase;
+    writing-mode: vertical-rl; transform: rotate(180deg);
+  }
+  .v-editorial .row { position: relative; }
+  .v-editorial .image { position: relative; overflow: hidden; }
+  .v-editorial .image img { transition: transform 700ms cubic-bezier(.2,.7,.2,1); }
+  .v-editorial .image:hover img { transform: scale(1.04); }
+
+  /* ====================================================== */
+  /*  C.  MOSAIC DENSITY                                    */
+  /* ====================================================== */
+  .v-mosaic { background: var(--bg); }
+  .v-mosaic .stage {
+    max-width: 1180px; margin: 0 auto; padding: 0 32px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .v-mosaic .row {
+    display: flex; gap: 6px; justify-content: center;
+  }
+  .v-mosaic .row img { object-fit: cover; flex: 1 1 0; }
+  .v-mosaic .row.h-tall  img { height: 560px; }
+  .v-mosaic .row.h-mid   img { height: 320px; }
+  .v-mosaic .row.h-short img { height: 200px; }
+  .v-mosaic .row.h-micro img { height: 130px; }
+  .v-mosaic .row.h-hero  img { height: 640px; }
+  .v-mosaic .row.indent-1 { padding-left: 18%; padding-right: 0; }
+  .v-mosaic .row.indent-2 { padding-left: 0; padding-right: 24%; }
+  .v-mosaic .row.indent-3 { padding-left: 32%; padding-right: 8%; }
+  .v-mosaic .gap-lg { height: 28px; }
+  .v-mosaic img { transition: filter 300ms; }
+  .v-mosaic img:hover { filter: brightness(1.1) contrast(1.04); }
+
+  /* ====================================================== */
+  /*  D.  ATMOSPHERIC FRAMES                                */
+  /* ====================================================== */
+  .v-atmos {
+    background:
+      radial-gradient(circle at 20% 0%, rgba(80,60,140,0.10), transparent 50%),
+      radial-gradient(circle at 90% 60%, rgba(190,120,80,0.08), transparent 55%),
+      var(--bg);
+    position: relative;
+  }
+  .v-atmos::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: 0.55; pointer-events: none; mix-blend-mode: overlay;
+  }
+  .v-atmos .stage { max-width: 1080px; margin: 0 auto; padding: 0 40px; position: relative; z-index: 1; }
+  .v-atmos .group {
+    padding: 56px 0 60px;
+    border-top: 1px solid var(--rule);
+    position: relative;
+  }
+  .v-atmos .group:first-child { border-top: none; }
+  .v-atmos .group::before {
+    content: attr(data-year);
+    position: absolute; top: 56px; right: -8px;
+    font-family: var(--serif); font-style: italic; font-weight: 400;
+    font-size: 13px; letter-spacing: 0.06em;
+    color: transparent; -webkit-text-stroke: 0.5px var(--ink-faint);
+    writing-mode: vertical-rl;
+  }
+  .v-atmos .row {
+    display: flex; gap: 10px; justify-content: center;
+    padding: 14px 0;
+    position: relative;
+  }
+  .v-atmos .row img {
+    height: 240px; width: auto; object-fit: cover;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.04) inset,
+      0 30px 60px -25px rgba(0,0,0,0.7),
+      0 8px 18px -10px rgba(0,0,0,0.5);
+    transition: transform 500ms cubic-bezier(.2,.7,.2,1), box-shadow 500ms;
+  }
+  .v-atmos .row img:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.06) inset,
+      0 40px 80px -25px rgba(0,0,0,0.85),
+      0 14px 24px -10px rgba(0,0,0,0.6);
+  }
+  /* alternating subtle indents */
+  .v-atmos .group:nth-child(2n) .row { padding-left: 6%; }
+  .v-atmos .group:nth-child(3n) .row { padding-right: 6%; padding-left: 0; }
+
+  /* ---------- footer ---------- */
+  .pageend {
+    text-align: center; padding: 100px 20px 60px;
+    color: var(--ink-faint); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  }
+  .pageend em { font-family: var(--serif); font-style: italic; text-transform: none;
+    letter-spacing: 0; color: var(--ink-dim); }
+
+  /* ---------- section header variants per option ---------- */
+  .section-pros {
+    grid-column: 2; margin-top: 18px;
+    font-size: 11px; letter-spacing: 0.04em; line-height: 1.7;
+    color: var(--ink-dim); display: flex; gap: 32px; flex-wrap: wrap;
+  }
+  .section-pros span::before { content: '— '; color: var(--accent); }
+
+  @media (max-width: 800px) {
+    .section-head { grid-template-columns: 1fr; gap: 8px; padding: 0 24px; }
+    .section-num { font-size: 48px; }
+    .section-name { font-size: 28px; }
+    .v-contact .roll { grid-template-columns: 24px 1fr 24px; gap: 8px; }
+    .v-contact .images img { height: 110px; }
+    .v-editorial .row--hero img { height: 280px; }
+    .v-editorial .row--pair img,
+    .v-editorial .row--right img,
+    .v-editorial .row--strip img { height: 160px; }
+    .v-mosaic .row.h-tall  img { height: 280px; }
+    .v-mosaic .row.h-mid   img { height: 180px; }
+    .v-mosaic .row.h-short img { height: 130px; }
+    .v-mosaic .row.h-micro img { height: 90px; }
+    .v-mosaic .row.h-hero  img { height: 320px; }
+    .v-atmos .row img { height: 130px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">Landing&nbsp;explorations <span style="color:var(--ink-faint); font-style:normal; letter-spacing:0.18em; font-family:var(--sans); font-size:11px; margin-left:14px; text-transform:uppercase;">— for Leopold</span></div>
+  <div class="nav-links">
+    <a href="#contact">A · Contact sheet</a>
+    <a href="#editorial">B · Editorial</a>
+    <a href="#mosaic">C · Mosaic</a>
+    <a href="#atmos">D · Atmospheric</a>
+  </div>
+</nav>
+
+<!-- ========== A. CONTACT SHEET ========== -->
+<section id="contact" class="section v-contact">
+  <header class="section-head">
+    <div class="section-num">A</div>
+    <div>
+      <div class="section-name">Contact&nbsp;Sheet</div>
+      <div class="section-tag">Photographic chrome — frame numbers, perforation marks, hairline rules — borrowed from a darkroom proof. Adds craft identity in the gutters without writing a single project name.</div>
+      <div class="section-pros">
+        <span>Wordless</span>
+        <span>Reads like a contact print</span>
+        <span>Cheap to implement</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="sheet">
+    <div class="roll">
+      <div class="frame-meta left"><span class="num">01</span><span class="tick">··</span><span>ISO&nbsp;400</span></div>
+      <div class="images">
+        <img src="https://picsum.photos/seed/contact-1a/420/560" alt="" loading="lazy">
+        <img src="https://picsum.photos/seed/contact-1b/420/560" alt="" loading="lazy">
+        <img src="https://picsum.photos/seed/contact-1c/420/560" alt="" loading="lazy">
+      </div>
+      <div class="frame-meta"><span class="num">·02</span><span class="tick">··</span><span>f/2.8</span></div>
+    </div>
+
+    <div class="roll">
+      <div class="frame-meta left"><span class="num">03</span><span class="tick">··</span><span>1/125</span></div>
+      <div class="images">
+        <img src="https://picsum.photos/seed/contact-2a/600/400" alt="" loading="lazy">
+        <img src="https://picsum.photos/seed/contact-2b/420/280" alt="" loading="lazy">
+      </div>
+      <div class="frame-meta"><span class="num">·04</span><span class="tick">··</span><span>50&nbsp;mm</span></div>
+    </div>
+
+    <div class="roll">
+      <div class="frame-meta left"><span class="num">05</span><span class="tick">··</span><span>—</span></div>
+      <div class="images">
+        <img src="https://picsum.photos/seed/contact-3a/320/440" alt="" loading="lazy">
+        <img src="https://picsum.photos/seed/contact-3b/320/440" alt="" loading="lazy">
+        <img src="https://picsum.photos/seed/contact-3c/320/440" alt="" loading="lazy">
+        <img src="https://picsum.photos/seed/contact-3d/320/440" alt="" loading="lazy">
+      </div>
+      <div class="frame-meta"><span class="num">·06</span><span class="tick">··</span><span>—</span></div>
+    </div>
+
+    <div class="roll">
+      <div class="frame-meta left"><span class="num">07</span><span class="tick">··</span><span>2024</span></div>
+      <div class="images">
+        <img src="https://picsum.photos/seed/contact-4a/700/440" alt="" loading="lazy">
+      </div>
+      <div class="frame-meta"><span class="num">·08</span><span class="tick">··</span><span>·</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== B. EDITORIAL ASYMMETRY ========== -->
+<section id="editorial" class="section v-editorial">
+  <header class="section-head">
+    <div class="section-num">B</div>
+    <div>
+      <div class="section-name">Editorial&nbsp;asymmetry</div>
+      <div class="section-tag">Breaks the centered column. Each project is composed deliberately — sometimes a hero, sometimes a wide pair, sometimes a tight strip pushed to the right margin. Composition itself becomes the rhythm.</div>
+      <div class="section-pros">
+        <span>Most cinematic</span>
+        <span>Lets standout images breathe</span>
+        <span>Layout is the variety, not chrome</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="stage">
+    <div class="row row--hero">
+      <div class="marker">No.&nbsp;01</div>
+      <div class="image"><img src="https://picsum.photos/seed/edit-h1/1600/900" alt="" loading="lazy"></div>
+    </div>
+
+    <div class="row row--pair">
+      <div class="marker">No.&nbsp;02</div>
+      <div class="image"><img src="https://picsum.photos/seed/edit-p1/900/640" alt="" loading="lazy"></div>
+      <div class="image"><img src="https://picsum.photos/seed/edit-p2/600/640" alt="" loading="lazy"></div>
+    </div>
+
+    <div class="row row--right">
+      <div class="marker">No.&nbsp;03</div>
+      <div class="image"><img src="https://picsum.photos/seed/edit-r1/600/420" alt="" loading="lazy"></div>
+      <div class="image"><img src="https://picsum.photos/seed/edit-r2/500/420" alt="" loading="lazy"></div>
+      <div class="image"><img src="https://picsum.photos/seed/edit-r3/420/420" alt="" loading="lazy"></div>
+    </div>
+
+    <div class="row row--strip">
+      <div class="marker">No.&nbsp;04</div>
+      <div class="image"><img src="https://picsum.photos/seed/edit-s1/400/300" alt="" loading="lazy"></div>
+      <div class="image"><img src="https://picsum.photos/seed/edit-s2/400/300" alt="" loading="lazy"></div>
+      <div class="image"><img src="https://picsum.photos/seed/edit-s3/400/300" alt="" loading="lazy"></div>
+      <div class="image"><img src="https://picsum.photos/seed/edit-s4/400/300" alt="" loading="lazy"></div>
+    </div>
+
+    <div class="row row--hero">
+      <div class="marker">No.&nbsp;05</div>
+      <div class="image"><img src="https://picsum.photos/seed/edit-h2/1600/700" alt="" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== C. MOSAIC DENSITY ========== -->
+<section id="mosaic" class="section v-mosaic">
+  <header class="section-head">
+    <div class="section-num">C</div>
+    <div>
+      <div class="section-name">Mosaic&nbsp;density</div>
+      <div class="section-tag">Stays on the centered column, but radically varies row height and indent. One project may appear as a single tall hero; the next as a tiny strip; the next nudged off-axis. Pure compositional rhythm — no typography added.</div>
+      <div class="section-pros">
+        <span>Closest to current code</span>
+        <span>Dramatic variety from heights alone</span>
+        <span>No new chrome</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="stage">
+    <div class="row h-tall">
+      <img src="https://picsum.photos/seed/mos-1a/720/1000" alt="" loading="lazy">
+      <img src="https://picsum.photos/seed/mos-1b/720/1000" alt="" loading="lazy">
+    </div>
+
+    <div class="row h-micro indent-1">
+      <img src="https://picsum.photos/seed/mos-2a/300/220" alt="" loading="lazy">
+      <img src="https://picsum.photos/seed/mos-2b/300/220" alt="" loading="lazy">
+      <img src="https://picsum.photos/seed/mos-2c/300/220" alt="" loading="lazy">
+      <img src="https://picsum.photos/seed/mos-2d/300/220" alt="" loading="lazy">
+      <img src="https://picsum.photos/seed/mos-2e/300/220" alt="" loading="lazy">
+    </div>
+
+    <div class="gap-lg"></div>
+
+    <div class="row h-hero">
+      <img src="https://picsum.photos/seed/mos-3a/1500/980" alt="" loading="lazy">
+    </div>
+
+    <div class="row h-short indent-2">
+      <img src="https://picsum.photos/seed/mos-4a/360/300" alt="" loading="lazy">
+      <img src="https://picsum.photos/seed/mos-4b/360/300" alt="" loading="lazy">
+      <img src="https://picsum.photos/seed/mos-4c/360/300" alt="" loading="lazy">
+    </div>
+
+    <div class="gap-lg"></div>
+
+    <div class="row h-mid indent-3">
+      <img src="https://picsum.photos/seed/mos-5a/500/420" alt="" loading="lazy">
+      <img src="https://picsum.photos/seed/mos-5b/500/420" alt="" loading="lazy">
+    </div>
+
+    <div class="row h-short">
+      <img src="https://picsum.photos/seed/mos-6a/420/300" alt="" loading="lazy">
+      <img src="https://picsum.photos/seed/mos-6b/420/300" alt="" loading="lazy">
+      <img src="https://picsum.photos/seed/mos-6c/420/300" alt="" loading="lazy">
+      <img src="https://picsum.photos/seed/mos-6d/420/300" alt="" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<!-- ========== D. ATMOSPHERIC FRAMES ========== -->
+<section id="atmos" class="section v-atmos">
+  <header class="section-head">
+    <div class="section-num">D</div>
+    <div>
+      <div class="section-name">Atmospheric&nbsp;frames</div>
+      <div class="section-tag">Layout stays disciplined. The variety comes from the surrounding atmosphere — paper-grain noise, soft drop shadows that lift each image off the page, hairline rules that group projects, alternating subtle indents, faint year glyphs floating in the margin.</div>
+      <div class="section-pros">
+        <span>Most premium feel</span>
+        <span>Adds depth without changing the grid</span>
+        <span>Compatible with your existing rows</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="stage">
+    <div class="group" data-year="MMXXIV">
+      <div class="row">
+        <img src="https://picsum.photos/seed/atm-1a/520/720" alt="" loading="lazy">
+        <img src="https://picsum.photos/seed/atm-1b/520/720" alt="" loading="lazy">
+        <img src="https://picsum.photos/seed/atm-1c/520/720" alt="" loading="lazy">
+      </div>
+      <div class="row">
+        <img src="https://picsum.photos/seed/atm-2a/600/400" alt="" loading="lazy">
+        <img src="https://picsum.photos/seed/atm-2b/420/400" alt="" loading="lazy">
+      </div>
+    </div>
+
+    <div class="group" data-year="MMXXIII">
+      <div class="row">
+        <img src="https://picsum.photos/seed/atm-3a/420/560" alt="" loading="lazy">
+        <img src="https://picsum.photos/seed/atm-3b/420/560" alt="" loading="lazy">
+        <img src="https://picsum.photos/seed/atm-3c/420/560" alt="" loading="lazy">
+        <img src="https://picsum.photos/seed/atm-3d/420/560" alt="" loading="lazy">
+      </div>
+    </div>
+
+    <div class="group" data-year="MMXXII">
+      <div class="row">
+        <img src="https://picsum.photos/seed/atm-4a/720/440" alt="" loading="lazy">
+        <img src="https://picsum.photos/seed/atm-4b/520/440" alt="" loading="lazy">
+      </div>
+      <div class="row">
+        <img src="https://picsum.photos/seed/atm-5a/420/520" alt="" loading="lazy">
+        <img src="https://picsum.photos/seed/atm-5b/420/520" alt="" loading="lazy">
+        <img src="https://picsum.photos/seed/atm-5c/420/520" alt="" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="pageend">
+  Four directions · pick one or remix · <em>open landing-options.html in a browser to compare</em>
+</div>
+
+</body>
+</html>

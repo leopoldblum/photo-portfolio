@@ -3,34 +3,352 @@
 @theme {
     --font-sans: "General Sans", system-ui, sans-serif;
     --font-display: "Bodoni Moda", serif;
+
+    --color-ink: #eef0f2;
+    --color-ink-dim: #7e7e85;
+    --color-ink-faint: #38383e;
+    --color-ink-ghost: #1f1f23;
+    --color-rule: rgba(238, 240, 242, 0.07);
+
+    --color-hot: #ff2b6e;
+    --color-bloom-hot: rgba(255, 43, 110, 0.10);
+    --color-bloom-mid: rgba(255, 43, 110, 0.03);
+    --color-hover-glow: rgba(255, 43, 110, 0.25);
 }
 
 /* --- Background depth treatment --- */
 
 body {
     isolation: isolate;
+    background: #0a0a0c;
 }
 
-/* Subtle radial vignette — lighter center, dark edges */
-body::before {
-    content: '';
+/* ============================================================
+   ATMOSPHERE STACK — static, no breathing animation.
+   Rendered as <div>s in Layout.astro.
+   ============================================================ */
+
+.atm-lights {
+    position: fixed;
+    inset: -20% -20% -20% -20%;
+    pointer-events: none;
+    z-index: -4;
+    background:
+        radial-gradient(ellipse 40% 30% at 18% 8%,  rgba(255,  43, 110, 0.28), transparent 60%),
+        radial-gradient(ellipse 35% 28% at 82% 22%, rgba( 77, 210, 255, 0.18), transparent 60%),
+        radial-gradient(ellipse 45% 35% at 28% 78%, rgba(255, 180,  84, 0.12), transparent 65%),
+        radial-gradient(ellipse 38% 32% at 88% 92%, rgba(255,  43, 110, 0.14), transparent 62%);
+    filter: blur(40px) saturate(1.2);
+}
+
+.atm-vignette {
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: -1;
-    background: radial-gradient(
-        ellipse at 50% 35%,
-        rgba(210, 220, 255, 0.06) 0%,
-        transparent 65%
-    );
+    background: radial-gradient(ellipse 80% 65% at 50% 45%, transparent 50%, rgba(0,0,0,0.55) 100%);
 }
 
-
-/* --- View Transitions --- */
-
-::view-transition-old(root) {
-    display: none;
+.atm-grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: 0.75;
+    mix-blend-mode: overlay;
 }
-::view-transition-new(root) {
-    animation: none;
+
+/* ============================================================
+   REGISTRATION CORNER MARKS
+   ============================================================ */
+
+.atm-reg {
+    position: fixed;
+    width: 14px; height: 14px;
+    pointer-events: none; z-index: 30; opacity: 0.4;
 }
+.atm-reg::before, .atm-reg::after { content: ''; position: absolute; background: var(--color-ink-dim); }
+.atm-reg::before { top: 50%; left: 0; right: 0; height: 1px; transform: translateY(-50%); }
+.atm-reg::after  { left: 50%; top: 0; bottom: 0; width: 1px; transform: translateX(-50%); }
+.atm-reg-tl { top: 18px; left: 18px; }
+.atm-reg-tr { top: 18px; right: 18px; }
+.atm-reg-bl { bottom: 18px; left: 18px; }
+.atm-reg-br { bottom: 18px; right: 18px; }
+
+/* ============================================================
+   HOME — editorial grid stage
+   ============================================================ */
+
+.home-stage {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 60px 60px 40px;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 14px;
+    position: relative;
+}
+.home-stage::before, .home-stage::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0; width: 1px;
+    background: linear-gradient(to bottom, transparent 0%, var(--color-rule) 6%, var(--color-rule) 94%, transparent 100%);
+}
+.home-stage::before { left: 36px; }
+.home-stage::after  { right: 36px; }
+
+@media (max-width: 900px) {
+    .home-stage { padding: 40px 16px; gap: 8px; }
+    .home-stage::before, .home-stage::after { display: none; }
+}
+
+/* ============================================================
+   ROW
+   ============================================================ */
+
+.row {
+    grid-column: span 12;
+    position: relative;
+}
+.row + .row { margin-top: clamp(70px, 8vw, 120px); }
+
+/* gutter diamond marks */
+.mark-l, .mark-r {
+    position: absolute; top: 0; pointer-events: none;
+    width: 9px; height: 9px;
+}
+.mark-l { left: -22px; }
+.mark-r { right: -22px; }
+.mark-l::before, .mark-r::before {
+    content: ''; position: absolute; inset: 0;
+    border: 1px solid var(--color-ink-faint);
+    transform: rotate(45deg);
+}
+.mark-l::after, .mark-r::after {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    width: 3px; height: 3px;
+    background: var(--color-hot);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 8px var(--color-hot);
+}
+@media (max-width: 900px) {
+    .mark-l, .mark-r { display: none; }
+}
+
+/* ============================================================
+   IMAGE — atmospheric hover system
+   ============================================================ */
+
+.image {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    background: var(--color-ink-ghost);
+    /* default: render at the image's native aspect ratio, no cropping.
+       --native-aspect is set inline on each <a> from image.width / image.height.
+       Cinematic rows (hero, bleed) override below using --row-aspect. */
+    aspect-ratio: var(--native-aspect);
+    transition: transform 600ms cubic-bezier(.18,.7,.2,1);
+    will-change: transform;
+}
+.image > img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: contrast(1.04) saturate(1.02);
+    box-shadow:
+        0 1px 0 rgba(255,255,255,0.05) inset,
+        0 36px 70px -22px rgba(0,0,0,0.95),
+        0 12px 24px -8px rgba(0,0,0,0.6);
+    transition:
+        box-shadow 700ms cubic-bezier(.18,.7,.2,1),
+        filter 600ms;
+}
+
+/* corner brackets — appear on hover */
+.image::before {
+    content: '';
+    position: absolute; inset: 6px;
+    z-index: 2;
+    background:
+        linear-gradient(var(--color-ink-dim), var(--color-ink-dim)) top    left  / 12px 1px no-repeat,
+        linear-gradient(var(--color-ink-dim), var(--color-ink-dim)) top    left  / 1px 12px no-repeat,
+        linear-gradient(var(--color-ink-dim), var(--color-ink-dim)) top    right / 12px 1px no-repeat,
+        linear-gradient(var(--color-ink-dim), var(--color-ink-dim)) top    right / 1px 12px no-repeat,
+        linear-gradient(var(--color-ink-dim), var(--color-ink-dim)) bottom left  / 12px 1px no-repeat,
+        linear-gradient(var(--color-ink-dim), var(--color-ink-dim)) bottom left  / 1px 12px no-repeat,
+        linear-gradient(var(--color-ink-dim), var(--color-ink-dim)) bottom right / 12px 1px no-repeat,
+        linear-gradient(var(--color-ink-dim), var(--color-ink-dim)) bottom right / 1px 12px no-repeat;
+    opacity: 0;
+    transition: opacity 250ms;
+    pointer-events: none;
+}
+
+/* always-visible hairline inset border */
+.image::after {
+    content: '';
+    position: absolute; inset: 0;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+    pointer-events: none;
+}
+
+@media (hover: hover) {
+    .image:hover { transform: translateY(-8px); z-index: 3; }
+    .image:hover > img {
+        box-shadow:
+            0 1px 0 rgba(255,255,255,0.08) inset,
+            0 60px 120px -22px rgba(0,0,0,1),
+            0 18px 32px -10px rgba(0,0,0,0.7),
+            0 0 60px -10px var(--color-hover-glow);
+    }
+    .image:hover::before { opacity: 0.7; }
+
+    /* sibling dim — turn the row into a stage */
+    .row:hover .image:not(:hover) > img {
+        filter: brightness(0.55) saturate(0.7) contrast(1);
+    }
+}
+
+/* ============================================================
+   ROW VARIANTS
+   ============================================================ */
+
+/* Cinematic rows: aspect comes from --row-aspect (set inline by JS), with fallback */
+.row--hero { display: grid; grid-template-columns: subgrid; grid-column: 2 / span 10; }
+.row--hero .image { grid-column: 1 / -1; aspect-ratio: var(--row-aspect, 16/9); }
+
+.row--bleed { display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; }
+.row--bleed .image { grid-column: 1 / -1; aspect-ratio: var(--row-aspect, 24/9); }
+
+/* Native-aspect rows: width set by grid-column span; height follows the image. */
+.row--tall { display: grid; grid-template-columns: subgrid; grid-column: 4 / span 5; }
+.row--tall .image { grid-column: 1 / -1; }
+
+.row--tower {
+    display: grid; grid-template-columns: subgrid; grid-column: 1 / span 12;
+    align-items: end;
+}
+.row--tower .image { grid-column: 1 / span 5; }
+.row--tower.is-flipped .image { grid-column: 8 / span 5; }
+.row--tower .glyph {
+    grid-column: 7 / span 6; padding-bottom: 30px;
+    font-family: "Bodoni Moda", serif;
+    font-style: italic; font-weight: 700;
+    font-size: clamp(120px, 22vw, 360px); line-height: 0.82;
+    color: transparent; -webkit-text-stroke: 0.7px var(--color-ink-faint);
+    user-select: none; pointer-events: none; letter-spacing: -0.04em;
+    text-align: left;
+}
+.row--tower.is-flipped .glyph { grid-column: 1 / span 6; text-align: right; padding-right: 0.2em; }
+.row--tower .glyph .dot {
+    color: var(--color-hot); -webkit-text-stroke: 0;
+    font-style: normal; font-size: 0.18em; vertical-align: super;
+    text-shadow: 0 0 18px var(--color-hot);
+}
+
+.row--pair {
+    display: grid; grid-template-columns: subgrid; grid-column: 1 / span 11;
+    gap: 12px; align-items: end;
+}
+.row--pair .image:nth-child(2) { grid-column: span 7; }
+.row--pair .image:nth-child(3) { grid-column: span 4; }
+.row--pair.is-flipped { grid-column: 2 / span 11; direction: rtl; }
+.row--pair.is-flipped > * { direction: ltr; }
+
+.row--small-cluster {
+    display: grid; grid-template-columns: subgrid; grid-column: 7 / span 5;
+    gap: 8px; align-items: end;
+}
+.row--small-cluster.is-flipped { grid-column: 1 / span 5; }
+.row--small-cluster .image:nth-child(2) { grid-column: span 3; }
+.row--small-cluster .image:nth-child(3) { grid-column: span 2; }
+
+.row--overlap {
+    display: grid; grid-template-columns: subgrid; grid-column: 2 / span 10;
+    gap: 0; position: relative; align-items: end;
+}
+.row--overlap .image:nth-child(2) { grid-column: 1 / span 7; grid-row: 1; z-index: 1; }
+.row--overlap .image:nth-child(3) {
+    grid-column: 8 / span 5; grid-row: 1;
+    margin-top: 80px; z-index: 2; position: relative;
+}
+
+.row--cluster {
+    display: grid; grid-template-columns: subgrid; grid-column: 1 / span 12;
+    gap: 8px; align-items: end;
+}
+.row--cluster .image:nth-child(2) { grid-column: span 4; }
+.row--cluster .image:nth-child(3) { grid-column: span 4; }
+.row--cluster .image:nth-child(4) { grid-column: span 3; }
+.row--cluster.indent-l { grid-column: 3 / span 10; }
+.row--cluster.indent-r { grid-column: 1 / span 10; }
+
+.row--right-cluster {
+    display: grid; grid-template-columns: subgrid; grid-column: 5 / span 8;
+    gap: 8px; align-items: end;
+}
+.row--right-cluster .image:nth-child(2) { grid-column: span 3; }
+.row--right-cluster .image:nth-child(3) { grid-column: span 3; }
+.row--right-cluster .image:nth-child(4) { grid-column: span 2; }
+.row--right-cluster .image:nth-child(5) { grid-column: span 2; }
+.row--right-cluster.is-flipped { grid-column: 1 / span 8; }
+
+/* Strip: a flex film-strip with fixed height; widths follow native aspect.
+   Uses overflow + edge mask to fade wider strips beyond the column rules. */
+.row--strip {
+    display: flex; gap: 6px; align-items: end;
+    grid-column: 2 / span 10;
+    overflow: hidden;
+    justify-content: center;
+    --strip-h: clamp(200px, 28vw, 360px);
+    mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
+}
+.row--strip.indent-l { grid-column: 4 / span 8; }
+.row--strip.indent-r { grid-column: 1 / span 9; }
+.row--strip .image {
+    height: var(--strip-h);
+    width: auto;
+    flex-shrink: 0;
+}
+
+/* mobile collapse */
+@media (max-width: 900px) {
+    .row + .row { margin-top: 50px; }
+    .row--hero, .row--bleed, .row--tall { grid-column: 1 / -1; display: block; }
+    .row--tower { display: block; }
+    .row--tower .image { width: 100%; }
+    .row--tower .glyph { display: none; }
+    .row--pair, .row--small-cluster, .row--overlap, .row--cluster, .row--right-cluster {
+        display: flex; flex-direction: column; gap: 8px; min-height: 0;
+    }
+    .row--pair.is-flipped { direction: ltr; }
+    .row--overlap .image:nth-child(3) { margin-top: 0; }
+    .row--strip {
+        grid-column: 1 / -1;
+        --strip-h: 180px;
+        overflow-x: auto;
+        justify-content: flex-start;
+    }
+}
+
+/* ============================================================
+   PUNCTUATION (silent dividers between rhythm sections)
+   ============================================================ */
+
+.punct {
+    grid-column: 2 / span 10;
+    padding: 30px 0;
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 28px;
+}
+.punct hr { border: 0; border-top: 1px solid var(--color-rule); height: 0; }
+.punct .glyph { display: flex; align-items: center; gap: 10px; }
+.punct .glyph .d { width: 4px; height: 4px; border-radius: 50%; background: var(--color-ink-faint); }
+.punct .glyph .d.hot { background: var(--color-hot); box-shadow: 0 0 12px var(--color-hot); }
+
+/* ============================================================
+   View Transitions
+   ============================================================ */
+
+::view-transition-old(root) { display: none; }
+::view-transition-new(root) { animation: none; }
