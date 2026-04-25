@@ -79,7 +79,7 @@ const HomeView = ({ projects, onProjectClick }: HomeViewProps) => {
             exit="exit"
             transition={pageTransition}
         >
-            {projects.map((project) => {
+            {projects.map((project, index) => {
                 const thumbnails = project.images.filter((img) => img.isThumbnail);
                 if (thumbnails.length === 0) return null;
 
@@ -89,6 +89,7 @@ const HomeView = ({ projects, onProjectClick }: HomeViewProps) => {
                 return (
                     <ScrollReveal
                         key={project.slug}
+                        delay={index === 0 ? 0.95 : 0}
                         className="flex flex-col py-0.5 lg:py-1 cursor-none"
                         onPointerOver={() => {
                             CustomCursor.setCursorType({ type: "displayTitle", displayText: projectTitle })
@@ -192,7 +193,12 @@ const PortfolioShell = () => {
     useEffect(() => {
         const onAfterSwap = () => {
             const data = readShellData();
-            if (!data) return;
+            if (!data) {
+                pendingDirection.current = null;
+                setNavDirection(null);
+                setCurrentView(null);
+                return;
+            }
 
             const dir = pendingDirection.current;
             pendingDirection.current = null;

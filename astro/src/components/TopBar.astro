@@ -1,9 +1,13 @@
 ---
+type MarkBehavior = "visible" | "reveal-on-scroll";
+
 interface Props {
     instagramUrl?: string;
+    markBehavior?: MarkBehavior;
 }
 
-const { instagramUrl } = Astro.props;
+const { instagramUrl, markBehavior = "visible" } = Astro.props;
+const reveal = markBehavior === "reveal-on-scroll";
 ---
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -16,8 +20,29 @@ const { instagramUrl } = Astro.props;
 <header
     class="flex items-center gap-5 md:gap-8 w-[93vw] mx-auto py-7 md:py-9 select-none"
 >
-    <a href="/" class="header-mark text-neutral-200/80 cursor-none p-2 -m-2" data-cursor="link">LB</a>
-    <div class="header-rule flex-1 h-px bg-neutral-700/40"></div>
+    <a
+        href="/"
+        class:list={["header-mark", "text-neutral-200/80", "cursor-none", "p-2", "-m-2", reveal && "header-mark--reveal"]}
+        data-cursor="link"
+    >LB</a>
+
+    {reveal ? (
+        <>
+            <div class="flex-1"></div>
+            <div class="header-rule-fade h-px"></div>
+        </>
+    ) : (
+        <div class="header-rule flex-1 h-px bg-neutral-700/40"></div>
+    )}
+
+    <a
+        href="/archive"
+        class="header-link text-[10px] tracking-[0.25em] uppercase text-neutral-500/60 cursor-none p-2 -m-2"
+        data-cursor="link"
+    >
+        archive
+    </a>
+
     {instagramUrl && (
         <a
             href={instagramUrl}
@@ -37,12 +62,45 @@ const { instagramUrl } = Astro.props;
         font-style: italic;
         font-size: 1.15rem;
         line-height: 1;
+    }
+
+    .header-mark:not(.header-mark--reveal) {
         animation: fadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .header-mark--reveal {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .header-mark--reveal.is-revealed {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .header-mark--reveal {
+            transition: none;
+        }
     }
 
     .header-rule {
         transform: scaleX(0);
         animation: drawLine 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+    }
+
+    .header-rule-fade {
+        flex-basis: 66%;
+        background: linear-gradient(
+            to right,
+            rgb(115 115 115 / 0),
+            rgb(115 115 115 / 0.4) 60%,
+            rgb(115 115 115 / 0.4)
+        );
+        transform-origin: right center;
+        transform: scaleX(0);
+        animation: drawLine 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
     }
 
     .header-link {
@@ -87,6 +145,23 @@ const { instagramUrl } = Astro.props;
         });
     }
 
+    function setupRevealMark() {
+        const mark = document.querySelector<HTMLElement>(".header-mark--reveal");
+        const masthead = document.getElementById("masthead");
+        if (!mark || !masthead) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                mark.classList.toggle("is-revealed", !entry.isIntersecting);
+            },
+            { rootMargin: "-40px 0px 0px 0px" }
+        );
+        observer.observe(masthead);
+    }
+
     setupCursorLinks();
-    document.addEventListener("astro:after-swap", setupCursorLinks);
+    setupRevealMark();
+    document.addEventListener("astro:after-swap", () => {
+        setupCursorLinks();
+        setupRevealMark();
+    });
 </script>

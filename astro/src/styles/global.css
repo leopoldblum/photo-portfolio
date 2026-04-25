@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-    --font-sans: "Space Grotesk", sans-serif;
+    --font-sans: "General Sans", system-ui, sans-serif;
+    --font-display: "Bodoni Moda", serif;
 }
 
 /* --- Background depth treatment --- */

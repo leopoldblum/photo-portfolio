@@ -16,9 +16,23 @@ const instagramUrl = websitelayout.siteMetadata?.instagramUrl ?? undefined;
 const firstProject = allPhotoProjectWrappers[0]?.photoProject;
 const firstThumb = firstProject?.images.find(img => img.isThumbnail) ?? firstProject?.images[0];
 const ogImage = firstThumb ? db_url + (firstThumb.image.sizes?.res1080?.url ?? firstThumb.image.url) : undefined;
+
+const projectYears = allPhotoProjectWrappers
+    .map(w => new Date(w.photoProject.date).getFullYear())
+    .filter(y => Number.isFinite(y));
+const minYear = projectYears.length ? Math.min(...projectYears) : 2019;
+const maxYear = projectYears.length ? Math.max(...projectYears) : new Date().getFullYear();
+const yearRange = minYear === maxYear ? `${minYear}` : `${minYear}–${maxYear}`;
 ---
 
-<Layout title={siteName} description={siteDescription} ogImage={ogImage} siteName={siteName} instagramUrl={instagramUrl}>
+<Layout
+    title={siteName}
+    description={siteDescription}
+    ogImage={ogImage}
+    siteName={siteName}
+    instagramUrl={instagramUrl}
+    masthead={{ name: "Leopold Blum", yearRange }}
+>
     <script
         id="shell-data"
         type="application/json"
