@@ -218,7 +218,7 @@ function drawStar(
 // --- Component ---
 
 const DEFAULT_RGB: [number, number, number] = [120, 80, 180]
-const COLOR_TRANSITION = { duration: 0.6, ease: [0.32, 0.72, 0, 1] as const }
+const COLOR_TRANSITION = { duration: 1.2, ease: [0.32, 0.72, 0, 1] as const }
 
 const AmbientBackground = () => {
   const [hasHover, setHasHover] = useState(true)
