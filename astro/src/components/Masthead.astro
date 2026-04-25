@@ -15,9 +15,8 @@ const isRight = align === "right";
 >
     <h1 class="masthead-name text-neutral-100/90">{name}</h1>
     <div class="masthead-row">
-        <span class="masthead-dash" aria-hidden="true">—</span>
         <span class="masthead-rule" aria-hidden="true"></span>
-        <span class="masthead-meta text-neutral-500/70">photographs · {yearRange}</span>
+        <span class="masthead-meta text-neutral-300/85">photographs · {yearRange}</span>
     </div>
 </section>
 
@@ -58,18 +57,9 @@ const isRight = align === "right";
         transform-origin: right center;
         background: linear-gradient(
             to left,
-            rgb(115 115 115 / 0.45),
-            rgb(115 115 115 / 0)
+            rgb(163 163 163 / 0.7),
+            rgb(163 163 163 / 0)
         );
-    }
-
-    .masthead-dash {
-        font-family: "Bodoni Moda", serif;
-        font-style: italic;
-        color: rgb(163 163 163 / 0.5);
-        font-size: 1rem;
-        line-height: 1;
-        animation: maFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.65s both;
     }
 
     .masthead-rule {
@@ -78,8 +68,8 @@ const isRight = align === "right";
         max-width: 18rem;
         background: linear-gradient(
             to right,
-            rgb(115 115 115 / 0.45),
-            rgb(115 115 115 / 0)
+            rgb(163 163 163 / 0.7),
+            rgb(163 163 163 / 0)
         );
         transform-origin: left center;
         transform: scaleX(0);
