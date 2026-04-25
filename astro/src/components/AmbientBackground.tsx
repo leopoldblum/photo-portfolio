@@ -39,11 +39,29 @@ interface Particle {
   tint: (typeof TINTS)[number]
 }
 
-const PARTICLE_COUNT = 150
-const BIG_STAR_COUNT = 25
-const HUGE_STAR_COUNT = 12
+const PARTICLE_COUNT_FULL = 150
+const BIG_STAR_COUNT_FULL = 25
+const HUGE_STAR_COUNT_FULL = 12
+const PARTICLE_COUNT_LITE = 50
+const BIG_STAR_COUNT_LITE = 10
+const HUGE_STAR_COUNT_LITE = 5
 const CURSOR_RADIUS = 150
 const CURSOR_FORCE = 0.8
+
+// Pick a particle tier based on device capability. Runs once at module load
+// (component is `client:only`, so window is always available).
+function pickTier(): { particles: number; bigStars: number; hugeStars: number; reducedMotion: boolean } {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const lowCores = (navigator.hardwareConcurrency ?? 8) <= 4
+  const narrowViewport = window.matchMedia('(max-width: 1024px)').matches
+  const lite = lowCores || narrowViewport
+  return {
+    particles: lite ? PARTICLE_COUNT_LITE : PARTICLE_COUNT_FULL,
+    bigStars: lite ? BIG_STAR_COUNT_LITE : BIG_STAR_COUNT_FULL,
+    hugeStars: lite ? HUGE_STAR_COUNT_LITE : HUGE_STAR_COUNT_FULL,
+    reducedMotion,
+  }
+}
 
 function createParticle(w: number, h: number): Particle {
   return {
@@ -221,9 +239,10 @@ const DEFAULT_RGB: [number, number, number] = [120, 80, 180]
 const COLOR_TRANSITION = { duration: 1.2, ease: [0.32, 0.72, 0, 1] as const }
 
 const AmbientBackground = () => {
-  const [hasHover, setHasHover] = useState(true)
+  const [hasHover, setHasHover] = useState(() => window.matchMedia('(hover: hover)').matches)
   const [currentRgb, setCurrentRgb] = useState<[number, number, number]>(DEFAULT_RGB)
   const palette = useMemo(() => buildPalette(currentRgb), [currentRgb])
+  const tierRef = useRef(pickTier())
   const mouseRef = useRef({ x: 0, y: 0 })
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const colorAnimRef = useRef<AnimationPlaybackControls | null>(null)
@@ -248,19 +267,19 @@ const AmbientBackground = () => {
   }, [])
 
   useEffect(() => {
-    setHasHover(window.matchMedia('(hover: hover)').matches)
+    const hover = window.matchMedia('(hover: hover)').matches
+    setHasHover(hover)
+
+    mouseRef.current = { x: window.innerWidth / 2, y: window.innerHeight / 2 }
 
     const onPointerMove = (e: PointerEvent) => {
       mouseRef.current.x = e.clientX
       mouseRef.current.y = e.clientY
     }
-
-    mouseRef.current = { x: window.innerWidth / 2, y: window.innerHeight / 2 }
-
-    window.addEventListener('pointermove', onPointerMove)
+    if (hover) window.addEventListener('pointermove', onPointerMove)
     document.addEventListener('background-color', onColorChange)
     return () => {
-      window.removeEventListener('pointermove', onPointerMove)
+      if (hover) window.removeEventListener('pointermove', onPointerMove)
       document.removeEventListener('background-color', onColorChange)
       colorAnimRef.current?.stop()
     }
@@ -290,19 +309,20 @@ const AmbientBackground = () => {
 
     const worldH = () => Math.max(document.documentElement.scrollHeight, window.innerHeight)
 
-    const particles: Particle[] = Array.from({ length: PARTICLE_COUNT }, () =>
+    const tier = tierRef.current
+    const particles: Particle[] = Array.from({ length: tier.particles }, () =>
       createParticle(canvas.width, worldH()),
     )
-    const bigStars: Particle[] = Array.from({ length: BIG_STAR_COUNT }, () =>
+    const bigStars: Particle[] = Array.from({ length: tier.bigStars }, () =>
       createBigStar(canvas.width, worldH()),
     )
-    const hugeStars: Particle[] = Array.from({ length: HUGE_STAR_COUNT }, () =>
+    const hugeStars: Particle[] = Array.from({ length: tier.hugeStars }, () =>
       createHugeStar(canvas.width, worldH()),
     )
     const flares: LensFlare[] = Array.from({ length: LENS_FLARE_COUNT }, () =>
       createLensFlare(canvas.width, worldH()),
     )
-    let frameId: number
+    let frameId = 0
     let time = 0
     let prevWorldH = worldH()
 
@@ -461,7 +481,13 @@ const AmbientBackground = () => {
       frameId = requestAnimationFrame(animate)
     }
 
-    frameId = requestAnimationFrame(animate)
+    if (tier.reducedMotion) {
+      // Render one static frame so stars are visible, then stop.
+      animate()
+      cancelAnimationFrame(frameId)
+    } else {
+      frameId = requestAnimationFrame(animate)
+    }
 
     return () => {
       cancelAnimationFrame(frameId)

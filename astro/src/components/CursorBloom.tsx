@@ -20,13 +20,25 @@ const CursorBloom = () => {
     mouseX.set(cx)
     mouseY.set(cy)
 
+    let pendingX = cx
+    let pendingY = cy
+    let rafId = 0
+    const flush = () => {
+      rafId = 0
+      mouseX.set(pendingX)
+      mouseY.set(pendingY)
+    }
     const onPointerMove = (e: PointerEvent) => {
-      mouseX.set(e.clientX)
-      mouseY.set(e.clientY)
+      pendingX = e.clientX
+      pendingY = e.clientY
+      if (!rafId) rafId = requestAnimationFrame(flush)
     }
 
     window.addEventListener('pointermove', onPointerMove)
-    return () => window.removeEventListener('pointermove', onPointerMove)
+    return () => {
+      window.removeEventListener('pointermove', onPointerMove)
+      if (rafId) cancelAnimationFrame(rafId)
+    }
   }, [])
 
   if (!hasHover) return null

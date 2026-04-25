@@ -80,6 +80,7 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
     const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set())
     const firstImageShown = useRef(false)
     const blurGracePeriod = useRef(true)
+    const vibrantColorCache = useRef<Map<string, string[]>>(new Map())
     const imageWidthScaling = isFullscreen ? "100vw" : "60vw"
 
     const totalImages = photoProject.images.length;
@@ -126,15 +127,26 @@ const ImageCarouselReact = ({ photoProject, isFullscreen, imageIndex, direction,
     // Extract vibrant colors from tinyPreview for info icon gradient
     useEffect(() => {
         if (isOnCard) return
+        const id = currImgWrapper.id
+        const cached = vibrantColorCache.current.get(id)
+        if (cached) {
+            setImageColors(cached)
+            return
+        }
+        let cancelled = false
         const tinyUrl = db_url + currImgWrapper.image.sizes.tinyPreview.url
         fetch(tinyUrl)
             .then(res => res.blob())
             .then(blob => createImageBitmap(blob))
             .then(bitmap => {
-                setImageColors(extractVibrantColors(bitmap, 3))
+                if (cancelled) { bitmap.close(); return }
+                const colors = extractVibrantColors(bitmap, 3)
+                vibrantColorCache.current.set(id, colors)
+                setImageColors(colors)
                 bitmap.close()
             })
             .catch(() => {})
+        return () => { cancelled = true }
     }, [currImgWrapper, isOnCard])
 
 
