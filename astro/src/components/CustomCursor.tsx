@@ -82,14 +82,18 @@ export const CustomCursor = () => {
         >
             <motion.div
                 layout
-                className={`text-neutral-100 overflow-hidden ${isTitle ? "px-5 py-2" : isIcon ? "p-2" : "size-6"} ${!isTitle ? "mix-blend-luminosity" : ""}`}
+                className={`text-neutral-100 overflow-hidden ${isTitle ? "px-5 py-2" : isIcon ? "p-2" : "size-6"}`}
                 animate={{
                     opacity: cursor.type === "hidden" ? 0 : 1,
                     scale: isTitle ? 1 : cursor.type === "hidden" ? 0.5 : 1,
                     borderRadius: isTitle ? 6 : isIcon ? 24 : 12,
-                    backgroundColor: "rgba(38, 38, 38, 0.7)",
-                    boxShadow: "0 0 0 2px rgba(245, 245, 245, 0.3)",
-                    backdropFilter: isTitle ? "blur(12px)" : "blur(2px)",
+                    backgroundColor: isTitle
+                        ? "rgba(28, 28, 30, 0.55)"
+                        : "rgba(255, 255, 255, 0.55)",
+                    boxShadow: isTitle
+                        ? "0px 0px 0px 1px rgba(255, 255, 255, 0.3), 0px 0px 0px 0px rgba(255, 255, 255, 0), 0px 10px 28px 0px rgba(0, 0, 0, 0.4)"
+                        : "0px 0px 0px 1.5px rgba(255, 255, 255, 1), 0px 0px 6px 0px rgba(255, 255, 255, 0.5), 0px 0px 20px 4px rgba(255, 255, 255, 0.28)",
+                    backdropFilter: isTitle ? "blur(12px)" : "blur(0px)",
                 }}
                 initial={false}
                 transition={{
