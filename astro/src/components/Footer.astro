@@ -3,47 +3,67 @@ const year = new Date().getFullYear();
 ---
 
 <footer
+    id="site-footer"
     class="flex items-center gap-4 md:gap-6 w-[93vw] mx-auto py-7 md:py-9 select-none"
 >
-    <div class="footer-line-left flex-1 h-px bg-neutral-700/40"></div>
-    <span class="footer-year text-[10px] tracking-[0.3em] text-neutral-500/40">
-        {year}
+    <span class="footer-text footer-text-left text-[10px] tracking-[0.3em] uppercase text-neutral-500/40">
+        © Leopold Blum {year}
     </span>
-    <div class="footer-line-right flex-1 h-px bg-neutral-700/40"></div>
+    <div class="footer-line flex-1 h-px bg-neutral-700/40"></div>
+    <span class="footer-text footer-text-right text-[10px] tracking-[0.3em] uppercase text-neutral-500/40">
+        Berlin
+    </span>
 </footer>
 
 <style>
-    .footer-line-left {
+    .footer-text {
+        line-height: 1;
+        opacity: 0;
+        transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .footer-line {
         transform: scaleX(0);
         transform-origin: left;
-        animation: drawLine 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+        transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
     }
 
-    .footer-line-right {
-        transform: scaleX(0);
-        transform-origin: right;
-        animation: drawLine 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    #site-footer.is-visible .footer-text {
+        opacity: 1;
     }
 
-    .footer-year {
-        animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+    #site-footer.is-visible .footer-text-right {
+        transition-delay: 0.4s;
     }
 
-    @keyframes drawLine {
-        from {
-            transform: scaleX(0);
-        }
-        to {
-            transform: scaleX(1);
-        }
+    #site-footer.is-visible .footer-line {
+        transform: scaleX(1);
     }
 
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
+    @media (prefers-reduced-motion: reduce) {
+        .footer-text,
+        .footer-line {
+            transition: none;
         }
     }
 </style>
+
+<script>
+    function setupFooterReveal() {
+        const footer = document.getElementById("site-footer");
+        if (!footer) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    footer.classList.add("is-visible");
+                    observer.disconnect();
+                }
+            },
+            { rootMargin: "0px 0px -10% 0px" }
+        );
+        observer.observe(footer);
+    }
+
+    setupFooterReveal();
+    document.addEventListener("astro:after-swap", setupFooterReveal);
+</script>
